@@ -114,50 +114,50 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BET-01 | TBD | Pending |
-| BET-02 | TBD | Pending |
-| BET-03 | TBD | Pending |
-| BET-04 | TBD | Pending |
-| BET-05 | TBD | Pending |
-| BET-06 | TBD | Pending |
-| BET-07 | TBD | Pending |
-| MKT-01 | TBD | Pending |
-| MKT-02 | TBD | Pending |
-| MKT-03 | TBD | Pending |
-| MKT-04 | TBD | Pending |
-| RES-01 | TBD | Pending |
-| RES-02 | TBD | Pending |
-| RES-03 | TBD | Pending |
-| RES-04 | TBD | Pending |
-| RES-05 | TBD | Pending |
-| RES-06 | TBD | Pending |
-| RES-07 | TBD | Pending |
-| RES-08 | TBD | Pending |
-| RES-09 | TBD | Pending |
-| UX-01 | TBD | Pending |
-| UX-02 | TBD | Pending |
-| UX-03 | TBD | Pending |
-| UX-04 | TBD | Pending |
-| UX-05 | TBD | Pending |
-| UX-06 | TBD | Pending |
-| UX-07 | TBD | Pending |
-| UX-08 | TBD | Pending |
-| INF-01 | TBD | Pending |
-| INF-02 | TBD | Pending |
-| INF-03 | TBD | Pending |
-| INF-04 | TBD | Pending |
-| INF-05 | TBD | Pending |
-| INF-06 | TBD | Pending |
-| INF-07 | TBD | Pending |
-| RTG-01 | TBD | Pending |
-| RTG-02 | TBD | Pending |
-| RTG-03 | TBD | Pending |
+| BET-01 | Phase 5: Encrypted Betting | Pending |
+| BET-02 | Phase 5: Encrypted Betting | Pending |
+| BET-03 | Phase 5: Encrypted Betting | Pending |
+| BET-04 | Phase 5: Encrypted Betting | Pending |
+| BET-05 | Phase 5: Encrypted Betting | Pending |
+| BET-06 | Phase 5: Encrypted Betting | Pending |
+| BET-07 | Phase 5: Encrypted Betting | Pending |
+| MKT-01 | Phase 2: Market Creation | Pending |
+| MKT-02 | Phase 2: Market Creation | Pending |
+| MKT-03 | Phase 2: Market Creation | Pending |
+| MKT-04 | Phase 1: Foundation | Pending |
+| RES-01 | Phase 6: Resolution & Payouts | Pending |
+| RES-02 | Phase 6: Resolution & Payouts | Pending |
+| RES-03 | Phase 8: Dispute System | Pending |
+| RES-04 | Phase 8: Dispute System | Pending |
+| RES-05 | Phase 8: Dispute System | Pending |
+| RES-06 | Phase 8: Dispute System | Pending |
+| RES-07 | Phase 6: Resolution & Payouts | Pending |
+| RES-08 | Phase 6: Resolution & Payouts | Pending |
+| RES-09 | Phase 6: Resolution & Payouts | Pending |
+| UX-01 | Phase 7: Core UI Integration | Pending |
+| UX-02 | Phase 7: Core UI Integration | Pending |
+| UX-03 | Phase 7: Core UI Integration | Pending |
+| UX-04 | Phase 9: Portfolio & Search | Pending |
+| UX-05 | Phase 9: Portfolio & Search | Pending |
+| UX-06 | Phase 4: Design System & Fog | Pending |
+| UX-07 | Phase 4: Design System & Fog | Pending |
+| UX-08 | Phase 9: Portfolio & Search | Pending |
+| INF-01 | Phase 1: Foundation | Pending |
+| INF-02 | Phase 3: Arcium MPC Core | Pending |
+| INF-03 | Phase 3: Arcium MPC Core | Pending |
+| INF-04 | Phase 5: Encrypted Betting | Pending |
+| INF-05 | Phase 1: Foundation | Pending |
+| INF-06 | Phase 4: Design System & Fog | Pending |
+| INF-07 | Phase 3: Arcium MPC Core | Pending |
+| RTG-01 | Phase 10: RTG Submission | Pending |
+| RTG-02 | Phase 10: RTG Submission | Pending |
+| RTG-03 | Phase 10: RTG Submission | Pending |
 
 **Coverage:**
-- v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33 ⚠️
+- v1 requirements: 38 total
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-02*
-*Last updated: 2026-03-02 after initial definition*
+*Last updated: 2026-03-02 after roadmap creation*
