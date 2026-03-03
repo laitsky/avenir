@@ -5,3 +5,9 @@ nodes = 2
 localnet_timeout_secs = 60
 # MPC backends this MXE supports (default: ["Cerberus"])
 backends = ["Cerberus"]
+
+[devnet]
+# Arcium devnet cluster offset
+# Used by getArciumEnv() when ARCIUM_CLUSTER=devnet
+cluster_offset = 456
+backends = ["Cerberus"]
