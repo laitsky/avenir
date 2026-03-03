@@ -1,0 +1,113 @@
+name: Arcium MPC Tests
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "tests/**"
+      - "programs/**"
+      - "encrypted-ixs/**"
+      - "Anchor.toml"
+      - "Arcium.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tests/**"
+      - "programs/**"
+      - "encrypted-ixs/**"
+      - "Anchor.toml"
+      - "Arcium.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  arcium-test:
+    name: Run MPC Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Cargo registry and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Configure Solana
+        run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+          solana --version
+          solana-keygen new --no-bip39-passphrase
+
+      - name: Cache Anchor CLI
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/avm
+            ~/.cargo/bin/anchor
+            ~/.avm
+          key: ${{ runner.os }}-anchor-0.32.1
+          restore-keys: |
+            ${{ runner.os }}-anchor-
+
+      - name: Install Anchor CLI
+        run: |
+          if ! command -v anchor &> /dev/null || [[ "$(anchor --version)" != *"0.32.1"* ]]; then
+            cargo install --git https://github.com/coral-xyz/anchor avm --force
+            avm install 0.32.1
+            avm use 0.32.1
+          fi
+          anchor --version
+
+      - name: Install Arcium CLI
+        run: |
+          curl -L https://github.com/arcium-hq/arcium-cli/releases/download/v0.8.5/arcium-cli-x86_64-unknown-linux-gnu -o /usr/local/bin/arcium
+          chmod +x /usr/local/bin/arcium
+          arcium --version
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install Node dependencies
+        run: bun install
+
+      - name: Build Arcium circuits
+        run: arcium build
+
+      - name: Run MPC tests
+        run: arcium test
