@@ -1,18 +1,38 @@
 # Arcium MPC Latency Benchmark
 
 **Date:** 2026-03-03
-**Environment:** Arcium devnet (cluster offset 456) -- PLACEHOLDER: not yet measured
+**Environment:** Arcium devnet (cluster offset 456)
 **Circuit:** update_pool (pool accumulation + sentiment bucket computation)
 **Methodology:** N=10 sequential update_pool calls, each measuring encrypt + submit + MPC phases
 **ACU Cost:** 558,000,000 ACUs (from `arcium build` output)
+**Document Status:** ESTIMATED -- blocked by Arcium devnet DKG ceremony non-functional
 
-> **IMPORTANT: PLACEHOLDER DATA**
+> **ESTIMATED DATA -- Arcium Devnet DKG Non-Functional**
 >
-> The latency numbers in this document are **estimates, not measurements**. Actual benchmark
-> execution was blocked by infrastructure constraints (see [Blockers](#blockers) section below).
-> The benchmark script (`tests/mpc/benchmark.ts`) is ready to run when the infrastructure
-> issues are resolved. All numbers below should be replaced with actual measurements before
-> RTG submission (Phase 10).
+> The latency numbers in this document are **estimates, not measurements**. The Avenir program was
+> successfully deployed to Arcium devnet and the MXE account was initialized, but the benchmark
+> could not be executed because the **DKG (Distributed Key Generation) ceremony is not completing
+> on Arcium devnet**. As of 2026-03-03, 0 out of 142 MXE accounts on devnet have completed DKG.
+> `getMXEPublicKey()` returns `null` for all accounts, which blocks all encryption and MPC
+> computation. The benchmark script (`tests/mpc/benchmark.ts`) is ready to run when the DKG
+> issue is resolved by the Arcium team.
+
+## Devnet Deployment Status
+
+The following infrastructure is deployed and verified on Arcium devnet:
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Avenir Solana Program | Deployed | Program ID: `PjLEXWGmgCA78MTaK9fN1k4muUiis2gdkUkrXRHRUkN` |
+| MXE Account | Initialized | Cluster offset 456, status: active |
+| DKG Ceremony | NOT COMPLETED | 0/142 MXE accounts have completed DKG on devnet |
+| getMXEPublicKey() | Returns null | Blocks all client-side encryption |
+| Benchmark Script | Ready | Adapted for devnet (wallet transfers, retry logic) |
+| GitHub Actions CI | Passing | `arcium build` validates program + circuit compilation |
+
+**What works:** Program deployment, MXE initialization, creator whitelisting, benchmark script setup through "Creator whitelisted" step.
+
+**What is blocked:** Any operation requiring encryption (getMXEPublicKey, encryptBetInput, update_pool MPC calls) because DKG has not completed for any MXE account on the network.
 
 ## Estimated Results
 
@@ -44,7 +64,7 @@ These estimates are derived from:
 
 4. **Total:** Sum of phases. The MPC computation phase dominates end-to-end latency.
 
-### Estimated Individual Runs -- PLACEHOLDER
+### Estimated Individual Runs
 
 | Run | Encrypt | Submit | MPC | Total | Target |
 |-----|---------|--------|-----|-------|--------|
@@ -59,13 +79,13 @@ These estimates are derived from:
 | 9 | ~2ms | ~550ms | ~3,400ms | ~3,952ms | PASS |
 | 10 | ~2ms | ~600ms | ~2,800ms | ~3,402ms | PASS |
 
-*All values are estimates. Run 1 and 8 show expected cold-start and outlier variance.*
+*All values are estimates based on Arcium documentation and Solana devnet benchmarks. Actual measurement blocked by DKG ceremony failure.*
 
 ## Viability Assessment
 
 ### Target: < 5 seconds end-to-end
 
-**Assessment: CONDITIONAL (estimated, pending actual measurement)**
+**Assessment: CONDITIONAL (estimated -- actual measurement blocked by Arcium devnet DKG)**
 
 Based on estimated latency:
 
@@ -74,7 +94,7 @@ Based on estimated latency:
 - **Estimated P95 total:** ~7,750ms (over 5s target)
 - **Estimated pass rate:** ~80% (8/10 under target)
 
-**Interpretation (subject to validation):**
+**Interpretation (pending validation when DKG is resolved):**
 
 The sequential lock approach is likely viable for v1 UX, with most bet placements completing
 under the 5-second target. However, tail latency (P95) may exceed the target significantly,
@@ -88,7 +108,7 @@ meaning some users will experience 7-8 second waits. Per CONTEXT.md decision:
   - Parallel MPC: if Arcium supports concurrent computations per circuit
   - Network improvements: Arcium mainnet may have better latency than devnet
 
-### Observations (Expected)
+### Observations (Estimated)
 
 - **MPC computation dominates:** Estimated ~88% of total latency is MPC processing time.
   Client encryption is negligible (<0.1%). Solana transaction submission is ~12%.
@@ -113,35 +133,48 @@ meaning some users will experience 7-8 second waits. Per CONTEXT.md decision:
 
 ## Blockers
 
-The benchmark script (`tests/mpc/benchmark.ts`) could not be executed due to:
+### Resolved
 
-1. **Docker ARM64 incompatibility:** The Arcium ARX node Docker image is only available for
-   x86_64 architecture. On Apple Silicon (M-series), it runs under Rosetta emulation which
-   causes reliability issues with the `arcium test` local test infrastructure.
+1. **Docker ARM64 incompatibility** -- RESOLVED via GitHub Actions CI (03-06).
+   The Arcium ARX node Docker image is x86_64 only. GitHub Actions ubuntu-latest runner
+   provides x86_64 environment for `arcium build` verification.
 
-2. **arcium-cli startup timeout:** The `arcium test` command has a hardcoded validator startup
-   timeout that does not respect the `startup_wait` configuration in `Anchor.toml`. The
-   solana-test-validator works standalone but fails to initialize within the CLI's timeout
-   window when loading genesis accounts through `arcium test`.
+2. **arcium-cli startup timeout** -- RESOLVED (workaround: devnet deployment bypasses localnet).
+   The `arcium test` command has a hardcoded validator startup timeout. Devnet deployment
+   eliminates the need for local test infrastructure.
 
-3. **No devnet deployment yet:** Devnet deployment requires SOL for fees and a working
-   `arcium deploy --cluster devnet` command. The program builds successfully but has not
-   been deployed to devnet.
+3. **No devnet deployment** -- RESOLVED (03-07).
+   Program deployed to devnet at `PjLEXWGmgCA78MTaK9fN1k4muUiis2gdkUkrXRHRUkN`.
+   MXE account initialized with cluster offset 456.
+
+### Active
+
+4. **Arcium devnet DKG ceremony non-functional** -- BLOCKING
+   The Distributed Key Generation (DKG) ceremony is not completing for ANY MXE account on
+   Arcium devnet. As of 2026-03-03:
+   - 0 out of 142 MXE accounts have completed DKG
+   - `getMXEPublicKey()` returns `null` for all accounts
+   - This blocks ALL encryption and MPC computation on devnet
+   - The issue is network-wide, not specific to Avenir's MXE account
+   - Root cause: Arcium devnet infrastructure issue (not an application bug)
 
 ### Resolution Path
 
-1. **Short-term:** Wait for Arcium to release ARM64-native Docker images, or
-   use an x86_64 CI runner (GitHub Actions) to execute the benchmark
-2. **Medium-term:** File issue with Arcium team about `arcium test` startup timeout
-   not respecting `Anchor.toml` settings
-3. **Phase 10 (RTG):** Before RTG submission, execute benchmark on devnet and replace
-   all placeholder values with actual measurements
+1. **Short-term:** Monitor Arcium devnet DKG status. When DKG completes for Avenir's MXE
+   account, run the benchmark immediately:
+   ```bash
+   bun run ts-mocha -p ./tsconfig.json -t 1000000 "tests/mpc/benchmark.ts"
+   ```
+2. **Medium-term:** Engage Arcium team about devnet DKG completion timeline
+3. **Phase 10 (RTG):** Before RTG submission, replace all estimated values with actual
+   measurements once DKG is functional
 
 ## Implications for Future Phases
 
 - **Phase 5 (Encrypted Betting):** Sequential lock UX design should assume 3-5s average
   latency for update_pool. UI should show a progress indicator during MPC computation.
   If actual latency exceeds 5s consistently, consider SCAL-01 batched epoch model.
+  **Note:** Phase 5 implementation is blocked by the same DKG issue until resolved.
 
 - **Phase 6 (Resolution):** compute_payouts circuit is simpler than update_pool (no
   comparisons needed -- just division and multiplication for payout calculation). Expected
@@ -159,6 +192,6 @@ The benchmark script (`tests/mpc/benchmark.ts`) could not be executed due to:
 
 ---
 
-*Document Status: PLACEHOLDER -- pending actual benchmark execution*
-*Benchmark Script: tests/mpc/benchmark.ts (ready to run)*
+*Document Status: ESTIMATED -- blocked by Arcium devnet DKG ceremony non-functional*
+*Benchmark Script: tests/mpc/benchmark.ts (ready to run when DKG completes)*
 *Last Updated: 2026-03-03*
