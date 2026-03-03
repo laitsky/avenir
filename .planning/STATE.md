@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-03T03:06:22.766Z"
+status: phase-complete
+last_updated: "2026-03-03T03:12:32Z"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,32 +23,33 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 2 of 10 (Market Creation)
-Plan: 1 of 2 in current phase
-Status: In Progress
-Last activity: 2026-03-03 -- Completed 02-01-PLAN.md (Whitelist & Market Creation)
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase Complete
+Last activity: 2026-03-03 -- Completed 02-02-PLAN.md (Cancel Market & Integration Tests)
 
-Progress: [▓▓▓░░░░░░░] 12%
+Progress: [▓▓▓▓▓░░░░░] 15%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 8min
-- Total execution time: 0.52 hours
+- Total plans completed: 5
+- Average duration: 7min
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
-| 2. Market Creation | 1 | 2min | 2min |
+| 2. Market Creation | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 14min, 5min, 10min, 2min
+- Last 5 plans: 14min, 5min, 10min, 2min, 4min
 - Trend: improving
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
+| Phase 02 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - [01-03]: Docker not installed -- Phase 3 prerequisite for arcium test
 - [02-01]: Used Anchor seeds constraint with config.market_counter.checked_add(1) directly -- no param-based fallback needed
 - [02-01]: CreatorWhitelist PDA closed on removal (rent returned to admin) rather than soft-delete
+- [02-02]: Close vault token account via CPI BEFORE Anchor closes Market PDA -- ordering required because Market PDA signs for vault authority
+- [02-02]: Replaced fake usdcMint keypair in tests with real createMint for proper token account integration
 
 ### Pending Todos
 
@@ -89,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-02-PLAN.md (Phase 2 complete)
 Resume file: None

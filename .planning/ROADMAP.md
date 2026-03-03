@@ -36,7 +36,7 @@ Phase 1: Foundation (both tracks)
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Solana program skeleton, account model, USDC vault, and frontend scaffolding
-- [ ] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
+- [x] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
 - [ ] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption
 - [ ] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
 - [ ] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
@@ -76,8 +76,8 @@ Plans:
   4. Transactions submitted after market deadline are rejected by the program
 
 Plans:
-- [ ] 02-01: CreatorWhitelist PDA, add/remove creator, create_market with vault init and all validations
-- [ ] 02-02: cancel_market instruction and comprehensive integration tests
+- [x] 02-01: CreatorWhitelist PDA, add/remove creator, create_market with vault init and all validations
+- [x] 02-02: cancel_market instruction and comprehensive integration tests
 
 ### Phase 3: Arcium MPC Core
 **Goal**: The encrypted state relay pattern is validated — ciphertext stored on-chain can be passed into an MPC computation and updated via callback — and users can encrypt data client-side
@@ -234,8 +234,8 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
-| 2. Market Creation | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete | 2026-03-02 |
+| 2. Market Creation | 2/2 | Complete | 2026-03-03 |
 | 3. Arcium MPC Core | 0/5 | Not started | - |
 | 4. Design System & Fog | 0/5 | Not started | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
