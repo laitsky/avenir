@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 1 of 10 (Foundation)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing
-Last activity: 2026-03-03 -- Completed 01-01-PLAN.md (Solana program scaffold)
+Last activity: 2026-03-03 -- Completed 01-02-PLAN.md (TanStack Start frontend scaffold)
 
-Progress: [▓░░░░░░░░░] 2%
+Progress: [▓▓░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 14min
-- Total execution time: 0.23 hours
+- Total plans completed: 2
+- Average duration: 10min
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1 | 14min | 14min |
+| 1. Foundation | 2 | 19min | 10min |
 
 **Recent Trend:**
-- Last 5 plans: 14min
-- Trend: baseline
+- Last 5 plans: 14min, 5min
+- Trend: improving
 
 *Updated after each plan completion*
 
@@ -51,6 +51,9 @@ Recent decisions affecting current work:
 - [01-01]: Pinned blake3 to 1.6.1 to avoid constant_time_eq edition2024 incompatibility
 - [01-01]: Used anchor init + manual Arcium structure (Docker not installed for arcium init)
 - [01-01]: Used Solana CLI 3.0.15 (latest stable) instead of 2.3.0
+- [01-02]: Used bun create @tanstack/start scaffold then customized (CLI pre-configured shadcn/ui)
+- [01-02]: Dark-first theme with oklch CSS variables (no light/dark toggle in Phase 1)
+- [01-02]: Skipped postcss.config.js -- @tailwindcss/vite handles CSS natively without PostCSS
 
 ### Pending Todos
 
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 01-01-PLAN.md
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
