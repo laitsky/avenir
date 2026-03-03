@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-03T16:03:35Z"
+last_updated: "2026-03-03T16:08:57Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 15
 ---
 
 # Project State
@@ -23,17 +23,17 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 4 of 10 (Design System & Fog) -- IN PROGRESS
-Plan: 1 of 4 in current phase (1 complete)
+Plan: 3 of 4 in current phase (3 complete)
 Status: Executing Phase 4
-Last activity: 2026-03-03 -- Completed 04-01-PLAN.md (Design Tokens & Fog Overlay)
+Last activity: 2026-03-03 -- Completed 04-03-PLAN.md (Market Detail Page)
 
-Progress: [▓▓▓▓▓▓▓▓▓░░] 36%
+Progress: [▓▓▓▓▓▓▓▓▓▓░] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 8min
+- Total plans completed: 15
+- Average duration: 7min
 - Total execution time: 1.6 hours
 
 **By Phase:**
@@ -43,11 +43,11 @@ Progress: [▓▓▓▓▓▓▓▓▓░░] 36%
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
-| 4. Design System & Fog | 1/4 | 2min | 2min |
+| 4. Design System & Fog | 3/4 | 6min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 2min, 45min, 8min, 2min
-- Trend: Phase 4 started (04-01 fast -- CSS tokens + single component)
+- Last 5 plans: 45min, 8min, 2min, 2min, 2min
+- Trend: Phase 4 progressing fast (04-01, 04-02, 04-03 all 2min -- tokens + components + detail page)
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -60,6 +60,8 @@ Progress: [▓▓▓▓▓▓▓▓▓░░] 36%
 | Phase 03 P05 | 2min | 2 tasks | 3 files |
 | Phase 03 P07 | 8min | 1 tasks | 1 files |
 | Phase 04 P01 | 2min | 2 tasks | 2 files |
+| Phase 04 P02 | 2min | 2 tasks | 3 files |
+| Phase 04 P03 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -114,6 +116,11 @@ Recent decisions affecting current work:
 - [03-07]: Estimated latency numbers retained with ESTIMATED label -- will be replaced with actual measurements when DKG completes
 - [04-01]: Fog reveal uses opacity fade (GPU-composited) not blur value transition for performance
 - [04-01]: Fog drift animation removed when revealed=true (no animating invisible elements)
+- [04-02]: 10 mock markets (not 8) for richer category distribution and dev data variety
+- [04-02]: CountdownTimer urgency threshold at <1h uses destructive-foreground color
+- [04-02]: CVA card variants: live (hover border) vs resolved (dimmed opacity)
+- [04-03]: Used CountdownTimer from Plan 02 (already available) instead of fallback date display
+- [04-03]: lg:top-20 for sticky bet panel positioning accounts for header height (~5rem)
 
 ### Pending Todos
 
@@ -129,6 +136,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 04-01-PLAN.md
-Resume file: .planning/phases/04-design-system-fog/04-01-SUMMARY.md
-Note: Phase 4 Plan 1 complete -- forest/fog design tokens and FogOverlay component. Ready for Plan 2 (market cards).
+Stopped at: Completed 04-03-PLAN.md
+Resume file: .planning/phases/04-design-system-fog/04-03-SUMMARY.md
+Note: Phase 4 Plan 3 complete -- market detail page with sidebar layout, fog overlays, and bet placement form. Ready for Plan 4 (layout shells / homepage feed).
