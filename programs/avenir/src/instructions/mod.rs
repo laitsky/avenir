@@ -4,6 +4,7 @@ pub mod create_market;
 pub mod initialize;
 pub mod remove_creator;
 
+#[allow(ambiguous_glob_reexports)]
 pub use add_creator::*;
 pub use cancel_market::*;
 pub use create_market::*;
