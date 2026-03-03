@@ -92,14 +92,17 @@ Plans:
   4. Client-side encryption via @arcium-hq/client produces ciphertext that the MPC circuit can consume
   5. MPC latency benchmarked on devnet (establishes whether sequential lock is viable UX)
 
-**Plans:** 6/6 plans complete
+**Plans:** 8/8 plans complete
 
 Plans:
-- [ ] 03-01-PLAN.md — Docker install, Arcium Rust deps, hello-world circuit lifecycle (Wave 1)
-- [ ] 03-02-PLAN.md — MarketPool PDA, update_pool circuit with sentiment, all MPC instructions (Wave 2)
-- [ ] 03-03-PLAN.md — Encrypted state relay integration test, reusable MPC test helpers (Wave 3)
-- [ ] 03-04-PLAN.md — Client-side encryption via @arcium-hq/client end-to-end validation (Wave 4)
-- [ ] 03-05-PLAN.md — Devnet deployment, latency benchmark, BENCHMARK.md (Wave 5)
+- [x] 03-01: Docker install, Arcium Rust deps, hello-world circuit lifecycle (Wave 1)
+- [x] 03-02a: MarketPool PDA, update_pool circuit with sentiment (Wave 2)
+- [x] 03-02b: MPC callback, init_pool, update_pool instructions (Wave 2)
+- [x] 03-03: Encrypted state relay integration test, reusable MPC test helpers (Wave 3)
+- [x] 03-04: Client-side encryption via @arcium-hq/client end-to-end validation (Wave 4)
+- [x] 03-05: Devnet benchmark config and BENCHMARK.md with placeholder latency (Wave 5)
+- [x] 03-06: GitHub Actions CI for arcium build verification (Wave 6)
+- [x] 03-07: Devnet deployment and benchmark execution -- DKG blocker documented (Wave 7)
 
 ### Phase 4: Design System & Fog
 **Goal**: The forest/fog design system is built with reusable tokens, components, and fog gradient primitives — all using mock data so it doesn't depend on on-chain work
@@ -238,7 +241,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
-| 3. Arcium MPC Core | 6/6 | Complete   | 2026-03-03 |
+| 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
 | 4. Design System & Fog | 0/5 | Not started | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
