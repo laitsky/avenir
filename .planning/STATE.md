@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-03T07:43:44Z"
+last_updated: "2026-03-03T07:52:45.931Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 3 of 10 (Arcium MPC Core)
-Plan: 4 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In Progress
-Last activity: 2026-03-03 -- Completed 03-03-PLAN.md (Encrypted State Relay POC)
+Last activity: 2026-03-03 -- Completed 03-04-PLAN.md (Client-Side Encryption Validation)
 
-Progress: [▓▓▓▓▓▓▓▓▓░] 27%
+Progress: [▓▓▓▓▓▓▓▓▓░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 10min
-- Total execution time: 1.3 hours
+- Total plans completed: 10
+- Average duration: 9min
+- Total execution time: 1.4 hours
 
 **By Phase:**
 
@@ -42,11 +42,11 @@ Progress: [▓▓▓▓▓▓▓▓▓░] 27%
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
-| 3. Arcium MPC Core | 4 | 48min | 12min |
+| 3. Arcium MPC Core | 5 | 51min | 10min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 25min, 8min, 11min, 4min
-- Trend: variable (Phase 3 higher complexity)
+- Last 5 plans: 25min, 8min, 11min, 4min, 3min
+- Trend: stabilizing (Phase 3 complexity decreasing as patterns established)
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -55,6 +55,7 @@ Progress: [▓▓▓▓▓▓▓▓▓░] 27%
 | Phase 03 P02a | 8min | 2 tasks | 5 files |
 | Phase 03 P02b | 11min | 2 tasks | 11 files |
 | Phase 03 P03 | 4min | 2 tasks | 3 files |
+| Phase 03 P04 | 3min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,9 @@ Recent decisions affecting current work:
 - [03-03]: Typed interfaces (ArciumContext, EncryptedBetInput, etc.) for strong test helper typing
 - [03-03]: initCompDef uses switch-case dispatch on circuit name for typed Anchor method calls
 - [03-03]: Sequential test accumulation -- Tests 1-3 share market state for cumulative pool validation
+- [03-04]: Direct @arcium-hq/client SDK usage in tests (no wrapper) to prove raw SDK flow for Phase 7 frontend
+- [03-04]: Separate cipher.encrypt() calls per field (isYes, amount) matching update_pool's separate [u8; 32] args
+- [03-04]: 3 unique x25519 keypairs in multi-user test to prove independent shared secrets work with same pool
 
 ### Pending Todos
 
@@ -112,6 +116,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 03-03-PLAN.md (Encrypted State Relay POC)
+Stopped at: Completed 03-04-PLAN.md (Client-Side Encryption Validation)
 Resume file: None
 Note: Docker Desktop needs EULA acceptance before arcium test can validate MPC integration tests

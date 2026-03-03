@@ -238,7 +238,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
-| 3. Arcium MPC Core | 2/6 | In Progress | - |
+| 3. Arcium MPC Core | 5/6 | In Progress | - |
 | 4. Design System & Fog | 0/5 | Not started | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |

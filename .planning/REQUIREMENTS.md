@@ -55,7 +55,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [ ] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
 - [x] **INF-05**: Frontend built with TanStack Start, Tailwind v4, shadcn/ui
 - [ ] **INF-06**: Forest/fog design system — deep forest green, sage, muted gold accents, warm dark background
-- [ ] **INF-07**: Client-side encryption via @arcium-hq/client (x25519 key exchange, RescueCipher)
+- [x] **INF-07**: Client-side encryption via @arcium-hq/client (x25519 key exchange, RescueCipher)
 
 ### RTG Submission
 
@@ -148,7 +148,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INF-04 | Phase 5: Encrypted Betting | Pending |
 | INF-05 | Phase 1: Foundation | Complete |
 | INF-06 | Phase 4: Design System & Fog | Pending |
-| INF-07 | Phase 3: Arcium MPC Core | Pending |
+| INF-07 | Phase 3: Arcium MPC Core | Complete |
 | RTG-01 | Phase 10: RTG Submission | Pending |
 | RTG-02 | Phase 10: RTG Submission | Pending |
 | RTG-03 | Phase 10: RTG Submission | Pending |
