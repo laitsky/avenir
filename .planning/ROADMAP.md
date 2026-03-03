@@ -35,7 +35,7 @@ Phase 1: Foundation (both tracks)
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Solana program skeleton, account model, USDC vault, and frontend scaffolding
+- [x] **Phase 1: Foundation** - Solana program skeleton, account model, USDC vault, and frontend scaffolding
 - [ ] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
 - [ ] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption
 - [ ] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
@@ -61,8 +61,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01: Solana program scaffold with Anchor 0.32.1, account model, and USDC vault
-- [ ] 01-02: TanStack Start frontend scaffold with Tailwind v4 and shadcn/ui
-- [ ] 01-03: Arcium project initialization and toolchain validation
+- [x] 01-02: TanStack Start frontend scaffold with Tailwind v4 and shadcn/ui
+- [x] 01-03: Arcium project initialization and toolchain validation
 
 ### Phase 2: Market Creation
 **Goal**: Whitelisted addresses can create binary markets that enforce deadlines and organize by category
