@@ -1,9 +1,10 @@
-name: Arcium Build
+name: Arcium MPC Tests
 
 on:
   push:
     branches: [main, master]
     paths:
+      - "tests/**"
       - "programs/**"
       - "encrypted-ixs/**"
       - "Anchor.toml"
@@ -13,6 +14,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "tests/**"
       - "programs/**"
       - "encrypted-ixs/**"
       - "Anchor.toml"
@@ -26,10 +28,10 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  arcium-build:
-    name: Build Programs & Circuits
+  arcium-test:
+    name: Run MPC Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -89,5 +91,21 @@ jobs:
           arcup install
           arcium --version
 
-      - name: Build Arcium programs and circuits
-        run: arcium build
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install Node dependencies
+        run: bun install
+
+      - name: Build and run MPC tests
+        run: arcium test
