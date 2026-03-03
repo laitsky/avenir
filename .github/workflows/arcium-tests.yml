@@ -26,11 +26,12 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  SOLANA_VERSION: v3.0.15
 
 jobs:
   arcium-test:
     name: Run MPC Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
 
     steps:
@@ -55,14 +56,18 @@ jobs:
 
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/v2.3.0/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/${SOLANA_VERSION}/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       - name: Configure Solana
         run: |
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
-          solana-keygen new --no-bip39-passphrase
+          mkdir -p ~/.config/solana
+          solana-keygen new --no-bip39-passphrase --force --outfile ~/.config/solana/id.json
+          solana config set --keypair ~/.config/solana/id.json
+          solana config set --url http://127.0.0.1:8899
+          solana config get
 
       - name: Cache Anchor CLI
         uses: actions/cache@v4
@@ -107,5 +112,115 @@ jobs:
       - name: Install Node dependencies
         run: bun install
 
+      - name: Preflight local validator (diagnostics)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Tooling versions:"
+          which solana solana-test-validator anchor arcium bun
+          solana --version
+          solana-test-validator --version
+          anchor --version
+          arcium --version
+          bun --version
+
+          echo "Docker status:"
+          docker --version
+          docker info
+
+          echo "Port 8899 availability:"
+          if ss -lnt | awk '{print $4}' | grep -qE '(^|:)8899$'; then
+            echo "ERROR: port 8899 is already in use on the runner."
+            ss -lntp | grep -E '(:|^)8899\\b' || true
+            exit 1
+          fi
+
+          echo "Starting solana-test-validator preflight on :18999..."
+          LOG_PATH="$(mktemp)"
+          solana-test-validator --reset --ledger /tmp/solana-test-ledger --rpc-port 18999 --quiet >"$LOG_PATH" 2>&1 &
+          VALIDATOR_PID="$!"
+
+          ok="false"
+          for _ in $(seq 1 45); do
+            if curl -sS --max-time 1 -X POST -H 'Content-Type: application/json' \
+              -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' \
+              http://127.0.0.1:18999 | grep -q '"result"'; then
+              ok="true"
+              break
+            fi
+            if ! kill -0 "$VALIDATOR_PID" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          kill "$VALIDATOR_PID" 2>/dev/null || true
+          wait "$VALIDATOR_PID" 2>/dev/null || true
+
+          if [[ "$ok" != "true" ]]; then
+            echo "ERROR: solana-test-validator did not become healthy on :18999."
+            echo "---- solana-test-validator log ----"
+            cat "$LOG_PATH" || true
+            exit 1
+          fi
+
+          echo "solana-test-validator preflight OK."
+
       - name: Build and run MPC tests
-        run: arcium test
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Increase logs to make localnet startup failures actionable in CI output.
+          export RUST_LOG="${RUST_LOG:-info}"
+
+          LOG_PATH="${RUNNER_TEMP:-/tmp}/arcium-test.log"
+
+          arcium test 2>&1 | tee "$LOG_PATH" &
+          ARCIUM_PID="$!"
+
+          echo "Waiting for Solana localnet RPC health on :8899..."
+          ok="false"
+          for i in $(seq 1 600); do
+            if curl -sS --max-time 1 -X POST -H 'Content-Type: application/json' \
+              -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' \
+              http://127.0.0.1:8899 | grep -q '"result"'; then
+              ok="true"
+              break
+            fi
+
+            if ! kill -0 "$ARCIUM_PID" 2>/dev/null; then
+              break
+            fi
+
+            if (( i % 30 == 0 )); then
+              echo "Still waiting ($i/600). Process snapshot:"
+              ps aux | grep -E 'solana-test-validator|anchor|arcium' || true
+              ss -lntp || true
+              docker ps || true
+            fi
+
+            sleep 1
+          done
+
+          if [[ "$ok" != "true" ]]; then
+            echo "ERROR: Solana localnet RPC did not become healthy on :8899 within 10 minutes."
+            echo "---- process snapshot ----"
+            ps aux | grep -E 'solana-test-validator|anchor|arcium' || true
+            echo "---- listening ports ----"
+            ss -lntp || true
+            echo "---- .anchor dir ----"
+            ls -la .anchor || true
+            find .anchor -maxdepth 4 -type f -print || true
+            echo "---- docker ps ----"
+            docker ps || true
+            echo "---- last arcium output ----"
+            tail -n 200 "$LOG_PATH" || true
+            kill "$ARCIUM_PID" 2>/dev/null || true
+            wait "$ARCIUM_PID" 2>/dev/null || true
+            exit 1
+          fi
+
+          wait "$ARCIUM_PID"
