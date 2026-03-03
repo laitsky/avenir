@@ -31,7 +31,7 @@ jobs:
   arcium-test:
     name: Run MPC Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -91,6 +91,13 @@ jobs:
           arcup install
           arcium --version
 
+      - name: Verify Docker and pre-pull Arx images
+        run: |
+          docker --version
+          docker info --format '{{.ServerVersion}}' || true
+          # List any arcium images pulled by arcup install
+          docker images | grep -i arcium || echo "No arcium images yet - will be pulled by arcium test"
+
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -111,4 +118,4 @@ jobs:
         run: arcium build
 
       - name: Run MPC tests
-        run: arcium test
+        run: arcium test --skip-build
