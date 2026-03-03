@@ -76,9 +76,8 @@ Plans:
   4. Transactions submitted after market deadline are rejected by the program
 
 Plans:
-- [ ] 02-01: Market creation instruction with whitelist enforcement
-- [ ] 02-02: Category tagging and market metadata storage
-- [ ] 02-03: Deadline validation and market state transitions
+- [ ] 02-01: CreatorWhitelist PDA, add/remove creator, create_market with vault init and all validations
+- [ ] 02-02: cancel_market instruction and comprehensive integration tests
 
 ### Phase 3: Arcium MPC Core
 **Goal**: The encrypted state relay pattern is validated — ciphertext stored on-chain can be passed into an MPC computation and updated via callback — and users can encrypt data client-side
