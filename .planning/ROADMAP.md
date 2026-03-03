@@ -60,7 +60,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Arcium CLI installed and `arcium init` project structure validated
 
 Plans:
-- [ ] 01-01: Solana program scaffold with Anchor 0.32.1, account model, and USDC vault
+- [x] 01-01: Solana program scaffold with Anchor 0.32.1, account model, and USDC vault
 - [ ] 01-02: TanStack Start frontend scaffold with Tailwind v4 and shadcn/ui
 - [ ] 01-03: Arcium project initialization and toolchain validation
 

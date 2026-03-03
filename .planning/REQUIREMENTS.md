@@ -22,7 +22,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [ ] **MKT-01**: Whitelisted address can create a binary market with question, outcomes, deadline, category, and resolution source
 - [ ] **MKT-02**: Markets are organized by category (Politics, Crypto, Sports, Culture, Economics)
 - [ ] **MKT-03**: Bets are rejected after market deadline passes (on-chain timestamp validation)
-- [ ] **MKT-04**: Each market has a PDA-owned USDC vault for fund custody
+- [x] **MKT-04**: Each market has a PDA-owned USDC vault for fund custody
 
 ### Resolution & Disputes
 
@@ -49,7 +49,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INF-01**: Solana program built with Anchor 0.32.1 + Arcium v0.4.0
+- [x] **INF-01**: Solana program built with Anchor 0.32.1 + Arcium v0.4.0
 - [ ] **INF-02**: Four MPC circuits: update_pool, compute_payouts, add_dispute_vote, finalize_dispute
 - [ ] **INF-03**: Encrypted state relay pattern — ciphertext stored on-chain, passed to MPC, updated via callback
 - [ ] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
@@ -124,7 +124,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MKT-01 | Phase 2: Market Creation | Pending |
 | MKT-02 | Phase 2: Market Creation | Pending |
 | MKT-03 | Phase 2: Market Creation | Pending |
-| MKT-04 | Phase 1: Foundation | Pending |
+| MKT-04 | Phase 1: Foundation | Complete |
 | RES-01 | Phase 6: Resolution & Payouts | Pending |
 | RES-02 | Phase 6: Resolution & Payouts | Pending |
 | RES-03 | Phase 8: Dispute System | Pending |
@@ -142,7 +142,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-06 | Phase 4: Design System & Fog | Pending |
 | UX-07 | Phase 4: Design System & Fog | Pending |
 | UX-08 | Phase 9: Portfolio & Search | Pending |
-| INF-01 | Phase 1: Foundation | Pending |
+| INF-01 | Phase 1: Foundation | Complete |
 | INF-02 | Phase 3: Arcium MPC Core | Pending |
 | INF-03 | Phase 3: Arcium MPC Core | Pending |
 | INF-04 | Phase 5: Encrypted Betting | Pending |
