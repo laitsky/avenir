@@ -21,6 +21,37 @@ import {
 import { randomBytes } from "crypto";
 
 // ============================================================================
+// Devnet Helpers
+// ============================================================================
+
+/** Small delay to let devnet blockhash advance between transactions */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Retry a transaction up to maxRetries on blockhash/network errors */
+async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delayMs = 2000): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const msg = err?.toString?.() ?? "";
+      const isRetryable = msg.includes("Blockhash not found") ||
+        msg.includes("fetch failed") ||
+        msg.includes("block height exceeded") ||
+        msg.includes("TransactionExpiredBlockheight");
+      if (isRetryable && attempt < maxRetries) {
+        console.log(`    Retry ${attempt}/${maxRetries} after devnet error: ${msg.slice(0, 80)}`);
+        await sleep(delayMs);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("unreachable");
+}
+
+// ============================================================================
 // Configuration
 // ============================================================================
 
@@ -120,30 +151,36 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
     console.log(`  Target: < ${TARGET_LATENCY_MS}ms end-to-end`);
     console.log("  ============================================\n");
 
-    // 1. Airdrop SOL to test accounts
-    const airdropCreator = await connection.requestAirdrop(
-      creator.publicKey,
-      10 * LAMPORTS_PER_SOL
+    // 1. Fund test accounts (transfer from admin wallet instead of airdrop for devnet reliability)
+    console.log("  Funding test accounts from admin wallet...");
+    const fundCreatorSig = await connection.sendTransaction(
+      new anchor.web3.Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: admin.publicKey,
+          toPubkey: creator.publicKey,
+          lamports: 2 * LAMPORTS_PER_SOL,
+        })
+      ),
+      [payer],
+      { skipPreflight: true }
     );
-    await connection.confirmTransaction(airdropCreator);
+    await connection.confirmTransaction(fundCreatorSig, "confirmed");
+    console.log(`  Funded creator: ${creator.publicKey.toBase58()}`);
 
-    const airdropMintAuth = await connection.requestAirdrop(
-      mintAuthority.publicKey,
-      2 * LAMPORTS_PER_SOL
-    );
-    await connection.confirmTransaction(airdropMintAuth);
-
-    // 2. Create USDC mint (6 decimals)
-    usdcMint = await createMint(
+    // 2. Create USDC mint (6 decimals) -- use admin (payer) as mint payer for devnet reliability
+    await sleep(2000);
+    usdcMint = await withRetry(() => createMint(
       connection,
-      mintAuthority,
-      mintAuthority.publicKey,
+      payer,
+      payer.publicKey,
       null,
       6
-    );
+    ));
+    console.log(`  USDC mint created: ${usdcMint.toBase58()}`);
 
     // 3. Initialize Config PDA
-    await program.methods
+    await sleep(1000);
+    await withRetry(() => program.methods
       .initialize({
         feeRecipient,
         usdcMint,
@@ -154,7 +191,8 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
         config: configPda,
         systemProgram: SystemProgram.programId,
       })
-      .rpc({ commitment: "confirmed" });
+      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    console.log("  Config PDA initialized");
 
     // 4. Whitelist the test creator
     const [whitelistPda] = PublicKey.findProgramAddressSync(
@@ -162,7 +200,8 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
       program.programId
     );
 
-    await program.methods
+    await sleep(1000);
+    await withRetry(() => program.methods
       .addCreator()
       .accounts({
         admin: admin.publicKey,
@@ -171,17 +210,22 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
         creator: creator.publicKey,
         systemProgram: SystemProgram.programId,
       })
-      .rpc({ commitment: "confirmed" });
+      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    console.log("  Creator whitelisted");
 
     // 5. Setup Arcium context
     arciumCtx = await setupArciumContext(provider, program.programId);
+    console.log("  Arcium context initialized");
 
     // 6. Initialize comp_defs
+    await sleep(1000);
     await initCompDef(program, payer, "init_pool", arciumCtx);
+    await sleep(1000);
     await initCompDef(program, payer, "update_pool", arciumCtx);
 
     // 7. Create market and initialize pool
-    const marketResult = await createTestMarket(
+    await sleep(1000);
+    const marketResult = await withRetry(() => createTestMarket(
       program,
       admin,
       creator,
@@ -189,9 +233,10 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
       configPda,
       1,
       { question: "Benchmark market for MPC latency measurement" }
-    );
+    ));
     marketPda = marketResult.marketPda;
     marketPoolPda = marketResult.marketPoolPda;
+    console.log("  Market created");
 
     // 8. Initialize encrypted pool state via init_pool
     const initOffset = new anchor.BN(randomBytes(8), "hex");
@@ -202,7 +247,8 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
       "init_pool"
     );
 
-    await program.methods
+    await sleep(1000);
+    await withRetry(() => program.methods
       .initPool(initOffset)
       .accountsPartial({
         payer: payer.publicKey,
@@ -219,7 +265,8 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
         systemProgram: SystemProgram.programId,
         arciumProgram: initAccounts.arciumProgram,
       })
-      .rpc({ skipPreflight: true, commitment: "confirmed" });
+      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    console.log("  init_pool submitted, awaiting MPC callback...");
 
     await awaitAndVerifyCallback(provider, initOffset, program.programId);
 
@@ -303,6 +350,8 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
       );
 
       // mpc_lock is already released by the callback -- next iteration can proceed
+      // Brief delay between runs to allow devnet blockhash to advance
+      if (i < NUM_RUNS - 1) await sleep(500);
     }
 
     // Print results summary
