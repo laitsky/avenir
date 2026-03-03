@@ -8,3 +8,5 @@ test-ledger
 .pnp.cjs
 .pnp.loader.mjs
 yarn.lock
+artifacts
+build
