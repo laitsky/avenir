@@ -15,4 +15,12 @@ pub mod avenir {
     pub fn initialize(ctx: Context<Initialize>, params: InitializeParams) -> Result<()> {
         instructions::initialize::handler(ctx, params)
     }
+
+    pub fn add_creator(ctx: Context<AddCreator>) -> Result<()> {
+        instructions::add_creator::handler(ctx)
+    }
+
+    pub fn remove_creator(ctx: Context<RemoveCreator>) -> Result<()> {
+        instructions::remove_creator::handler(ctx)
+    }
 }

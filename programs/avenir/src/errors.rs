@@ -12,4 +12,16 @@ pub enum AvenirError {
     InvalidCategory,
     #[msg("Question exceeds maximum length of 200 characters")]
     QuestionTooLong,
+    #[msg("Protocol is paused")]
+    ProtocolPaused,
+    #[msg("Creator is not whitelisted")]
+    CreatorNotWhitelisted,
+    #[msg("Market deadline must be at least 1 hour in the future")]
+    DeadlineTooSoon,
+    #[msg("Resolution source cannot be empty")]
+    EmptyResolutionSource,
+    #[msg("Question cannot be empty")]
+    EmptyQuestion,
+    #[msg("Market has bets and cannot be cancelled")]
+    MarketHasBets,
 }
