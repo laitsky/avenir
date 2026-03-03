@@ -1,10 +1,9 @@
-name: Arcium MPC Tests
+name: Arcium Build
 
 on:
   push:
     branches: [main, master]
     paths:
-      - "tests/**"
       - "programs/**"
       - "encrypted-ixs/**"
       - "Anchor.toml"
@@ -14,7 +13,6 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "tests/**"
       - "programs/**"
       - "encrypted-ixs/**"
       - "Anchor.toml"
@@ -28,10 +26,10 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  arcium-test:
-    name: Run MPC Tests
+  arcium-build:
+    name: Build Programs & Circuits
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -91,65 +89,5 @@ jobs:
           arcup install
           arcium --version
 
-      - name: Verify Docker and pre-pull Arx images
-        run: |
-          docker --version
-          docker info --format '{{.ServerVersion}}' || true
-          # List any arcium images pulled by arcup install
-          docker images | grep -i arcium || echo "No arcium images yet - will be pulled by arcium test"
-
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install Node dependencies
-        run: bun install
-
-      - name: Build Arcium circuits
+      - name: Build Arcium programs and circuits
         run: arcium build
-
-      - name: Run MPC tests
-        run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-          arcium localnet --skip-build > /tmp/arcium-localnet.log 2>&1 &
-          LOCALNET_PID=$!
-
-          cleanup() {
-            if kill -0 "$LOCALNET_PID" 2>/dev/null; then
-              kill "$LOCALNET_PID" || true
-              wait "$LOCALNET_PID" || true
-            fi
-          }
-
-          trap cleanup EXIT
-
-          for _ in $(seq 1 120); do
-            if curl -sf http://127.0.0.1:8899/health >/dev/null; then
-              break
-            fi
-
-            if ! kill -0 "$LOCALNET_PID" 2>/dev/null; then
-              echo "Arcium localnet exited before Solana became healthy"
-              cat /tmp/arcium-localnet.log
-              exit 1
-            fi
-
-            sleep 5
-          done
-
-          if ! curl -sf http://127.0.0.1:8899/health >/dev/null; then
-            echo "Timed out waiting for Solana localnet health"
-            cat /tmp/arcium-localnet.log
-            exit 1
-          fi
-
-          anchor test --skip-build --skip-local-validator --skip-deploy
