@@ -117,8 +117,8 @@ Plans:
   5. Layout shells for homepage feed, detail page, and portfolio page established
 
 Plans:
-- [ ] 04-01: Design tokens (forest/fog oklch palette) and FogOverlay component with reveal animation (Wave 1)
-- [ ] 04-02: Mock market data, CountdownTimer, and MarketCard with fog overlays (Wave 2)
+- [x] 04-01: Design tokens (forest/fog oklch palette) and FogOverlay component with reveal animation (Wave 1)
+- [x] 04-02: Mock market data, CountdownTimer, and MarketCard with fog overlays (Wave 2)
 - [ ] 04-03: Market detail page with sidebar layout and bet placement form (Wave 2)
 - [ ] 04-04: Homepage feed with category tabs, responsive grid, sorting, and portfolio shell (Wave 3)
 
@@ -241,7 +241,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
 | 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
-| 4. Design System & Fog | 0/4 | Not started | - |
+| 4. Design System & Fog | 2/4 | In progress | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
 | 7. Core UI Integration | 0/6 | Not started | - |
