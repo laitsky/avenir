@@ -27,4 +27,8 @@ pub mod avenir {
     pub fn create_market(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result<()> {
         instructions::create_market::handler(ctx, params)
     }
+
+    pub fn cancel_market(ctx: Context<CancelMarket>) -> Result<()> {
+        instructions::cancel_market::handler(ctx)
+    }
 }
