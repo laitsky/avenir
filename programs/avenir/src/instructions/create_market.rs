@@ -91,8 +91,6 @@ pub fn handler(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result
     market.resolution_time = params.resolution_time;
     market.state = 0; // Open
     market.winning_outcome = 0; // None
-    market.yes_pool_encrypted = [0u8; 32];
-    market.no_pool_encrypted = [0u8; 32];
     market.sentiment = 0; // Unknown
     market.total_bets = 0;
     market.creator = ctx.accounts.creator.key();
@@ -102,6 +100,7 @@ pub fn handler(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result
     market.mpc_lock = false;
     market.bump = ctx.bumps.market;
     market.vault_bump = ctx.bumps.market_vault;
+    market.market_pool_bump = 0; // Set when MarketPool is initialized via init_pool MPC
 
     Ok(())
 }

@@ -19,10 +19,6 @@ pub struct Market {
     pub state: u8,
     /// Winning outcome: 0=None, 1=Yes, 2=No
     pub winning_outcome: u8,
-    /// Encrypted Yes pool total (Arcium ciphertext)
-    pub yes_pool_encrypted: [u8; 32],
-    /// Encrypted No pool total (Arcium ciphertext)
-    pub no_pool_encrypted: [u8; 32],
     /// Sentiment bucket: 0=Unknown, 1=LeaningYes, 2=Even, 3=LeaningNo
     pub sentiment: u8,
     /// Total number of bets placed on this market
@@ -43,4 +39,7 @@ pub struct Market {
     /// Vault seeds: [b"vault", market_id.to_le_bytes()]
     /// Vault authority: this Market PDA (token::authority = market)
     pub vault_bump: u8,
+    /// PDA bump seed for the associated MarketPool account
+    /// MarketPool seeds: [b"market_pool", market_id.to_le_bytes()]
+    pub market_pool_bump: u8,
 }
