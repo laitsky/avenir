@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 
 use crate::errors::AvenirError;
-use crate::state::{Config, CreatorWhitelist, Market};
+use crate::state::{Config, CreatorWhitelist, Market, MarketPool};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateMarketParams {
@@ -52,6 +52,17 @@ pub struct CreateMarket<'info> {
     )]
     pub market_vault: Account<'info, TokenAccount>,
 
+    /// MarketPool PDA -- fixed-layout account for encrypted pool state.
+    /// Created alongside Market so init_pool can write to it via callback.
+    #[account(
+        init,
+        payer = creator,
+        space = 8 + MarketPool::INIT_SPACE,
+        seeds = [b"market_pool", config.market_counter.checked_add(1).unwrap().to_le_bytes().as_ref()],
+        bump,
+    )]
+    pub market_pool: Account<'info, MarketPool>,
+
     #[account(
         constraint = usdc_mint.key() == config.usdc_mint @ AvenirError::InvalidMint,
     )]
@@ -100,7 +111,16 @@ pub fn handler(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result
     market.mpc_lock = false;
     market.bump = ctx.bumps.market;
     market.vault_bump = ctx.bumps.market_vault;
-    market.market_pool_bump = 0; // Set when MarketPool is initialized via init_pool MPC
+    market.market_pool_bump = ctx.bumps.market_pool;
+
+    // Initialize MarketPool PDA (empty -- init_pool MPC must be called separately
+    // to populate with valid MXE-encrypted zeros before update_pool can work)
+    let market_pool = &mut ctx.accounts.market_pool;
+    market_pool.market_id = config.market_counter;
+    market_pool.yes_pool_encrypted = [0u8; 32];
+    market_pool.no_pool_encrypted = [0u8; 32];
+    market_pool.nonce = 0;
+    market_pool.bump = ctx.bumps.market_pool;
 
     Ok(())
 }

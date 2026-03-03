@@ -30,4 +30,6 @@ pub enum AvenirError {
     MarketHasBets,
     #[msg("Arcium cluster not set on MXE account")]
     ClusterNotSet,
+    #[msg("Market MPC computation is in progress")]
+    MpcLocked,
 }

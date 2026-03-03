@@ -120,4 +120,74 @@ pub mod avenir {
         );
         Ok(())
     }
+
+    // MPC instructions -- update_pool
+    pub fn init_update_pool_comp_def(ctx: Context<InitUpdatePoolCompDef>) -> Result<()> {
+        instructions::mpc::init_update_pool_comp_def::handler(ctx)
+    }
+
+    pub fn update_pool(
+        ctx: Context<UpdatePool>,
+        computation_offset: u64,
+        is_yes_ciphertext: [u8; 32],
+        amount_ciphertext: [u8; 32],
+        pub_key: [u8; 32],
+        nonce: u128,
+    ) -> Result<()> {
+        instructions::mpc::update_pool::handler(
+            ctx,
+            computation_offset,
+            is_yes_ciphertext,
+            amount_ciphertext,
+            pub_key,
+            nonce,
+        )
+    }
+
+    #[arcium_callback(encrypted_ix = "update_pool")]
+    pub fn update_pool_callback(
+        ctx: Context<UpdatePoolCallback>,
+        output: SignedComputationOutputs<UpdatePoolOutput>,
+    ) -> Result<()> {
+        // update_pool returns (Enc<Mxe, PoolTotals>, u8)
+        // Generated output structure:
+        //   UpdatePoolOutput { field_0: UpdatePoolOutputStruct0 }
+        //   UpdatePoolOutputStruct0 { field_0: MXEEncryptedStruct<2>, field_1: u8 }
+        let result = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(UpdatePoolOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("update_pool computation failed: {}", e);
+                // Release mpc_lock even on failure so the market isn't permanently locked
+                ctx.accounts.market.mpc_lock = false;
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // Write updated pool ciphertexts back to MarketPool
+        let market_pool = &mut ctx.accounts.market_pool;
+        market_pool.yes_pool_encrypted = result.field_0.ciphertexts[0];
+        market_pool.no_pool_encrypted = result.field_0.ciphertexts[1];
+        market_pool.nonce = result.field_0.nonce;
+
+        // Write revealed sentiment to Market (plaintext u8)
+        let market = &mut ctx.accounts.market;
+        market.sentiment = result.field_1;
+
+        // Release mpc_lock
+        market.mpc_lock = false;
+
+        // Increment total_bets
+        market.total_bets += 1;
+
+        msg!(
+            "update_pool complete - MarketPool {} updated, sentiment={}, total_bets={}",
+            market_pool.market_id,
+            market.sentiment,
+            market.total_bets
+        );
+        Ok(())
+    }
 }
