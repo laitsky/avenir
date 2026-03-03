@@ -23,4 +23,18 @@ mod circuits {
         let pool_totals: PoolTotals = [0, 0];
         mxe.from_arcis(pool_totals)
     }
+
+    /// Hello-world circuit for environment validation.
+    /// Takes two encrypted u64 inputs (Shared) and returns their sum (Mxe-owned).
+    /// Validates: Enc<Shared, T> input, Enc<Mxe, T> output, basic arithmetic, to_arcis/from_arcis lifecycle.
+    #[instruction]
+    pub fn hello_world(
+        a_ctxt: Enc<Shared, u64>,
+        b_ctxt: Enc<Shared, u64>,
+    ) -> Enc<Mxe, u64> {
+        let a = a_ctxt.to_arcis();
+        let b = b_ctxt.to_arcis();
+        let sum = a + b;
+        Mxe::get().from_arcis(sum)
+    }
 }
