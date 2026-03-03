@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-03T03:19:02.312Z"
+status: in-progress
+last_updated: "2026-03-03T07:19:31Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 11
+  completed_plans: 6
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 2: Market Creation
+**Current focus:** Phase 3: Arcium MPC Core
 
 ## Current Position
 
-Phase: 2 of 10 (Market Creation)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: Phase Complete
-Last activity: 2026-03-03 -- Completed 02-02-PLAN.md (Cancel Market & Integration Tests)
+Phase: 3 of 10 (Arcium MPC Core)
+Plan: 1 of 6 in current phase (COMPLETE)
+Status: In Progress
+Last activity: 2026-03-03 -- Completed 03-01-PLAN.md (Hello-World MPC Circuit)
 
-Progress: [▓▓▓▓▓░░░░░] 15%
+Progress: [▓▓▓▓▓▓░░░░] 18%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 7min
-- Total execution time: 0.58 hours
+- Total plans completed: 6
+- Average duration: 10min
+- Total execution time: 1.0 hours
 
 **By Phase:**
 
@@ -42,14 +42,16 @@ Progress: [▓▓▓▓▓░░░░░] 15%
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
+| 3. Arcium MPC Core | 1 | 25min | 25min |
 
 **Recent Trend:**
-- Last 5 plans: 14min, 5min, 10min, 2min, 4min
-- Trend: improving
+- Last 5 plans: 5min, 10min, 2min, 4min, 25min
+- Trend: variable (Phase 3 higher complexity)
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
 | Phase 02 P02 | 4min | 2 tasks | 5 files |
+| Phase 03 P01 | 25min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -78,6 +80,10 @@ Recent decisions affecting current work:
 - [02-01]: CreatorWhitelist PDA closed on removal (rent returned to admin) rather than soft-delete
 - [02-02]: Close vault token account via CPI BEFORE Anchor closes Market PDA -- ordering required because Market PDA signs for vault authority
 - [02-02]: Replaced fake usdcMint keypair in tests with real createMint for proper token account integration
+- [03-01]: Changed #[program] to #[arcium_program] -- one-time Arcium migration enabling MPC callback validation
+- [03-01]: Added ErrorCode type alias (pub use AvenirError as ErrorCode) for Arcium macro compatibility
+- [03-01]: @arcium-hq/client v0.8.5 (not v0.5.2 from research) -- matches Rust crate versions
+- [03-01]: Docker Desktop installed via Homebrew; needs user EULA acceptance before arcium test works
 
 ### Pending Todos
 
@@ -92,5 +98,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 02-02-PLAN.md (Phase 2 complete)
+Stopped at: Completed 03-01-PLAN.md (Hello-World MPC Circuit)
 Resume file: None
+Note: Docker Desktop needs EULA acceptance before arcium test can validate hello-world MPC lifecycle
