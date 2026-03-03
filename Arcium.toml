@@ -1,0 +1,9 @@
+[project]
+name = "avenir"
+description = "Confidential prediction market powered by Arcium MPC"
+
+[programs]
+path = "programs"
+
+[encrypted_instructions]
+path = "encrypted-ixs"
