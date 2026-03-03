@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-03T16:08:57Z"
+last_updated: "2026-03-03T16:16:13.210Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -22,17 +22,17 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 4 of 10 (Design System & Fog) -- IN PROGRESS
-Plan: 3 of 4 in current phase (3 complete)
-Status: Executing Phase 4
-Last activity: 2026-03-03 -- Completed 04-03-PLAN.md (Market Detail Page)
+Phase: 4 of 10 (Design System & Fog) -- COMPLETE
+Plan: 4 of 4 in current phase (4 complete)
+Status: Phase 4 complete
+Last activity: 2026-03-03 -- Completed 04-04-PLAN.md (Homepage Feed & Layout Shells)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓░] 42%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 7min
 - Total execution time: 1.6 hours
 
@@ -43,11 +43,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓░] 42%
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
-| 4. Design System & Fog | 3/4 | 6min | 2min |
+| 4. Design System & Fog | 4/4 | 8min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 45min, 8min, 2min, 2min, 2min
-- Trend: Phase 4 progressing fast (04-01, 04-02, 04-03 all 2min -- tokens + components + detail page)
+- Last 5 plans: 8min, 2min, 2min, 2min, 2min
+- Trend: Phase 4 complete -- all 4 plans averaged 2min each
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -62,6 +62,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓░] 42%
 | Phase 04 P01 | 2min | 2 tasks | 2 files |
 | Phase 04 P02 | 2min | 2 tasks | 3 files |
 | Phase 04 P03 | 2min | 2 tasks | 3 files |
+| Phase 04 P04 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [04-02]: CVA card variants: live (hover border) vs resolved (dimmed opacity)
 - [04-03]: Used CountdownTimer from Plan 02 (already available) instead of fallback date display
 - [04-03]: lg:top-20 for sticky bet panel positioning accounts for header height (~5rem)
+- [04-04]: CategoryTabs rendered in homepage (not Header) to avoid state-lifting through root layout
+- [04-04]: Header stays minimal: logo + Portfolio link + Connect Wallet (no embedded tabs)
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 04-03-PLAN.md
-Resume file: .planning/phases/04-design-system-fog/04-03-SUMMARY.md
-Note: Phase 4 Plan 3 complete -- market detail page with sidebar layout, fog overlays, and bet placement form. Ready for Plan 4 (layout shells / homepage feed).
+Stopped at: Completed 04-04-PLAN.md
+Resume file: .planning/phases/04-design-system-fog/04-04-SUMMARY.md
+Note: Phase 4 complete -- all 4 plans finished. Design tokens, fog overlays, market components, detail page, homepage feed, and portfolio shell all built. Ready for Phase 5 (on-chain track) or Phase 7 (frontend integration).
