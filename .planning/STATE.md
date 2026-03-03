@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-03T07:19:31Z"
+last_updated: "2026-03-03T07:32:18Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 11
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 3 of 10 (Arcium MPC Core)
-Plan: 1 of 6 in current phase (COMPLETE)
+Plan: 2 of 6 in current phase (COMPLETE)
 Status: In Progress
-Last activity: 2026-03-03 -- Completed 03-01-PLAN.md (Hello-World MPC Circuit)
+Last activity: 2026-03-03 -- Completed 03-02a-PLAN.md (MarketPool PDA + update_pool Circuit)
 
-Progress: [▓▓▓▓▓▓░░░░] 18%
+Progress: [▓▓▓▓▓▓▓░░░] 21%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 10min
-- Total execution time: 1.0 hours
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
@@ -42,16 +42,17 @@ Progress: [▓▓▓▓▓▓░░░░] 18%
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
-| 3. Arcium MPC Core | 1 | 25min | 25min |
+| 3. Arcium MPC Core | 2 | 33min | 17min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 10min, 2min, 4min, 25min
+- Last 5 plans: 10min, 2min, 4min, 25min, 8min
 - Trend: variable (Phase 3 higher complexity)
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
 | Phase 02 P02 | 4min | 2 tasks | 5 files |
 | Phase 03 P01 | 25min | 2 tasks | 12 files |
+| Phase 03 P02a | 8min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,10 @@ Recent decisions affecting current work:
 - [03-01]: Added ErrorCode type alias (pub use AvenirError as ErrorCode) for Arcium macro compatibility
 - [03-01]: @arcium-hq/client v0.8.5 (not v0.5.2 from research) -- matches Rust crate versions
 - [03-01]: Docker Desktop installed via Homebrew; needs user EULA acceptance before arcium test works
+- [03-02a]: MarketPool PDA with fixed-layout fields solves variable byte offset problem for ArgBuilder.account()
+- [03-02a]: BetInput struct with bool is_yes inside #[encrypted] module -- arcis handles ArcisType derivation
+- [03-02a]: Sentiment .reveal() makes u8 plaintext in circuit output -- intentional for on-chain Market.sentiment
+- [03-02a]: market_pool_bump = 0 at creation, set when init_pool MPC called
 
 ### Pending Todos
 
@@ -98,6 +103,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 03-01-PLAN.md (Hello-World MPC Circuit)
+Stopped at: Completed 03-02a-PLAN.md (MarketPool PDA + update_pool Circuit)
 Resume file: None
 Note: Docker Desktop needs EULA acceptance before arcium test can validate hello-world MPC lifecycle
