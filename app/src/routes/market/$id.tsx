@@ -1,38 +1,33 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { MOCK_MARKETS } from '#/lib/mock-data'
+import { MarketDetail } from '#/components/market/MarketDetail'
+import { BetPlacement } from '#/components/market/BetPlacement'
 
 export const Route = createFileRoute('/market/$id')({
-  component: MarketDetail,
+  component: MarketDetailPage,
 })
 
-function MarketDetail() {
+function MarketDetailPage() {
   const { id } = Route.useParams()
+  const market = MOCK_MARKETS.find((m) => m.id === id) ?? MOCK_MARKETS[0]
 
   return (
-    <div className="space-y-8">
-      <section className="space-y-2">
-        <p className="text-sm text-muted-foreground">Market #{id}</p>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Market Question Placeholder
-        </h1>
-      </section>
+    <div className="space-y-6">
+      {/* Back link */}
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        &larr; Back to Markets
+      </Link>
 
+      {/* Sidebar layout: info left, bet form sticky right */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <section className="rounded-lg border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Sentiment</h2>
-            <p className="text-sm text-muted-foreground">
-              Encrypted sentiment data will appear here
-            </p>
-          </section>
+        <div className="lg:col-span-2">
+          <MarketDetail market={market} />
         </div>
-
-        <aside className="space-y-6">
-          <section className="rounded-lg border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Place Bet</h2>
-            <p className="text-sm text-muted-foreground">
-              Bet placement form will appear here
-            </p>
-          </section>
+        <aside className="lg:sticky lg:top-20 lg:self-start">
+          <BetPlacement market={market} />
         </aside>
       </div>
     </div>
