@@ -118,4 +118,38 @@ jobs:
         run: arcium build
 
       - name: Run MPC tests
-        run: arcium test --skip-build
+        run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+          arcium localnet --skip-build > /tmp/arcium-localnet.log 2>&1 &
+          LOCALNET_PID=$!
+
+          cleanup() {
+            if kill -0 "$LOCALNET_PID" 2>/dev/null; then
+              kill "$LOCALNET_PID" || true
+              wait "$LOCALNET_PID" || true
+            fi
+          }
+
+          trap cleanup EXIT
+
+          for _ in $(seq 1 120); do
+            if curl -sf http://127.0.0.1:8899/health >/dev/null; then
+              break
+            fi
+
+            if ! kill -0 "$LOCALNET_PID" 2>/dev/null; then
+              echo "Arcium localnet exited before Solana became healthy"
+              cat /tmp/arcium-localnet.log
+              exit 1
+            fi
+
+            sleep 5
+          done
+
+          if ! curl -sf http://127.0.0.1:8899/health >/dev/null; then
+            echo "Timed out waiting for Solana localnet health"
+            cat /tmp/arcium-localnet.log
+            exit 1
+          fi
+
+          anchor test --skip-build --skip-local-validator --skip-deploy
