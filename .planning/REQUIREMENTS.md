@@ -51,7 +51,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 - [x] **INF-01**: Solana program built with Anchor 0.32.1 + Arcium v0.4.0
 - [x] **INF-02**: Four MPC circuits: update_pool, compute_payouts, add_dispute_vote, finalize_dispute
-- [ ] **INF-03**: Encrypted state relay pattern — ciphertext stored on-chain, passed to MPC, updated via callback
+- [x] **INF-03**: Encrypted state relay pattern — ciphertext stored on-chain, passed to MPC, updated via callback
 - [ ] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
 - [x] **INF-05**: Frontend built with TanStack Start, Tailwind v4, shadcn/ui
 - [ ] **INF-06**: Forest/fog design system — deep forest green, sage, muted gold accents, warm dark background
@@ -144,7 +144,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-08 | Phase 9: Portfolio & Search | Pending |
 | INF-01 | Phase 1: Foundation | Complete |
 | INF-02 | Phase 3: Arcium MPC Core | Complete |
-| INF-03 | Phase 3: Arcium MPC Core | Pending |
+| INF-03 | Phase 3: Arcium MPC Core | Complete |
 | INF-04 | Phase 5: Encrypted Betting | Pending |
 | INF-05 | Phase 1: Foundation | Complete |
 | INF-06 | Phase 4: Design System & Fog | Pending |

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-03T07:32:18Z"
+last_updated: "2026-03-03T07:34:12Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 11
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 3 of 10 (Arcium MPC Core)
-Plan: 2 of 6 in current phase (COMPLETE)
+Plan: 3 of 6 in current phase (COMPLETE)
 Status: In Progress
-Last activity: 2026-03-03 -- Completed 03-02a-PLAN.md (MarketPool PDA + update_pool Circuit)
+Last activity: 2026-03-03 -- Completed 03-02b-PLAN.md (Pool MPC Instructions)
 
-Progress: [▓▓▓▓▓▓▓░░░] 21%
+Progress: [▓▓▓▓▓▓▓▓░░] 24%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 10min
-- Total execution time: 1.1 hours
+- Total execution time: 1.2 hours
 
 **By Phase:**
 
@@ -42,10 +42,10 @@ Progress: [▓▓▓▓▓▓▓░░░] 21%
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
 | 2. Market Creation | 2 | 6min | 3min |
-| 3. Arcium MPC Core | 2 | 33min | 17min |
+| 3. Arcium MPC Core | 3 | 44min | 15min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 2min, 4min, 25min, 8min
+- Last 5 plans: 2min, 4min, 25min, 8min, 11min
 - Trend: variable (Phase 3 higher complexity)
 
 *Updated after each plan completion*
@@ -53,6 +53,7 @@ Progress: [▓▓▓▓▓▓▓░░░] 21%
 | Phase 02 P02 | 4min | 2 tasks | 5 files |
 | Phase 03 P01 | 25min | 2 tasks | 12 files |
 | Phase 03 P02a | 8min | 2 tasks | 5 files |
+| Phase 03 P02b | 11min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,10 @@ Recent decisions affecting current work:
 - [03-02a]: BetInput struct with bool is_yes inside #[encrypted] module -- arcis handles ArcisType derivation
 - [03-02a]: Sentiment .reveal() makes u8 plaintext in circuit output -- intentional for on-chain Market.sentiment
 - [03-02a]: market_pool_bump = 0 at creation, set when init_pool MPC called
+- [03-02b]: Tuple output destructuring: UpdatePoolOutput { field_0: { field_0: MXEEncryptedStruct<2>, field_1: u8 } } for (Enc<Mxe, PoolTotals>, u8)
+- [03-02b]: CallbackAccount from arcium_client::idl::arcium::types (not in arcium_anchor prelude)
+- [03-02b]: mpc_lock released on both success AND failure paths to prevent permanent market lockout
+- [03-02b]: ArgBuilder.account() offset 16, length 64 for MarketPool ciphertext read
 
 ### Pending Todos
 
@@ -103,6 +108,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 03-02a-PLAN.md (MarketPool PDA + update_pool Circuit)
+Stopped at: Completed 03-02b-PLAN.md (Pool MPC Instructions)
 Resume file: None
 Note: Docker Desktop needs EULA acceptance before arcium test can validate hello-world MPC lifecycle
