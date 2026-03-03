@@ -23,4 +23,8 @@ pub mod avenir {
     pub fn remove_creator(ctx: Context<RemoveCreator>) -> Result<()> {
         instructions::remove_creator::handler(ctx)
     }
+
+    pub fn create_market(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result<()> {
+        instructions::create_market::handler(ctx, params)
+    }
 }

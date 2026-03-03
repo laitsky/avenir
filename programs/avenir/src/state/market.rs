@@ -8,6 +8,9 @@ pub struct Market {
     /// Market question, max 200 characters (tweet-length)
     #[max_len(200)]
     pub question: String,
+    /// Resolution source URL or reference -- required, immutable after creation
+    #[max_len(128)]
+    pub resolution_source: String,
     /// Category: 0=Politics, 1=Crypto, 2=Sports, 3=Culture, 4=Economics
     pub category: u8,
     /// Unix timestamp when the market should be resolved
