@@ -117,11 +117,10 @@ Plans:
   5. Layout shells for homepage feed, detail page, and portfolio page established
 
 Plans:
-- [ ] 04-01: Tailwind v4 design tokens and forest/fog color system
-- [ ] 04-02: Fog gradient component and fog-clear reveal animation
-- [ ] 04-03: Market card component with fog overlays (mock data)
-- [ ] 04-04: Market detail page layout and bet placement component (mock data)
-- [ ] 04-05: Homepage feed layout, portfolio shell, and responsive grid
+- [ ] 04-01: Design tokens (forest/fog oklch palette) and FogOverlay component with reveal animation (Wave 1)
+- [ ] 04-02: Mock market data, CountdownTimer, and MarketCard with fog overlays (Wave 2)
+- [ ] 04-03: Market detail page with sidebar layout and bet placement form (Wave 2)
+- [ ] 04-04: Homepage feed with category tabs, responsive grid, sorting, and portfolio shell (Wave 3)
 
 ### Phase 5: Encrypted Betting
 **Goal**: Users can place USDC bets on binary markets with their amounts encrypted, pool totals hidden, and a fuzzy sentiment bucket visible
@@ -242,7 +241,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
 | 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
-| 4. Design System & Fog | 0/5 | Not started | - |
+| 4. Design System & Fog | 0/4 | Not started | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
 | 7. Core UI Integration | 0/6 | Not started | - |
