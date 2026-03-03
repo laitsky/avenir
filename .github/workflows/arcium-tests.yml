@@ -55,9 +55,48 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Install Solana CLI
+        shell: bash
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/${SOLANA_VERSION}/install)"
-          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          set -euo pipefail
+
+          INSTALLER_URL="https://release.anza.xyz/${SOLANA_VERSION}/install"
+          echo "Installing Solana CLI from: $INSTALLER_URL"
+          curl -sSfL "$INSTALLER_URL" -o /tmp/solana-install.sh
+          bash /tmp/solana-install.sh
+
+          SOLANA_INSTALL_BIN="$(find "$HOME/.local/share/solana" -type f -name solana-install -executable -print -quit 2>/dev/null || true)"
+          SOLANA_BIN="$(find "$HOME/.local/share/solana" -type f -name solana -executable -print -quit 2>/dev/null || true)"
+
+          if [[ -z "$SOLANA_BIN" && -n "$SOLANA_INSTALL_BIN" ]]; then
+            echo "solana not found yet; running solana-install init ${SOLANA_VERSION} (fallback: stable)"
+            "$SOLANA_INSTALL_BIN" init "${SOLANA_VERSION}" || "$SOLANA_INSTALL_BIN" init stable
+            SOLANA_BIN="$(find "$HOME/.local/share/solana" -type f -name solana -executable -print -quit 2>/dev/null || true)"
+          fi
+
+          if [[ -z "$SOLANA_BIN" ]]; then
+            echo "Solana CLI still missing; retrying using stable installer..."
+            curl -sSfL "https://release.anza.xyz/stable/install" -o /tmp/solana-install.sh
+            bash /tmp/solana-install.sh
+
+            SOLANA_INSTALL_BIN="$(find "$HOME/.local/share/solana" -type f -name solana-install -executable -print -quit 2>/dev/null || true)"
+            if [[ -n "$SOLANA_INSTALL_BIN" ]]; then
+              "$SOLANA_INSTALL_BIN" init "${SOLANA_VERSION}" || "$SOLANA_INSTALL_BIN" init stable
+            fi
+            SOLANA_BIN="$(find "$HOME/.local/share/solana" -type f -name solana -executable -print -quit 2>/dev/null || true)"
+          fi
+
+          if [[ -z "$SOLANA_BIN" ]]; then
+            echo "ERROR: solana binary not found after install."
+            echo "---- ~/.local/share/solana ----"
+            ls -la "$HOME/.local/share" || true
+            find "$HOME/.local/share/solana" -maxdepth 6 -type f -print || true
+            exit 1
+          fi
+
+          SOLANA_BIN_DIR="$(dirname "$SOLANA_BIN")"
+          echo "Using SOLANA_BIN_DIR=$SOLANA_BIN_DIR"
+          echo "$SOLANA_BIN_DIR" >> "$GITHUB_PATH"
+          "$SOLANA_BIN" --version
 
       - name: Configure Solana
         run: |
