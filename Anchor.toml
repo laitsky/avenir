@@ -8,6 +8,9 @@ skip-lint = false
 [programs.localnet]
 avenir = "PjLEXWGmgCA78MTaK9fN1k4muUiis2gdkUkrXRHRUkN"
 
+[programs.devnet]
+avenir = "PjLEXWGmgCA78MTaK9fN1k4muUiis2gdkUkrXRHRUkN"
+
 [registry]
 url = "https://api.apr.dev"
 
