@@ -43,8 +43,8 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [ ] **UX-03**: User can connect Solana wallet (Phantom, Solflare, Backpack)
 - [ ] **UX-04**: Portfolio view shows active positions, potential payouts, and resolved bet history
 - [ ] **UX-05**: Full-text search across market questions, descriptions, and categories
-- [ ] **UX-06**: Fog gradients overlay encrypted data (pool amounts, sentiment, jury votes, market cards)
-- [ ] **UX-07**: Fog clears with animation when data is revealed (resolution, dispute outcome)
+- [x] **UX-06**: Fog gradients overlay encrypted data (pool amounts, sentiment, jury votes, market cards)
+- [x] **UX-07**: Fog clears with animation when data is revealed (resolution, dispute outcome)
 - [ ] **UX-08**: Responsive design works on mobile browsers
 
 ### Infrastructure
@@ -54,7 +54,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [x] **INF-03**: Encrypted state relay pattern — ciphertext stored on-chain, passed to MPC, updated via callback
 - [ ] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
 - [x] **INF-05**: Frontend built with TanStack Start, Tailwind v4, shadcn/ui
-- [ ] **INF-06**: Forest/fog design system — deep forest green, sage, muted gold accents, warm dark background
+- [x] **INF-06**: Forest/fog design system — deep forest green, sage, muted gold accents, warm dark background
 - [x] **INF-07**: Client-side encryption via @arcium-hq/client (x25519 key exchange, RescueCipher)
 
 ### RTG Submission
@@ -139,15 +139,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-03 | Phase 7: Core UI Integration | Pending |
 | UX-04 | Phase 9: Portfolio & Search | Pending |
 | UX-05 | Phase 9: Portfolio & Search | Pending |
-| UX-06 | Phase 4: Design System & Fog | Pending |
-| UX-07 | Phase 4: Design System & Fog | Pending |
+| UX-06 | Phase 4: Design System & Fog | Complete |
+| UX-07 | Phase 4: Design System & Fog | Complete |
 | UX-08 | Phase 9: Portfolio & Search | Pending |
 | INF-01 | Phase 1: Foundation | Complete |
 | INF-02 | Phase 3: Arcium MPC Core | Complete |
 | INF-03 | Phase 3: Arcium MPC Core | Complete |
 | INF-04 | Phase 5: Encrypted Betting | Pending |
 | INF-05 | Phase 1: Foundation | Complete |
-| INF-06 | Phase 4: Design System & Fog | Pending |
+| INF-06 | Phase 4: Design System & Fog | Complete |
 | INF-07 | Phase 3: Arcium MPC Core | Complete |
 | RTG-01 | Phase 10: RTG Submission | Pending |
 | RTG-02 | Phase 10: RTG Submission | Pending |
