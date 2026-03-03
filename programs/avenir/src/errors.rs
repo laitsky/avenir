@@ -1,5 +1,9 @@
 use anchor_lang::prelude::*;
 
+/// Alias required by Arcium macros (callback_accounts, queue_computation_accounts).
+/// The generated macro code references `ErrorCode::ClusterNotSet` in the crate scope.
+pub use AvenirError as ErrorCode;
+
 #[error_code]
 pub enum AvenirError {
     #[msg("Invalid USDC mint address")]
@@ -24,4 +28,6 @@ pub enum AvenirError {
     EmptyQuestion,
     #[msg("Market has bets and cannot be cancelled")]
     MarketHasBets,
+    #[msg("Arcium cluster not set on MXE account")]
+    ClusterNotSet,
 }
