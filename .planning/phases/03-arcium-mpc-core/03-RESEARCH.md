@@ -467,7 +467,7 @@ await awaitComputationFinalization(provider, computationOffset, programId, "conf
 1. **Market struct byte offset for encrypted fields**
    - What we know: `ArgBuilder.account()` needs the exact byte offset of `yes_pool_encrypted` within the serialized Market account. The offset depends on all preceding fields' sizes, including variable-length String fields (`question` max 200 chars, `resolution_source` max 128 chars).
    - What's unclear: Anchor serializes String fields with a 4-byte length prefix + variable content. With variable-length strings, the offset is not constant across markets. This may require either: (a) using fixed-size fields for question/resolution_source, or (b) storing encrypted pool data in a separate fixed-layout account.
-   - Recommendation: **HIGH PRIORITY.** Investigate whether `ArgBuilder.account()` can handle variable offsets. If not, the simplest fix is moving encrypted fields to a separate `MarketPool` PDA with fixed layout (no strings). The voting example uses a simple fixed-layout `PollAccount`. Resolve this in plan 03-02 before implementing the state relay POC.
+   - Recommendation: **HIGH PRIORITY.** Investigate whether `ArgBuilder.account()` can handle variable offsets. If not, the simplest fix is moving encrypted fields to a separate `MarketPool` PDA with fixed layout (no strings). The voting example uses a simple fixed-layout `PollAccount`. Resolve this in plan 03-02a before implementing the state relay POC.
 
 2. **Multiple return values from circuits**
    - What we know: `update_pool` needs to return both updated pool totals AND the sentiment bucket. The circuit can return a tuple or struct.

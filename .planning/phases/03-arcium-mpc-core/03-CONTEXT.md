@@ -34,7 +34,7 @@ Validate the encrypted state relay pattern — prove that ciphertext stored on-c
 
 ### Ciphertext storage format
 - Adjust Market struct fields during POC to match real Arcium ciphertext size — prevents breaking migration later
-- Keep encrypted state on Market account (current design) — simpler, one account holds everything
+- **Encrypted state stored in separate MarketPool PDA** (fixed-layout, no variable-length strings) to ensure deterministic byte offsets for `ArgBuilder.account()`. *Revised from original "keep on Market account" decision — Market's variable-length String fields (`question` max 200, `resolution_source` max 128) cause non-deterministic byte offsets per market instance, making `ArgBuilder.account()` reads impossible. MarketPool PDA seeds: `[b"market_pool", market_id.to_le_bytes()]`, created alongside Market in `create_market`. Plaintext fields (sentiment, mpc_lock, total_bets) remain on Market.*
 - Functional round-trip validation only — prove ciphertext survives store → read → MPC reprocess → callback. Cryptographic guarantees come from Arcium's framework
 - Direct @arcium-hq/client SDK usage for client-side encryption — no wrapper utility layer, the SDK is the abstraction
 
@@ -76,10 +76,10 @@ Validate the encrypted state relay pattern — prove that ciphertext stored on-c
 - Handler functions separated from account validation structs
 
 ### Integration Points
-- MPC callback instruction needs to write updated ciphertext to Market account's encrypted pool fields
+- MPC callback instruction writes updated ciphertext to MarketPool PDA (fixed-layout, deterministic byte offsets for `ArgBuilder.account()`)
 - `mpc_lock: bool` on Market controls sequential access — set before MPC call, cleared in callback
 - `sentiment: u8` on Market updated by callback after MPC computes bucket
-- Client-side encryption produces ciphertext that maps to `yes_pool_encrypted`/`no_pool_encrypted` field format
+- Client-side encryption produces ciphertext that maps to MarketPool's `yes_pool_encrypted`/`no_pool_encrypted` field format
 - Frontend will use @arcium-hq/client (Phase 7) — patterns established here carry forward
 
 </code_context>
