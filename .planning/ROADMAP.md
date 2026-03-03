@@ -92,12 +92,14 @@ Plans:
   4. Client-side encryption via @arcium-hq/client produces ciphertext that the MPC circuit can consume
   5. MPC latency benchmarked on devnet (establishes whether sequential lock is viable UX)
 
+**Plans:** 5 plans
+
 Plans:
-- [ ] 03-01: Arcium MPC environment setup and hello-world circuit
-- [ ] 03-02: update_pool circuit implementation (encrypted pool accumulation + sentiment)
-- [ ] 03-03: Encrypted state relay POC (on-chain ciphertext round-trip via callback)
-- [ ] 03-04: Client-side encryption integration with @arcium-hq/client
-- [ ] 03-05: MPC latency benchmarking on devnet
+- [ ] 03-01-PLAN.md — Docker install, Arcium Rust deps, hello-world circuit lifecycle (Wave 1)
+- [ ] 03-02-PLAN.md — MarketPool PDA, update_pool circuit with sentiment, all MPC instructions (Wave 2)
+- [ ] 03-03-PLAN.md — Encrypted state relay integration test, reusable MPC test helpers (Wave 3)
+- [ ] 03-04-PLAN.md — Client-side encryption via @arcium-hq/client end-to-end validation (Wave 4)
+- [ ] 03-05-PLAN.md — Devnet deployment, latency benchmark, BENCHMARK.md (Wave 5)
 
 ### Phase 4: Design System & Fog
 **Goal**: The forest/fog design system is built with reusable tokens, components, and fog gradient primitives — all using mock data so it doesn't depend on on-chain work
