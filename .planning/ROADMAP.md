@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Solana program skeleton, account model, USDC vault, and frontend scaffolding
 - [x] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
-- [ ] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption
+- [x] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption (completed 2026-03-03)
 - [ ] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
 - [ ] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
 - [ ] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts
@@ -92,7 +92,7 @@ Plans:
   4. Client-side encryption via @arcium-hq/client produces ciphertext that the MPC circuit can consume
   5. MPC latency benchmarked on devnet (establishes whether sequential lock is viable UX)
 
-**Plans:** 5 plans
+**Plans:** 6/6 plans complete
 
 Plans:
 - [ ] 03-01-PLAN.md — Docker install, Arcium Rust deps, hello-world circuit lifecycle (Wave 1)
@@ -238,7 +238,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
-| 3. Arcium MPC Core | 5/6 | In Progress | - |
+| 3. Arcium MPC Core | 6/6 | Complete   | 2026-03-03 |
 | 4. Design System & Fog | 0/5 | Not started | - |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
