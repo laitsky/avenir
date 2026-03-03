@@ -84,10 +84,11 @@ jobs:
           fi
           anchor --version
 
-      - name: Install Arcium CLI
+      - name: Install Arcium CLI via arcup
         run: |
-          curl -L https://github.com/arcium-hq/arcium-cli/releases/download/v0.8.5/arcium-cli-x86_64-unknown-linux-gnu -o /usr/local/bin/arcium
-          chmod +x /usr/local/bin/arcium
+          curl "https://bin.arcium.com/download/arcup_x86_64_linux_0.8.5" -o ~/.cargo/bin/arcup
+          chmod +x ~/.cargo/bin/arcup
+          arcup install
           arcium --version
 
       - name: Install Bun
