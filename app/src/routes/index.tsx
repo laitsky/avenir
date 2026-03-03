@@ -1,29 +1,30 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { MOCK_MARKETS } from '#/lib/mock-data'
+import { MarketGrid } from '#/components/layout/MarketGrid'
+import { CategoryTabs } from '#/components/layout/CategoryTabs'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
 })
 
 function HomePage() {
-  return (
-    <div className="space-y-8">
-      <section className="space-y-4 pt-8">
-        <h1 className="text-4xl font-bold tracking-tight">Avenir</h1>
-        <p className="text-lg text-muted-foreground">
-          Encrypted prediction markets on Solana
-        </p>
-      </section>
+  const [category, setCategory] = useState('All')
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Markets</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card p-6">
-            <p className="text-sm text-muted-foreground">
-              Market cards will appear here
-            </p>
-          </div>
-        </div>
-      </section>
+  const filteredMarkets =
+    category === 'All'
+      ? MOCK_MARKETS
+      : MOCK_MARKETS.filter((m) => m.category === category)
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-muted-foreground">
+        Encrypted prediction markets on Solana
+      </p>
+
+      <CategoryTabs value={category} onValueChange={setCategory} />
+
+      <MarketGrid markets={filteredMarkets} />
     </div>
   )
 }
