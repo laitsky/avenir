@@ -19,9 +19,9 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 ### Market Management
 
-- [ ] **MKT-01**: Whitelisted address can create a binary market with question, outcomes, deadline, category, and resolution source
-- [ ] **MKT-02**: Markets are organized by category (Politics, Crypto, Sports, Culture, Economics)
-- [ ] **MKT-03**: Bets are rejected after market deadline passes (on-chain timestamp validation)
+- [x] **MKT-01**: Whitelisted address can create a binary market with question, outcomes, deadline, category, and resolution source
+- [x] **MKT-02**: Markets are organized by category (Politics, Crypto, Sports, Culture, Economics)
+- [x] **MKT-03**: Bets are rejected after market deadline passes (on-chain timestamp validation)
 - [x] **MKT-04**: Each market has a PDA-owned USDC vault for fund custody
 
 ### Resolution & Disputes
@@ -121,9 +121,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BET-05 | Phase 5: Encrypted Betting | Pending |
 | BET-06 | Phase 5: Encrypted Betting | Pending |
 | BET-07 | Phase 5: Encrypted Betting | Pending |
-| MKT-01 | Phase 2: Market Creation | Pending |
-| MKT-02 | Phase 2: Market Creation | Pending |
-| MKT-03 | Phase 2: Market Creation | Pending |
+| MKT-01 | Phase 2: Market Creation | Complete |
+| MKT-02 | Phase 2: Market Creation | Complete |
+| MKT-03 | Phase 2: Market Creation | Complete |
 | MKT-04 | Phase 1: Foundation | Complete |
 | RES-01 | Phase 6: Resolution & Payouts | Pending |
 | RES-02 | Phase 6: Resolution & Payouts | Pending |

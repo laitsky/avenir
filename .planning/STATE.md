@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T02:26:24.037Z"
+last_updated: "2026-03-03T03:06:22.766Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
 ---
 
 # Project State
@@ -18,35 +18,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Market Creation
 
 ## Current Position
 
-Phase: 1 of 10 (Foundation)
-Plan: 3 of 3 in current phase
-Status: Phase Complete
-Last activity: 2026-03-03 -- Completed 01-03-PLAN.md (Arcium toolchain validation)
+Phase: 2 of 10 (Market Creation)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-03-03 -- Completed 02-01-PLAN.md (Whitelist & Market Creation)
 
-Progress: [▓▓░░░░░░░░] 8%
+Progress: [▓▓▓░░░░░░░] 12%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 10min
-- Total execution time: 0.48 hours
+- Total plans completed: 4
+- Average duration: 8min
+- Total execution time: 0.52 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 29min | 10min |
+| 2. Market Creation | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 14min, 5min, 10min
-- Trend: stable
+- Last 5 plans: 14min, 5min, 10min, 2min
+- Trend: improving
 
 *Updated after each plan completion*
+| Phase 02 P01 | 2min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -71,6 +73,8 @@ Recent decisions affecting current work:
 - [01-03]: Arcium.toml updated to [localnet] format matching official examples
 - [01-03]: arcis 0.8.5 for encrypted instructions with init_pool placeholder circuit
 - [01-03]: Docker not installed -- Phase 3 prerequisite for arcium test
+- [02-01]: Used Anchor seeds constraint with config.market_counter.checked_add(1) directly -- no param-based fallback needed
+- [02-01]: CreatorWhitelist PDA closed on removal (rent returned to admin) rather than soft-delete
 
 ### Pending Todos
 
@@ -85,5 +89,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 01-03-PLAN.md (Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
