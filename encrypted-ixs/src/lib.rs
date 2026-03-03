@@ -4,15 +4,15 @@ use arcis::*;
 mod circuits {
     use arcis::*;
 
-    // Placeholder encrypted instruction for Arcium MPC
-    // Real circuits will be implemented in Phase 3:
-    // - update_pool: encrypted pool accumulation + sentiment bucket update
-    // - compute_payouts: reveal pool totals at market resolution
-    // - add_dispute_vote: encrypted vote accumulation for disputes
-
     /// Encrypted pool totals for a prediction market.
     /// [yes_pool, no_pool] in USDC lamports (u64).
     pub type PoolTotals = [u64; 2];
+
+    /// Bet input from user -- encrypted with user's shared secret.
+    pub struct BetInput {
+        pub is_yes: bool,
+        pub amount: u64,
+    }
 
     /// Initializes encrypted pool counters for a new market.
     ///
@@ -22,6 +22,46 @@ mod circuits {
     pub fn init_pool(mxe: Mxe) -> Enc<Mxe, PoolTotals> {
         let pool_totals: PoolTotals = [0, 0];
         mxe.from_arcis(pool_totals)
+    }
+
+    /// Update encrypted pool totals with a new bet and compute sentiment bucket.
+    ///
+    /// Takes an encrypted bet input (Shared) and existing pool state (Mxe),
+    /// updates the pool totals, and computes a sentiment bucket.
+    ///
+    /// Sentiment uses multiplication-based comparison (avoids expensive division):
+    /// - yes_pool * 2 > total  =>  Leaning Yes (1)
+    /// - no_pool * 2 > total   =>  Leaning No (3)
+    /// - otherwise              =>  Even (2)
+    ///
+    /// Returns: (updated pool totals as Mxe, sentiment value revealed as plaintext u8)
+    #[instruction]
+    pub fn update_pool(
+        bet_ctxt: Enc<Shared, BetInput>,
+        pool_ctxt: Enc<Mxe, PoolTotals>,
+    ) -> (Enc<Mxe, PoolTotals>, u8) {
+        let bet = bet_ctxt.to_arcis();
+        let mut pool = pool_ctxt.to_arcis();
+
+        // Update pool totals based on bet direction
+        if bet.is_yes {
+            pool[0] += bet.amount; // yes_pool
+        } else {
+            pool[1] += bet.amount; // no_pool
+        }
+
+        // Compute sentiment bucket using multiplication (no division)
+        let total = pool[0] + pool[1];
+        let sentiment: u8 = if pool[0] * 2 > total {
+            1 // Leaning Yes
+        } else if pool[1] * 2 > total {
+            3 // Leaning No
+        } else {
+            2 // Even
+        };
+
+        // Return updated pool as MXE-encrypted, sentiment as revealed plaintext
+        (pool_ctxt.owner.from_arcis(pool), sentiment.reveal())
     }
 
     /// Hello-world circuit for environment validation.

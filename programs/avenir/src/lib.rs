@@ -33,7 +33,7 @@ pub mod avenir {
         instructions::cancel_market::handler(ctx)
     }
 
-    // MPC instructions
+    // MPC instructions -- hello_world
     pub fn init_hello_world_comp_def(ctx: Context<InitHelloWorldCompDef>) -> Result<()> {
         instructions::mpc::init_hello_world_comp_def::handler(ctx)
     }
@@ -76,6 +76,47 @@ pub mod avenir {
             "Hello World MPC result - ciphertexts: {:?}, nonce: {}",
             o.ciphertexts,
             o.nonce
+        );
+        Ok(())
+    }
+
+    // MPC instructions -- init_pool
+    pub fn init_pool_comp_def(ctx: Context<InitPoolCompDef>) -> Result<()> {
+        instructions::mpc::init_pool_comp_def::handler(ctx)
+    }
+
+    pub fn init_pool(
+        ctx: Context<InitPool>,
+        computation_offset: u64,
+    ) -> Result<()> {
+        instructions::mpc::init_pool::handler(ctx, computation_offset)
+    }
+
+    #[arcium_callback(encrypted_ix = "init_pool")]
+    pub fn init_pool_callback(
+        ctx: Context<InitPoolCallback>,
+        output: SignedComputationOutputs<InitPoolOutput>,
+    ) -> Result<()> {
+        let o = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(InitPoolOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("init_pool computation failed: {}", e);
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // Write initial encrypted zeros to MarketPool
+        let market_pool = &mut ctx.accounts.market_pool;
+        market_pool.yes_pool_encrypted = o.ciphertexts[0];
+        market_pool.no_pool_encrypted = o.ciphertexts[1];
+        market_pool.nonce = o.nonce;
+
+        msg!(
+            "init_pool complete - MarketPool {} initialized with encrypted zeros",
+            market_pool.market_id
         );
         Ok(())
     }
