@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 11-01-PLAN.md (IDL + useOpenDispute)
-last_updated: "2026-03-04T15:34:00.000Z"
+stopped_at: Completed 11-02-PLAN.md (useFinalizeDispute + useAddTiebreaker)
+last_updated: "2026-03-04T15:41:10.000Z"
 progress:
   total_phases: 11
-  completed_phases: 8
+  completed_phases: 11
   total_plans: 37
-  completed_plans: 36
+  completed_plans: 37
 ---
 
 # Project State
@@ -19,23 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 11 in progress -- wiring dispute frontend hooks to on-chain instructions
+**Current focus:** All phases complete -- v1.0 milestone feature set delivered
 
 ## Current Position
 
 Phase: 11 of 11 (Wire Dispute Frontend Hooks)
-Plan: 1 of 2 in current phase (1 complete)
-Status: Phase 11 In Progress
-Last activity: 2026-03-04 -- Completed 11-01-PLAN.md (IDL Regeneration + useOpenDispute Hook)
+Plan: 2 of 2 in current phase (2 complete)
+Status: Phase 11 Complete -- v1.0 Milestone Complete
+Last activity: 2026-03-04 -- Completed 11-02-PLAN.md (useFinalizeDispute + useAddTiebreaker)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░] 97%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 36
+- Total plans completed: 37
 - Average duration: 6min
-- Total execution time: 2.35 hours
+- Total execution time: 2.4 hours
 
 **By Phase:**
 
@@ -49,11 +49,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
 | 8. Dispute System | 6/6 | 25min | 4min |
-| 11. Wire Dispute Frontend Hooks | 1/2 | 2min | 2min |
+| 11. Wire Dispute Frontend Hooks | 2/2 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 5min, 5min, 6min, 2min
-- Trend: Phase 11 started -- dispute frontend hooks wiring
+- Last 5 plans: 5min, 5min, 6min, 2min, 3min
+- Trend: Phase 11 complete -- all dispute frontend hooks wired
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -88,6 +88,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 08 P05 | 5min | 2 tasks | 2 files |
 | Phase 08 P06 | 6min | 2 tasks | 11 files |
 | Phase 11 P01 | 2min | 2 tasks | 4 files |
+| Phase 11 P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -206,6 +207,9 @@ Recent decisions affecting current work:
 - [08-06]: BetPlacement mode state machine extended to 12 modes (8 original + 4 dispute)
 - [11-01]: anchor build regenerates IDL successfully despite stack warnings -- no manual IDL patching needed
 - [11-01]: disputeOpened state tracks partial success for retry-only-init_dispute_tally recovery pattern
+- [11-02]: useFinalizeDispute mirrors useComputePayouts MPC queue pattern for finalize_dispute circuit
+- [11-02]: Tie detection uses composite signal: status=0 AND voteCount>=quorum AND !tiebreakerAdded
+- [11-02]: useAddTiebreaker passes first non-juror resolver PDA; slot-based on-chain selection may require retry
 
 ### Pending Todos
 
@@ -220,7 +224,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T15:34:00.000Z
-**Stopped at:** Completed 11-01-PLAN.md (IDL + useOpenDispute)
-**Resume file:** .planning/phases/11-wire-dispute-frontend-hooks/11-02-PLAN.md
-**Note:** Phase 11 plan 1 complete (1/2). IDL regenerated with all dispute instructions. useOpenDispute hook created and wired to DisputeEscalateMode. Ready for 11-02 (useFinalizeDispute + useAddTiebreaker).
+**Last session:** 2026-03-04T15:41:10.000Z
+**Stopped at:** Completed 11-02-PLAN.md (useFinalizeDispute + useAddTiebreaker)
+**Resume file:** N/A -- v1.0 milestone complete
+**Note:** Phase 11 complete (2/2). All dispute frontend hooks wired. Full dispute lifecycle operational: escalate -> vote -> finalize (or tie -> tiebreaker -> re-vote -> finalize). v1.0 milestone feature set delivered (37/37 plans).

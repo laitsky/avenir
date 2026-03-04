@@ -45,7 +45,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation (completed 2026-03-04)
 - [ ] **Phase 9: Portfolio & Search** - Portfolio view, full-text search, responsive design
 - [ ] **Phase 10: RTG Submission** - Open-source repo, documentation, architecture diagram
-- [ ] **Phase 11: Wire Dispute Frontend Hooks** - useOpenDispute, useFinalizeDispute, init_dispute_tally trigger (Gap Closure)
+- [x] **Phase 11: Wire Dispute Frontend Hooks** - useOpenDispute, useFinalizeDispute, init_dispute_tally trigger (Gap Closure) (completed 2026-03-04)
 - [ ] **Phase 12: Pool Init & Encryption Hardening** - init_pool trigger, nonce reuse fix (Gap Closure)
 
 ## Phase Details
@@ -283,5 +283,5 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 8. Dispute System | 0/6 | Planned | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
-| 11. Wire Dispute Frontend Hooks | 1/2 | In Progress|  |
+| 11. Wire Dispute Frontend Hooks | 2/2 | Complete   | 2026-03-04 |
 | 12. Pool Init & Encryption Hardening | 0/2 | Gap closure | - |
