@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T07:53:21Z"
+last_updated: "2026-03-04T08:01:28Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 6 of 10 (Resolution & Payouts)
-Plan: 1 of 4 in current phase (1 complete)
+Plan: 2 of 4 in current phase (2 complete)
 Status: Executing Phase 6
-Last activity: 2026-03-04 -- Completed 06-01-PLAN.md (Resolution Foundation)
+Last activity: 2026-03-04 -- Completed 06-02-PLAN.md (Compute Payouts MPC Infrastructure)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░] 55%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░] 58%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 6min
-- Total execution time: 1.78 hours
+- Total execution time: 1.87 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
-| 6. Resolution & Payouts | 1/4 | 2min | 2min |
+| 6. Resolution & Payouts | 2/4 | 7min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 5min, 4min, 2min
-- Trend: Phase 6 started -- resolution foundation in 2min
+- Last 5 plans: 5min, 4min, 2min, 5min
+- Trend: Phase 6 progressing -- compute_payouts MPC pipeline in 5min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -70,6 +70,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
 | Phase 05 P03 | 5min | 2 tasks | 2 files |
 | Phase 05 P04 | 4min | 2 tasks | 3 files |
 | Phase 06 P01 | 2min | 2 tasks | 6 files |
+| Phase 06 P02 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,9 @@ Recent decisions affecting current work:
 - [06-01]: resolve_market transitions directly Open(0) -> Resolved(2) with no intermediate Locked(1) state
 - [06-01]: compute_payouts circuit takes only Enc<Mxe, PoolTotals> -- no user-encrypted input, simpler than update_pool
 - [06-01]: ComputePayoutsOutput type not yet generated -- requires callback handler definition in Plan 02
+- [06-02]: ComputePayoutsOutput uses nested struct: field_0.field_0 (u64) and field_0.field_1 (u64) for revealed yes/no pool
+- [06-02]: compute_payouts callback has only 1 custom account (Market) -- no refund or token operations needed
+- [06-02]: Lock timeout recovery simplified vs place_bet: clear lock+timestamp only, no pending bet fields
 
 ### Pending Todos
 
@@ -161,6 +165,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 06-01-PLAN.md (Resolution Foundation)
-Resume file: .planning/phases/06-resolution-payouts/06-01-SUMMARY.md
-Note: Phase 6 plan 1 complete. resolve_market instruction and compute_payouts circuit added. Market struct extended with revealed pool fields. 7 new error variants. Ready for Plan 02 (compute_payouts MPC queue/callback).
+Stopped at: Completed 06-02-PLAN.md (Compute Payouts MPC Infrastructure)
+Resume file: .planning/phases/06-resolution-payouts/06-02-SUMMARY.md
+Note: Phase 6 plan 2 complete. compute_payouts MPC pipeline: comp_def registration, queue instruction, callback handler. Market transitions Open->Resolved->Finalized complete. Ready for Plan 03 (claim_payout).
