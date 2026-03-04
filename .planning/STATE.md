@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: Completed 12-02-PLAN.md (encryption nonce fix)
-last_updated: "2026-03-04T16:21:59Z"
+status: complete
+stopped_at: Completed 12-01-PLAN.md (pool init + BetPlacement gate)
+last_updated: "2026-03-04T16:24:49Z"
 progress:
   total_phases: 10
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 39
-  completed_plans: 38
+  completed_plans: 39
 ---
 
 # Project State
@@ -19,21 +19,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 12 hardening -- pool init + encryption nonce fixes
+**Current focus:** All phases complete -- v1.0 milestone feature set delivered including pool init hardening
 
 ## Current Position
 
 Phase: 12 of 12 (Pool Init & Encryption Hardening)
-Plan: 2 of 2 in current phase (1 complete)
-Status: Executing Phase 12 -- 12-02 complete, 12-01 remaining
-Last activity: 2026-03-04 -- Completed 12-02-PLAN.md (encryption nonce fix)
+Plan: 2 of 2 in current phase (2 complete)
+Status: Phase 12 Complete -- v1.0 Milestone Complete (including hardening)
+Last activity: 2026-03-04 -- Completed 12-01-PLAN.md (pool init + BetPlacement gate)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░] 97%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 6min
 - Total execution time: 2.4 hours
 
@@ -50,11 +50,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 7. Core UI Integration | 3/3 | 12min | 4min |
 | 8. Dispute System | 6/6 | 25min | 4min |
 | 11. Wire Dispute Frontend Hooks | 2/2 | 5min | 3min |
-| 12. Pool Init & Encryption Hardening | 1/2 | 1min | 1min |
+| 12. Pool Init & Encryption Hardening | 2/2 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 2min, 3min, 1min
-- Trend: Phase 12 in progress -- encryption nonce fix complete
+- Last 5 plans: 6min, 2min, 3min, 1min, 4min
+- Trend: Phase 12 complete -- pool init hardening and encryption nonce fix done
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -91,6 +91,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 11 P01 | 2min | 2 tasks | 4 files |
 | Phase 11 P02 | 3min | 2 tasks | 3 files |
 | Phase 12 P02 | 1min | 1 tasks | 1 files |
+| Phase 12 P01 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -215,6 +216,9 @@ Recent decisions affecting current work:
 - [12-02]: Deterministic nonce+1 derivation over random second nonce for reproducibility and ArgBuilder compatibility
 - [12-02]: Backward-compatible return type: nonce/nonceBN retained, nonce2/nonce2BN added
 - [12-02]: On-chain ArgBuilder change deferred: single plaintext_u128(nonce) kept, may need update if MPC decryption fails
+- [12-01]: CreateMarketParams uses actual IDL fields (question, resolutionSource, category, resolutionTime) not plan-specified fields
+- [12-01]: poolReady defaults to true before data arrives to avoid flashing pool-initializing gate on already-initialized markets
+- [12-01]: Recovery init_pool button appears after 30s timeout matching CONTEXT.md recommendation
 
 ### Pending Todos
 
@@ -229,7 +233,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T16:21:59Z
-**Stopped at:** Completed 12-02-PLAN.md (encryption nonce fix)
-**Resume file:** .planning/phases/12-pool-init-encryption-hardening/12-02-SUMMARY.md
-**Note:** Phase 12 plan 02 complete (1/2). Fixed nonce reuse vulnerability in encryptBetForMPC. Plan 12-01 (pool init hardening) remaining.
+**Last session:** 2026-03-04T16:24:49Z
+**Stopped at:** Completed 12-01-PLAN.md (pool init + BetPlacement gate)
+**Resume file:** .planning/phases/12-pool-init-encryption-hardening/12-01-SUMMARY.md
+**Note:** Phase 12 complete (2/2). useCreateMarket chains create_market + init_pool. BetPlacement has 13-mode state machine with pool-initializing gate. All 39 plans across 12 phases complete.
