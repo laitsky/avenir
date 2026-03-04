@@ -295,6 +295,108 @@ pub mod avenir {
         Ok(())
     }
 
+    // MPC instructions -- init_dispute_tally
+    pub fn init_dispute_tally_comp_def(ctx: Context<InitDisputeTallyCompDef>) -> Result<()> {
+        instructions::mpc::init_dispute_tally_comp_def::handler(ctx)
+    }
+
+    pub fn init_dispute_tally(
+        ctx: Context<InitDisputeTally>,
+        computation_offset: u64,
+    ) -> Result<()> {
+        instructions::mpc::init_dispute_tally::handler(ctx, computation_offset)
+    }
+
+    #[arcium_callback(encrypted_ix = "init_dispute_tally")]
+    pub fn init_dispute_tally_callback(
+        ctx: Context<InitDisputeTallyCallback>,
+        output: SignedComputationOutputs<InitDisputeTallyOutput>,
+    ) -> Result<()> {
+        let o = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(InitDisputeTallyOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("init_dispute_tally computation failed: {}", e);
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // Write initial encrypted zeros to DisputeTally
+        let dispute_tally = &mut ctx.accounts.dispute_tally;
+        dispute_tally.yes_votes_encrypted = o.ciphertexts[0];
+        dispute_tally.no_votes_encrypted = o.ciphertexts[1];
+        dispute_tally.nonce = o.nonce;
+
+        msg!(
+            "init_dispute_tally complete - DisputeTally {} initialized with encrypted zeros",
+            dispute_tally.market_id
+        );
+        Ok(())
+    }
+
+    // MPC instructions -- add_dispute_vote (cast_vote is the juror-facing entry point)
+    pub fn init_add_dispute_vote_comp_def(ctx: Context<InitAddDisputeVoteCompDef>) -> Result<()> {
+        instructions::mpc::add_dispute_vote_comp_def::handler(ctx)
+    }
+
+    pub fn cast_vote(
+        ctx: Context<CastVote>,
+        computation_offset: u64,
+        vote_ciphertext: [u8; 32],
+        pub_key: [u8; 32],
+        nonce: u128,
+    ) -> Result<()> {
+        instructions::cast_vote::handler(ctx, computation_offset, vote_ciphertext, pub_key, nonce)
+    }
+
+    #[arcium_callback(encrypted_ix = "add_dispute_vote")]
+    pub fn add_dispute_vote_callback(
+        ctx: Context<AddDisputeVoteCallback>,
+        output: SignedComputationOutputs<AddDisputeVoteOutput>,
+    ) -> Result<()> {
+        // add_dispute_vote returns Enc<Mxe, VoteTotals> -- updated encrypted tally
+        // Generated output structure:
+        //   AddDisputeVoteOutput { field_0: MXEEncryptedStruct<2> }
+        let o = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(AddDisputeVoteOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("add_dispute_vote computation failed: {}", e);
+
+                // Clear MPC lock on failure
+                let dispute = &mut ctx.accounts.dispute;
+                dispute.mpc_lock = false;
+                dispute.lock_timestamp = 0;
+
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // === Success path ===
+
+        // Write updated encrypted vote ciphertexts back to DisputeTally
+        let dispute_tally = &mut ctx.accounts.dispute_tally;
+        dispute_tally.yes_votes_encrypted = o.ciphertexts[0];
+        dispute_tally.no_votes_encrypted = o.ciphertexts[1];
+        dispute_tally.nonce = o.nonce;
+
+        // Clear MPC lock on dispute
+        let dispute = &mut ctx.accounts.dispute;
+        dispute.mpc_lock = false;
+        dispute.lock_timestamp = 0;
+
+        msg!(
+            "add_dispute_vote complete - DisputeTally {} updated, vote_count={}",
+            dispute_tally.market_id,
+            dispute.vote_count
+        );
+        Ok(())
+    }
+
     // MPC instructions -- compute_payouts
     pub fn init_compute_payouts_comp_def(ctx: Context<InitComputePayoutsCompDef>) -> Result<()> {
         instructions::mpc::init_compute_payouts_comp_def::handler(ctx)

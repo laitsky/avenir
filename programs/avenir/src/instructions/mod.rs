@@ -1,6 +1,7 @@
 pub mod add_creator;
 pub mod approve_resolver;
 pub mod cancel_market;
+pub mod cast_vote;
 pub mod claim_payout;
 pub mod create_market;
 pub mod initialize;
@@ -17,6 +18,7 @@ pub mod withdraw_resolver;
 pub use add_creator::*;
 pub use approve_resolver::*;
 pub use cancel_market::*;
+pub use cast_vote::*;
 pub use claim_payout::*;
 pub use create_market::*;
 pub use initialize::*;

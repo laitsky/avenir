@@ -82,4 +82,12 @@ pub enum AvenirError {
     GracePeriodNotExpired,
     #[msg("Not enough approved resolvers for jury selection")]
     NotEnoughResolvers,
+    #[msg("Caller is not a selected juror for this dispute")]
+    NotSelectedJuror,
+    #[msg("Juror has already submitted a vote")]
+    AlreadyVoted,
+    #[msg("Dispute voting window has closed")]
+    VotingWindowClosed,
+    #[msg("Dispute is not in voting state")]
+    DisputeNotVoting,
 }
