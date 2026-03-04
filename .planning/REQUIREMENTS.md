@@ -114,8 +114,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BET-01 | Phase 5: Encrypted Betting | Complete |
-| BET-02 | Phase 5: Encrypted Betting | Complete |
+| BET-01 | Phase 5: Encrypted Betting, Phase 12: Gap Closure | Complete (integration gap: INT-03) |
+| BET-02 | Phase 5: Encrypted Betting, Phase 12: Gap Closure | Complete (integration gap: INT-03, INT-05) |
 | BET-03 | Phase 5: Encrypted Betting | Complete |
 | BET-04 | Phase 5: Encrypted Betting | Complete |
 | BET-05 | Phase 5: Encrypted Betting | Complete |
@@ -127,10 +127,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MKT-04 | Phase 1: Foundation | Complete |
 | RES-01 | Phase 6: Resolution & Payouts | Complete |
 | RES-02 | Phase 8: Dispute System | Complete |
-| RES-03 | Phase 8: Dispute System | Complete |
+| RES-03 | Phase 8: Dispute System, Phase 11: Gap Closure | Complete (integration gap: INT-01) |
 | RES-04 | Phase 8: Dispute System | Complete |
-| RES-05 | Phase 8: Dispute System | Complete |
-| RES-06 | Phase 8: Dispute System | Complete |
+| RES-05 | Phase 8: Dispute System, Phase 11: Gap Closure | Complete (integration gap: INT-02, INT-06) |
+| RES-06 | Phase 8: Dispute System, Phase 11: Gap Closure | Complete (integration gap: INT-02) |
 | RES-07 | Phase 6: Resolution & Payouts | Complete |
 | RES-08 | Phase 6: Resolution & Payouts | Complete |
 | RES-09 | Phase 6: Resolution & Payouts | Complete |
@@ -148,7 +148,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INF-04 | Phase 5: Encrypted Betting | Complete |
 | INF-05 | Phase 1: Foundation | Complete |
 | INF-06 | Phase 4: Design System & Fog | Complete |
-| INF-07 | Phase 3: Arcium MPC Core | Complete |
+| INF-07 | Phase 3: Arcium MPC Core, Phase 12: Gap Closure | Complete (integration gap: INT-05) |
 | RTG-01 | Phase 10: RTG Submission | Pending |
 | RTG-02 | Phase 10: RTG Submission | Pending |
 | RTG-03 | Phase 10: RTG Submission | Pending |

@@ -45,6 +45,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation (completed 2026-03-04)
 - [ ] **Phase 9: Portfolio & Search** - Portfolio view, full-text search, responsive design
 - [ ] **Phase 10: RTG Submission** - Open-source repo, documentation, architecture diagram
+- [ ] **Phase 11: Wire Dispute Frontend Hooks** - useOpenDispute, useFinalizeDispute, init_dispute_tally trigger (Gap Closure)
+- [ ] **Phase 12: Pool Init & Encryption Hardening** - init_pool trigger, nonce reuse fix (Gap Closure)
 
 ## Phase Details
 
@@ -230,6 +232,37 @@ Plans:
 - [ ] 10-02: README with Arcium integration explanation and architecture diagram
 - [ ] 10-03: Demo preparation (screenshots, optional video walkthrough)
 
+### Phase 11: Wire Dispute Frontend Hooks
+**Goal**: Complete the dispute E2E flows by adding missing frontend hooks that call on-chain dispute instructions
+**Depends on**: Phase 8
+**Gap Closure**: Closes INT-01, INT-02, INT-06 from v1.0 audit; fixes broken Dispute Escalation and Dispute Finalization flows
+**Requirements**: RES-03, RES-05, RES-06
+**Success Criteria** (what must be TRUE):
+  1. useOpenDispute hook submits open_dispute transaction with correct resolver remaining_accounts
+  2. useFinalizeDispute hook submits finalize_dispute transaction to queue MPC tally reveal
+  3. init_dispute_tally is auto-triggered after successful open_dispute (or as part of the same flow)
+  4. DisputeEscalateMode.handleEscalate calls useOpenDispute and escalation completes E2E
+  5. DisputeFinalizedMode triggers via useFinalizeDispute and fog clears on tally reveal
+
+Plans:
+- [ ] 11-01: useOpenDispute hook and DisputeEscalateMode wiring
+- [ ] 11-02: useFinalizeDispute hook and DisputeFinalizedMode wiring
+- [ ] 11-03: init_dispute_tally auto-trigger and E2E flow verification
+
+### Phase 12: Pool Init & Encryption Hardening
+**Goal**: Ensure new markets have MPC-initialized pools before first bet and fix nonce reuse in client-side encryption
+**Depends on**: Phase 5
+**Gap Closure**: Closes INT-03, INT-05 from v1.0 audit
+**Requirements**: BET-01, BET-02, INF-07
+**Success Criteria** (what must be TRUE):
+  1. init_pool MPC is triggered automatically after create_market (or admin action ensures it runs before first bet)
+  2. New markets accept their first bet without MPC failure due to uninitialized pool
+  3. Each encrypt call in encryption.ts uses a unique nonce (no nonce reuse between isYes and amount)
+
+Plans:
+- [ ] 12-01: init_pool auto-trigger after create_market
+- [ ] 12-02: Fix nonce reuse in encryption.ts with unique nonce per ciphertext
+
 ## Progress
 
 **Execution Order:**
@@ -251,3 +284,5 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 8. Dispute System | 0/6 | Planned | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
+| 11. Wire Dispute Frontend Hooks | 0/3 | Gap closure | - |
+| 12. Pool Init & Encryption Hardening | 0/2 | Gap closure | - |
