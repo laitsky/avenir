@@ -15,7 +15,7 @@ pub struct Market {
     pub category: u8,
     /// Unix timestamp when the market should be resolved
     pub resolution_time: i64,
-    /// Market state: 0=Open, 1=Locked, 2=Resolved, 3=Disputed
+    /// Market state: 0=Open, 1=Locked, 2=Resolved, 3=Disputed, 4=Finalized
     pub state: u8,
     /// Winning outcome: 0=None, 1=Yes, 2=No
     pub winning_outcome: u8,
@@ -41,6 +41,10 @@ pub struct Market {
     pub pending_amount: u64,
     /// Which side the pending bet is on (for callback to update correct side of UserPosition)
     pub pending_is_yes: bool,
+    /// Revealed yes pool total (set by compute_payouts_callback at Finalized state)
+    pub revealed_yes_pool: u64,
+    /// Revealed no pool total (set by compute_payouts_callback at Finalized state)
+    pub revealed_no_pool: u64,
     /// PDA bump seed for the market account
     pub bump: u8,
     /// PDA bump seed for the market vault token account

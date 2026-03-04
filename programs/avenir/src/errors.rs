@@ -40,4 +40,18 @@ pub enum AvenirError {
     WrongSide,
     #[msg("Insufficient token balance")]
     InsufficientBalance,
+    #[msg("Market is not in Resolved state")]
+    MarketNotResolved,
+    #[msg("Market is not in Finalized state")]
+    MarketNotFinalized,
+    #[msg("No winning position to claim")]
+    NoWinningPosition,
+    #[msg("Payout has already been claimed")]
+    AlreadyClaimed,
+    #[msg("Caller is not the market creator")]
+    NotMarketCreator,
+    #[msg("Market deadline has not passed yet")]
+    MarketNotExpired,
+    #[msg("Invalid winning outcome (must be 1=Yes or 2=No)")]
+    InvalidOutcome,
 }
