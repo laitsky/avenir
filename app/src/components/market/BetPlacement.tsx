@@ -8,6 +8,7 @@ import { CountdownTimer } from '#/components/market/CountdownTimer'
 import { JurorVotePanel } from '#/components/dispute/JurorVotePanel'
 import type { OnChainMarket, OnChainPosition, OnChainDispute } from '#/lib/types'
 import { usePlaceBet } from '#/hooks/usePlaceBet'
+import { useOpenDispute } from '#/hooks/useOpenDispute'
 import { useResolveMarket } from '#/hooks/useResolveMarket'
 import { useComputePayouts } from '#/hooks/useComputePayouts'
 import { useClaimPayout } from '#/hooks/useClaimPayout'
@@ -663,19 +664,26 @@ function DisputeEscalateMode({
   connected: boolean
   onOpenWallet: () => void
 }) {
-  const [loading, setLoading] = useState(false)
+  const {
+    mutate: escalate,
+    step,
+    retryCount,
+    resolverCount,
+    reset,
+  } = useOpenDispute(market.id)
 
-  async function handleEscalate() {
+  function handleEscalate() {
     if (!connected) {
       onOpenWallet()
       return
     }
-    // Escalation requires on-chain transaction -- placeholder for open_dispute hook
-    setLoading(true)
-    // The actual open_dispute transaction would be wired here via a useOpenDispute hook
-    // For now, show loading state to indicate the flow
-    setLoading(false)
+    escalate()
   }
+
+  const isActive =
+    step !== 'idle' && step !== 'error'
+  const insufficientResolvers =
+    resolverCount !== null && resolverCount < 7
 
   return (
     <div className="rounded-xl bg-card p-6">
@@ -689,21 +697,157 @@ function DisputeEscalateMode({
         </p>
       </div>
 
-      <Button
-        className="w-full bg-amber-500/20 font-semibold text-amber-400 hover:bg-amber-500/30"
-        size="lg"
-        onClick={handleEscalate}
-        disabled={loading}
-      >
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <div className="size-4 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
-            Escalating...
+      {isActive ? (
+        <EscalateProgress step={step} retryCount={retryCount} />
+      ) : step === 'error' ? (
+        <div className="mt-4">
+          <p className="mb-3 text-center text-sm text-destructive-foreground">
+            Escalation failed
+          </p>
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => reset()}
+          >
+            Try Again
+          </Button>
+        </div>
+      ) : (
+        <>
+          <Button
+            className="w-full bg-amber-500/20 font-semibold text-amber-400 hover:bg-amber-500/30"
+            size="lg"
+            onClick={handleEscalate}
+            disabled={insufficientResolvers}
+          >
+            Escalate to Dispute
+          </Button>
+          {insufficientResolvers && (
+            <p className="mt-2 text-center text-xs text-amber-400/60">
+              Not enough resolvers available ({resolverCount}/7 required)
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// ESCALATE PROGRESS INDICATOR
+// =============================================================================
+
+function EscalateProgress({
+  step,
+  retryCount,
+}: {
+  step: string
+  retryCount: number
+}) {
+  const steps = [
+    { key: 'escalating', label: 'Escalating...' },
+    { key: 'initializing', label: 'Initializing vote tally...' },
+    { key: 'confirming', label: 'Awaiting confirmation...' },
+  ]
+
+  if (step === 'checking') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <div className="size-6 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+        <p className="text-center text-sm text-muted-foreground">
+          Checking resolver availability...
+        </p>
+      </div>
+    )
+  }
+
+  if (step === 'retrying') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <div className="size-6 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+        <p className="text-center text-sm text-muted-foreground">
+          Dispute busy -- retrying... (attempt {retryCount})
+        </p>
+      </div>
+    )
+  }
+
+  if (step === 'success') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <div className="flex size-8 items-center justify-center rounded-full bg-amber-400/10">
+          <svg
+            className="size-5 text-amber-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <p className="text-center text-sm font-medium text-amber-400">
+          Dispute escalated!
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3 py-6">
+      {steps.map((s, i) => {
+        const isActive = s.key === step
+        const stepIndex = steps.findIndex((ss) => ss.key === step)
+        const isDone = i < stepIndex
+
+        return (
+          <div key={s.key} className="flex items-center gap-3">
+            <div
+              className={cn(
+                'flex size-6 items-center justify-center rounded-full text-xs font-medium transition-colors',
+                isDone && 'bg-amber-400/10 text-amber-400',
+                isActive && 'bg-amber-400 text-amber-950',
+                !isDone && !isActive && 'bg-secondary text-muted-foreground',
+              )}
+            >
+              {isDone ? (
+                <svg
+                  className="size-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              ) : (
+                i + 1
+              )}
+            </div>
+            <span
+              className={cn(
+                'text-sm',
+                isActive && 'font-medium text-foreground',
+                isDone && 'text-muted-foreground',
+                !isDone && !isActive && 'text-muted-foreground/50',
+              )}
+            >
+              {s.label}
+            </span>
+            {isActive && (
+              <div className="ml-auto size-4 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+            )}
           </div>
-        ) : (
-          'Escalate to Dispute'
-        )}
-      </Button>
+        )
+      })}
     </div>
   )
 }
