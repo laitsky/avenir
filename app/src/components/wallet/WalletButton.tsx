@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { Copy, ExternalLink, LogOut } from 'lucide-react'
+import { useUsdcBalance } from '#/hooks/useUsdcBalance'
 
 /**
  * Truncates a base58 public key to "first4...last4" format.
@@ -23,6 +24,7 @@ function truncateAddress(address: string): string {
 export function WalletButton() {
   const { publicKey, connected, disconnect, wallet } = useWallet()
   const { setVisible } = useWalletModal()
+  const { data: usdcBalance } = useUsdcBalance()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -98,6 +100,10 @@ export function WalletButton() {
           />
         )}
         <span className="font-mono">{truncateAddress(address)}</span>
+        <span className="text-muted-foreground">&middot;</span>
+        <span className="font-mono tabular-nums">
+          {(usdcBalance ?? 0).toFixed(2)} USDC
+        </span>
       </button>
 
       {/* Dropdown menu */}
