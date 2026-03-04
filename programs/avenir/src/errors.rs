@@ -54,4 +54,24 @@ pub enum AvenirError {
     MarketNotExpired,
     #[msg("Invalid winning outcome (must be 1=Yes or 2=No)")]
     InvalidOutcome,
+
+    // Resolver / Dispute errors
+    #[msg("Resolver stake must be at least 500 USDC")]
+    StakeTooLow,
+    #[msg("Resolver is not approved")]
+    ResolverNotApproved,
+    #[msg("Resolver is already approved")]
+    ResolverAlreadyApproved,
+    #[msg("Resolver registry is full")]
+    RegistryFull,
+    #[msg("Cannot withdraw while active in a dispute")]
+    ActiveDisputeExists,
+    #[msg("7-day withdrawal cooldown has not elapsed")]
+    CooldownNotElapsed,
+    #[msg("No pending withdrawal request")]
+    WithdrawalNotRequested,
+    #[msg("Withdrawal would leave stake below minimum")]
+    InsufficientStake,
+    #[msg("48-hour grace period has expired; market must resolve via dispute")]
+    GracePeriodExpired,
 }

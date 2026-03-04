@@ -1,20 +1,28 @@
 pub mod add_creator;
+pub mod approve_resolver;
 pub mod cancel_market;
 pub mod claim_payout;
 pub mod create_market;
 pub mod initialize;
 pub mod mpc;
 pub mod place_bet;
+pub mod register_resolver;
 pub mod remove_creator;
 pub mod resolve_market;
+pub mod stake_resolver;
+pub mod withdraw_resolver;
 
 #[allow(ambiguous_glob_reexports)]
 pub use add_creator::*;
+pub use approve_resolver::*;
 pub use cancel_market::*;
 pub use claim_payout::*;
 pub use create_market::*;
 pub use initialize::*;
 pub use mpc::*;
 pub use place_bet::*;
+pub use register_resolver::*;
 pub use remove_creator::*;
 pub use resolve_market::*;
+pub use stake_resolver::*;
+pub use withdraw_resolver::*;

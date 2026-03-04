@@ -41,6 +41,26 @@ pub mod avenir {
         instructions::claim_payout::handler(ctx)
     }
 
+    pub fn register_resolver(ctx: Context<RegisterResolver>, amount: u64) -> Result<()> {
+        instructions::register_resolver::handler(ctx, amount)
+    }
+
+    pub fn approve_resolver(ctx: Context<ApproveResolver>) -> Result<()> {
+        instructions::approve_resolver::handler(ctx)
+    }
+
+    pub fn stake_resolver(ctx: Context<StakeResolver>, amount: u64) -> Result<()> {
+        instructions::stake_resolver::handler(ctx, amount)
+    }
+
+    pub fn withdraw_resolver(
+        ctx: Context<WithdrawResolver>,
+        amount: u64,
+        execute: bool,
+    ) -> Result<()> {
+        instructions::withdraw_resolver::handler(ctx, amount, execute)
+    }
+
     pub fn place_bet(
         ctx: Context<PlaceBet>,
         amount: u64,

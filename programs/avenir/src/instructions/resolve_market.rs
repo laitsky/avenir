@@ -16,6 +16,14 @@ pub fn handler(ctx: Context<ResolveMarket>, winning_outcome: u8) -> Result<()> {
         AvenirError::MarketNotExpired
     );
 
+    // Validate within 48-hour grace period (172800 seconds)
+    // After this window, the market must be resolved via dispute escalation
+    let grace_deadline = market.resolution_time.checked_add(172_800).unwrap();
+    require!(
+        clock.unix_timestamp <= grace_deadline,
+        AvenirError::GracePeriodExpired
+    );
+
     // Validate no MPC in flight
     require!(!market.mpc_lock, AvenirError::MpcLocked);
 
