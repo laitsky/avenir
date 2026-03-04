@@ -92,4 +92,8 @@ pub enum AvenirError {
     DisputeNotVoting,
     #[msg("Not enough votes to finalize dispute")]
     QuorumNotReached,
+    #[msg("Tiebreaker juror has already been added")]
+    TiebreakerAlreadyAdded,
+    #[msg("Dispute is not settled")]
+    DisputeNotSettled,
 }

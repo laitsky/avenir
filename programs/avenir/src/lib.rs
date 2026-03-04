@@ -45,6 +45,14 @@ pub mod avenir {
         instructions::open_dispute::handler(ctx)
     }
 
+    pub fn add_tiebreaker<'info>(ctx: Context<'_, '_, 'info, 'info, AddTiebreaker<'info>>) -> Result<()> {
+        instructions::add_tiebreaker::handler(ctx)
+    }
+
+    pub fn settle_dispute_rewards(ctx: Context<SettleDisputeRewards>, juror_index: u8) -> Result<()> {
+        instructions::settle_dispute_rewards::handler(ctx, juror_index)
+    }
+
     pub fn register_resolver(ctx: Context<RegisterResolver>, amount: u64) -> Result<()> {
         instructions::register_resolver::handler(ctx, amount)
     }

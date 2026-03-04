@@ -1,4 +1,5 @@
 pub mod add_creator;
+pub mod add_tiebreaker;
 pub mod approve_resolver;
 pub mod cancel_market;
 pub mod cast_vote;
@@ -11,11 +12,13 @@ pub mod place_bet;
 pub mod register_resolver;
 pub mod remove_creator;
 pub mod resolve_market;
+pub mod settle_dispute_rewards;
 pub mod stake_resolver;
 pub mod withdraw_resolver;
 
 #[allow(ambiguous_glob_reexports)]
 pub use add_creator::*;
+pub use add_tiebreaker::*;
 pub use approve_resolver::*;
 pub use cancel_market::*;
 pub use cast_vote::*;
@@ -28,5 +31,6 @@ pub use place_bet::*;
 pub use register_resolver::*;
 pub use remove_creator::*;
 pub use resolve_market::*;
+pub use settle_dispute_rewards::*;
 pub use stake_resolver::*;
 pub use withdraw_resolver::*;
