@@ -1,13 +1,5 @@
 import { cn } from '#/lib/utils'
-
-const CATEGORIES = [
-  'All',
-  'Crypto',
-  'Politics',
-  'Sports',
-  'Culture',
-  'Economics',
-] as const
+import { CATEGORIES } from '#/lib/constants'
 
 interface CategoryTabsProps {
   value: string

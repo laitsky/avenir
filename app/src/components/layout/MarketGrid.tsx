@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { MarketCard } from '#/components/market/MarketCard'
 import { cn } from '#/lib/utils'
-import type { MockMarket } from '#/lib/mock-data'
+import type { OnChainMarket } from '#/lib/types'
 
 type SortMode = 'trending' | 'newest' | 'ending'
 
@@ -12,25 +12,25 @@ const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: 'ending', label: 'Ending soon' },
 ]
 
-function sortMarkets(markets: MockMarket[], mode: SortMode): MockMarket[] {
+function sortMarkets(markets: OnChainMarket[], mode: SortMode): OnChainMarket[] {
   const sorted = [...markets]
   switch (mode) {
     case 'trending':
-      return sorted.sort((a, b) => b.betCount - a.betCount)
+      return sorted.sort((a, b) => b.totalBets - a.totalBets)
     case 'newest':
-      return sorted.sort((a, b) => b.deadline.getTime() - a.deadline.getTime())
+      return sorted.sort((a, b) => b.createdAt - a.createdAt)
     case 'ending': {
       const live = sorted
-        .filter((m) => m.status === 'live')
-        .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
-      const resolved = sorted.filter((m) => m.status !== 'live')
+        .filter((m) => m.state === 0 || m.state === 1)
+        .sort((a, b) => a.resolutionTime - b.resolutionTime)
+      const resolved = sorted.filter((m) => m.state !== 0 && m.state !== 1)
       return [...live, ...resolved]
     }
   }
 }
 
 interface MarketGridProps {
-  markets: MockMarket[]
+  markets: OnChainMarket[]
   className?: string
 }
 
@@ -72,7 +72,7 @@ export function MarketGrid({ markets, className }: MarketGridProps) {
           <Link
             key={market.id}
             to="/market/$id"
-            params={{ id: market.id }}
+            params={{ id: market.id.toString() }}
             className="no-underline"
           >
             <MarketCard

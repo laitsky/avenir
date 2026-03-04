@@ -1,16 +1,42 @@
 import { cn } from '#/lib/utils'
 import { FogOverlay } from '#/components/fog/FogOverlay'
 import { CountdownTimer } from '#/components/market/CountdownTimer'
-import type { MockMarket } from '#/lib/mock-data'
+import type { OnChainMarket } from '#/lib/types'
+import { CATEGORY_MAP, SENTIMENT_MAP } from '#/lib/types'
 
 interface MarketCardProps {
-  market: MockMarket
+  market: OnChainMarket
   className?: string
   style?: React.CSSProperties
 }
 
+/**
+ * Converts a sentiment enum value to an approximate visual percentage for the bar.
+ * These are visual-only hints since actual pool data is encrypted.
+ */
+function sentimentToPercent(sentiment: number): number {
+  switch (sentiment) {
+    case 1: return 65  // Leaning Yes
+    case 2: return 50  // Even
+    case 3: return 35  // Leaning No
+    default: return 50 // Unknown
+  }
+}
+
 export function MarketCard({ market, className, style }: MarketCardProps) {
-  const isResolved = market.status === 'resolved'
+  const isFinalized = market.state === 4 // Finalized
+  const isResolved = market.state === 2 || isFinalized // Resolved or Finalized
+  const isLive = market.state === 0 || market.state === 1 // Open or Locked
+
+  // Compute probability display
+  const yesPercent = isFinalized && (market.revealedYesPool + market.revealedNoPool) > 0
+    ? (market.revealedYesPool / (market.revealedYesPool + market.revealedNoPool)) * 100
+    : sentimentToPercent(market.sentiment)
+
+  // Pool total display
+  const poolDisplay = isFinalized
+    ? `${((market.revealedYesPool + market.revealedNoPool) / 1_000_000).toLocaleString()} USDC`
+    : 'Encrypted'
 
   return (
     <div
@@ -27,9 +53,9 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-medium uppercase tracking-wider text-primary/50">
-            {market.category}
+            {CATEGORY_MAP[market.category] ?? 'Other'}
           </span>
-          {!isResolved && (
+          {isLive && (
             <span className="flex items-center gap-1 text-[11px] text-primary/40">
               <span className="size-1 animate-pulse rounded-full bg-primary/60" />
             </span>
@@ -39,17 +65,17 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
           <span
             className={cn(
               'text-[11px] font-medium uppercase tracking-wider',
-              market.outcome === 'yes' ? 'text-primary' : 'text-destructive-foreground'
+              market.winningOutcome === 1 ? 'text-primary' : 'text-destructive-foreground'
             )}
           >
-            {market.outcome === 'yes' ? 'Yes' : 'No'}
+            {market.winningOutcome === 1 ? 'Yes' : 'No'}
           </span>
         ) : (
-          <CountdownTimer deadline={market.deadline} />
+          <CountdownTimer deadline={new Date(market.resolutionTime * 1000)} />
         )}
       </div>
 
-      {/* Question — serif italic, editorial */}
+      {/* Question -- serif italic, editorial */}
       <p className="mb-4 line-clamp-2 font-serif text-lg italic leading-snug text-foreground">
         {market.question}
       </p>
@@ -60,19 +86,19 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
           <div className="flex h-1.5 overflow-hidden rounded-full bg-secondary">
             <div
               className="rounded-full bg-primary/70 transition-all duration-500"
-              style={{ width: `${market.yesPercent}%` }}
+              style={{ width: `${yesPercent}%` }}
             />
           </div>
-          {!isResolved && (
-            <FogOverlay density="light" revealed={isResolved} className="absolute inset-0 rounded-full">
+          {!isFinalized && (
+            <FogOverlay density="light" revealed={isFinalized} className="absolute inset-0 rounded-full">
               <div className="h-1.5" />
             </FogOverlay>
           )}
         </div>
-        {isResolved && (
+        {isFinalized && (
           <div className="mt-1.5 flex justify-between font-mono text-[10px] tabular-nums">
-            <span className="text-primary">{market.yesPercent}% Yes</span>
-            <span className="text-muted-foreground">{100 - market.yesPercent}% No</span>
+            <span className="text-primary">{Math.round(yesPercent)}% Yes</span>
+            <span className="text-muted-foreground">{Math.round(100 - yesPercent)}% No</span>
           </div>
         )}
       </div>
@@ -80,17 +106,28 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
       {/* Pool + bets */}
       <div className="mb-4 flex items-center justify-between">
         <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-          {market.betCount} bets
+          {market.totalBets} bets
         </span>
-        <FogOverlay density="heavy" revealed={isResolved}>
+        <FogOverlay density="heavy" revealed={isFinalized}>
           <span className="font-mono text-[11px] tabular-nums text-accent">
-            {market.poolTotal}
+            {poolDisplay}
           </span>
         </FogOverlay>
       </div>
 
+      {/* Sentiment indicator for live markets */}
+      {isLive && (
+        <div className="mb-4">
+          <FogOverlay density="light">
+            <span className="text-[11px] text-muted-foreground">
+              {SENTIMENT_MAP[market.sentiment] ?? 'Unknown'}
+            </span>
+          </FogOverlay>
+        </div>
+      )}
+
       {/* Action chips */}
-      {!isResolved && (
+      {isLive && (
         <div className="flex gap-2">
           <span className="flex-1 cursor-pointer rounded-lg bg-primary/10 py-2 text-center text-xs font-medium text-primary transition-all group-hover:bg-primary/20">
             Yes
