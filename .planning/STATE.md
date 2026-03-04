@@ -174,6 +174,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 06-05-PLAN.md (RES-02 Reclassification Gap Closure)
-Resume file: .planning/phases/06-resolution-payouts/06-05-SUMMARY.md
-Note: Phase 6 complete (5/5 plans including gap closure). RES-02 reclassified to Phase 8. Ready for Phase 7 (frontend integration) or Phase 8 (dispute system).
+Stopped at: Phase 7 context gathered
+Resume file: .planning/phases/07-core-ui-integration/07-CONTEXT.md
+Note: Phase 7 context captured (wallet UX, bet flow, live data, resolution/claim). Ready for /gsd:plan-phase 7.
