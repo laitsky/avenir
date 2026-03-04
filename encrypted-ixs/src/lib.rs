@@ -122,6 +122,18 @@ mod circuits {
         tally_ctxt.owner.from_arcis(tally)
     }
 
+    /// Reveal encrypted dispute vote totals at finalization.
+    ///
+    /// Takes the encrypted VoteTotals and reveals both weighted vote values as plaintext.
+    /// The program uses these to determine the winning outcome.
+    #[instruction]
+    pub fn finalize_dispute(
+        tally_ctxt: Enc<Mxe, VoteTotals>,
+    ) -> (u64, u64) {
+        let tally = tally_ctxt.to_arcis();
+        (tally[0].reveal(), tally[1].reveal())
+    }
+
     /// Hello-world circuit for environment validation.
     /// Takes two encrypted u64 inputs (Shared) and returns their sum (Mxe-owned).
     /// Validates: Enc<Shared, T> input, Enc<Mxe, T> output, basic arithmetic, to_arcis/from_arcis lifecycle.

@@ -90,4 +90,6 @@ pub enum AvenirError {
     VotingWindowClosed,
     #[msg("Dispute is not in voting state")]
     DisputeNotVoting,
+    #[msg("Not enough votes to finalize dispute")]
+    QuorumNotReached,
 }

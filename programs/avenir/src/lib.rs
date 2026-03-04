@@ -397,6 +397,79 @@ pub mod avenir {
         Ok(())
     }
 
+    // MPC instructions -- finalize_dispute
+    pub fn init_finalize_dispute_comp_def(ctx: Context<InitFinalizeDisputeCompDef>) -> Result<()> {
+        instructions::mpc::finalize_dispute_comp_def::handler(ctx)
+    }
+
+    pub fn finalize_dispute(ctx: Context<FinalizeDispute>, computation_offset: u64) -> Result<()> {
+        instructions::mpc::finalize_dispute::handler(ctx, computation_offset)
+    }
+
+    #[arcium_callback(encrypted_ix = "finalize_dispute")]
+    pub fn finalize_dispute_callback(
+        ctx: Context<FinalizeDisputeCallback>,
+        output: SignedComputationOutputs<FinalizeDisputeOutput>,
+    ) -> Result<()> {
+        // finalize_dispute returns (u64, u64) with both .reveal()'d
+        // Generated output structure:
+        //   FinalizeDisputeOutput { field_0: FinalizeDisputeOutputStruct0 }
+        //   FinalizeDisputeOutputStruct0 { field_0: u64, field_1: u64 }
+        let result = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(FinalizeDisputeOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("finalize_dispute computation failed: {}", e);
+
+                // Clear MPC lock and revert status to Voting on failure
+                let dispute = &mut ctx.accounts.dispute;
+                dispute.mpc_lock = false;
+                dispute.lock_timestamp = 0;
+                dispute.status = 0; // Revert to Voting
+
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // === Success path ===
+
+        let revealed_yes_votes = result.field_0;
+        let revealed_no_votes = result.field_1;
+
+        let market = &mut ctx.accounts.market;
+        let dispute = &mut ctx.accounts.dispute;
+
+        if revealed_yes_votes > revealed_no_votes {
+            // Yes wins -- resolve market with Yes outcome
+            market.winning_outcome = 1;
+            market.state = 2; // Resolved
+            dispute.status = 2; // Settled
+        } else if revealed_no_votes > revealed_yes_votes {
+            // No wins -- resolve market with No outcome
+            market.winning_outcome = 2;
+            market.state = 2; // Resolved
+            dispute.status = 2; // Settled
+        } else {
+            // Tie -- do NOT resolve. Revert dispute to Voting for tiebreaker flow.
+            dispute.status = 0; // Back to Voting
+        }
+
+        // Clear MPC lock
+        dispute.mpc_lock = false;
+        dispute.lock_timestamp = 0;
+
+        msg!(
+            "finalize_dispute complete - yes_votes={}, no_votes={}, dispute.status={}, market.state={}",
+            revealed_yes_votes,
+            revealed_no_votes,
+            dispute.status,
+            market.state,
+        );
+        Ok(())
+    }
+
     // MPC instructions -- compute_payouts
     pub fn init_compute_payouts_comp_def(ctx: Context<InitComputePayoutsCompDef>) -> Result<()> {
         instructions::mpc::init_compute_payouts_comp_def::handler(ctx)
