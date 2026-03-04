@@ -192,11 +192,11 @@ Plans:
 **Plans:** 6 plans in 5 waves
 
 Plans:
-- [ ] 08-01: Resolver pool staking subsystem and 48h grace period enforcement (Wave 1)
-- [ ] 08-02: Dispute escalation trigger, state machine, and juror selection (Wave 2)
-- [ ] 08-03: Encrypted voting circuits and cast_vote instruction (Wave 3)
-- [ ] 08-04: finalize_dispute circuit, tie-breaking, and resolver rewards (Wave 4)
-- [ ] 08-05: Integration tests for full dispute lifecycle (Wave 5)
+- [x] 08-01: Resolver pool staking subsystem and 48h grace period enforcement (Wave 1)
+- [x] 08-02: Dispute escalation trigger, state machine, and juror selection (Wave 2)
+- [x] 08-03: Encrypted voting circuits and cast_vote instruction (Wave 3)
+- [x] 08-04: finalize_dispute circuit, tie-breaking, and resolver rewards (Wave 4)
+- [x] 08-05: Integration tests for full dispute lifecycle (Wave 5)
 - [ ] 08-06: Dispute UI integration -- badges, voting panel, fog-reveal (Wave 5)
 
 ### Phase 9: Portfolio & Search

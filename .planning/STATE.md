@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 08-04-PLAN.md
-last_updated: "2026-03-04T11:35:54.000Z"
+stopped_at: Completed 08-06-PLAN.md
+last_updated: "2026-03-04T11:53:54.000Z"
 progress:
   total_phases: 8
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 35
-  completed_plans: 33
+  completed_plans: 35
 ---
 
 # Project State
@@ -19,23 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 8 in progress -- dispute resolution, tiebreaker, and settlement
+**Current focus:** Phase 8 complete -- dispute system fully implemented including UI integration
 
 ## Current Position
 
 Phase: 8 of 10 (Dispute System)
-Plan: 4 of 6 in current phase (4 complete)
-Status: Phase 8 In Progress
-Last activity: 2026-03-04 -- Completed 08-04-PLAN.md (Dispute Resolution & Settlement)
+Plan: 6 of 6 in current phase (6 complete)
+Status: Phase 8 Complete
+Last activity: 2026-03-04 -- Completed 08-06-PLAN.md (Dispute Frontend Integration)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░] 94%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 35
 - Average duration: 6min
-- Total execution time: 2.22 hours
+- Total execution time: 2.32 hours
 
 **By Phase:**
 
@@ -48,11 +48,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
-| 8. Dispute System | 4/6 | 14min | 4min |
+| 8. Dispute System | 6/6 | 25min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 5min, 2min, 2min, 5min
-- Trend: Phase 8 progressing -- dispute resolution MPC and settlement complete
+- Last 5 plans: 2min, 2min, 5min, 5min, 6min
+- Trend: Phase 8 complete -- all dispute system plans executed including frontend integration
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -84,6 +84,8 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 08 P02 | 2min | 2 tasks | 7 files |
 | Phase 08 P03 | 5min | 2 tasks | 12 files |
 | Phase 08 P04 | 5min | 2 tasks | 10 files |
+| Phase 08 P05 | 5min | 2 tasks | 2 files |
+| Phase 08 P06 | 6min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -194,6 +196,12 @@ Recent decisions affecting current work:
 - [08-04]: V1 settlement preserves vote privacy: only non-voters slashed (0.5%), no majority/minority since individual votes cannot be revealed
 - [08-04]: Tie detection in finalize_dispute_callback reverts status to Voting without resolving, enabling tiebreaker flow
 - [08-04]: Deterministic tiebreaker selection uses wrapping_mul LCG seed with market_id, XOR clock.slot and vote_count
+- [08-05]: MPC-dependent dispute tests structured with DKG TODO markers; IDL error variant assertion for time-dependent tests
+- [08-05]: 32 test cases covering full dispute lifecycle: resolver CRUD, escalation, voting, finalization, settlement
+- [08-06]: Grace period calculated client-side as resolutionTime + 172800s matching on-chain GRACE_PERIOD constant
+- [08-06]: Juror eligibility check uses bitfield votesSubmitted for already-voted detection, mirroring on-chain pattern
+- [08-06]: Vote encryption uses single-field cipher.encrypt for boolean (isYes), not dual-field like usePlaceBet
+- [08-06]: BetPlacement mode state machine extended to 12 modes (8 original + 4 dispute)
 
 ### Pending Todos
 
@@ -208,7 +216,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T11:44:06Z
-**Stopped at:** Completed 08-04-PLAN.md
-**Resume file:** .planning/phases/08-dispute-system/08-05-PLAN.md
-**Note:** Phase 8 plan 4 complete. Dispute resolution MPC, tiebreaker, and settlement instructions implemented. Ready for 08-05 (dispute UI).
+**Last session:** 2026-03-04T11:53:54Z
+**Stopped at:** Completed 08-06-PLAN.md
+**Resume file:** Phase 8 complete. Next phase pending.
+**Note:** Phase 8 fully complete (6/6 plans). Dispute system: resolver pool, escalation, encrypted voting, resolution MPC, settlement, integration tests, and frontend UI all implemented. Ready for Phase 9 (Portfolio & Search).
