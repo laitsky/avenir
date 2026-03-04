@@ -74,4 +74,12 @@ pub enum AvenirError {
     InsufficientStake,
     #[msg("48-hour grace period has expired; market must resolve via dispute")]
     GracePeriodExpired,
+    #[msg("Caller has no position on this market")]
+    NotMarketParticipant,
+    #[msg("Market is already in dispute")]
+    MarketAlreadyDisputed,
+    #[msg("48-hour grace period has not expired yet")]
+    GracePeriodNotExpired,
+    #[msg("Not enough approved resolvers for jury selection")]
+    NotEnoughResolvers,
 }

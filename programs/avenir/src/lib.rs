@@ -41,6 +41,10 @@ pub mod avenir {
         instructions::claim_payout::handler(ctx)
     }
 
+    pub fn open_dispute<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) -> Result<()> {
+        instructions::open_dispute::handler(ctx)
+    }
+
     pub fn register_resolver(ctx: Context<RegisterResolver>, amount: u64) -> Result<()> {
         instructions::register_resolver::handler(ctx, amount)
     }
