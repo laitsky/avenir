@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { ClientOnly } from '@tanstack/react-router'
+import { WalletButton } from '#/components/wallet/WalletButton'
 
 export function Header() {
   return (
@@ -30,12 +32,18 @@ export function Header() {
           >
             Portfolio
           </Link>
-          <button
-            type="button"
-            className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
+          <ClientOnly
+            fallback={
+              <button
+                type="button"
+                className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
+              >
+                Connect Wallet
+              </button>
+            }
           >
-            Connect Wallet
-          </button>
+            <WalletButton />
+          </ClientOnly>
         </div>
       </nav>
     </header>

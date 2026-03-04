@@ -4,8 +4,14 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
+import { ClientOnly } from '@tanstack/react-router'
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import { Toaster } from 'sonner'
 import { Header } from '#/components/Header'
+import { RPC_ENDPOINT } from '#/lib/constants'
 
+import '@solana/wallet-adapter-react-ui/styles.css'
 import appCss from '../styles/app.css?url'
 
 export const Route = createRootRoute({
@@ -13,7 +19,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Avenir — Encrypted Prediction Markets' },
+      { title: 'Avenir -- Encrypted Prediction Markets' },
     ],
     links: [
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -28,6 +34,21 @@ export const Route = createRootRoute({
   component: RootLayout,
 })
 
+/**
+ * Fallback layout rendered during SSR before wallet providers hydrate.
+ * Matches the visual structure so there's no layout shift.
+ */
+function FallbackLayout() {
+  return (
+    <>
+      <Header />
+      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+        <Outlet />
+      </main>
+    </>
+  )
+}
+
 function RootLayout() {
   return (
     <html lang="en">
@@ -35,10 +56,19 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <Header />
-        <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
-          <Outlet />
-        </main>
+        <ClientOnly fallback={<FallbackLayout />}>
+          <ConnectionProvider endpoint={RPC_ENDPOINT}>
+            <WalletProvider wallets={[]} autoConnect>
+              <WalletModalProvider>
+                <Header />
+                <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+                  <Outlet />
+                </main>
+                <Toaster theme="dark" position="bottom-right" />
+              </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </ClientOnly>
         <Scripts />
       </body>
     </html>
