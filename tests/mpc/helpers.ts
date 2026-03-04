@@ -379,6 +379,24 @@ export async function initCompDef(
           .accountsPartial(accounts)
           .rpc({ skipPreflight: true, commitment: "confirmed" });
         break;
+      case "init_dispute_tally":
+        await program.methods
+          .initDisputeTallyCompDef()
+          .accountsPartial(accounts)
+          .rpc({ skipPreflight: true, commitment: "confirmed" });
+        break;
+      case "add_dispute_vote":
+        await program.methods
+          .initAddDisputeVoteCompDef()
+          .accountsPartial(accounts)
+          .rpc({ skipPreflight: true, commitment: "confirmed" });
+        break;
+      case "finalize_dispute":
+        await program.methods
+          .initFinalizeDisputeCompDef()
+          .accountsPartial(accounts)
+          .rpc({ skipPreflight: true, commitment: "confirmed" });
+        break;
       default:
         throw new Error(`Unknown comp_def name: ${compDefName}`);
     }

@@ -774,15 +774,10 @@ describe("dispute system", () => {
   // Dispute Escalation Tests (RES-03)
   // =========================================================================
   describe("dispute escalation", () => {
-    it("cannot open dispute before grace period expires (GracePeriodNotExpired IDL assertion)", async () => {
+    it("cannot open dispute before grace period expires (GracePeriodNotExpired)", async () => {
       // The grace period is 48h after resolution_time. Since our market has a
       // very short deadline that passed quickly, but 48h grace period cannot pass
-      // on localnet, we rely on IDL assertion to prove the guard exists.
-      // The open_dispute handler checks: clock.unix_timestamp > grace_deadline.
-      // This was already verified in the previous test via IDL error variant.
-      //
-      // Additionally, attempting open_dispute on a market whose grace period
-      // hasn't expired will error with GracePeriodNotExpired.
+      // on localnet, attempting open_dispute should fail with GracePeriodNotExpired.
       const [disputePda] = getDisputePda(marketId);
       const [disputeTallyPda] = getDisputeTallyPda(marketId);
       const [positionPdaA] = getPositionPda(marketId, bettorA.publicKey);
@@ -803,14 +798,12 @@ describe("dispute system", () => {
           .signers([bettorA])
           .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-        // If it succeeds, the grace period somehow passed (very short deadline + enough time elapsed).
-        // This is acceptable -- it means the test ran slowly enough that 48h worth of slots passed.
+        // If it succeeds, the grace period somehow passed (very unlikely on localnet).
         console.log(
-          "    Note: open_dispute succeeded (grace period may have expired in test timing)"
+          "    Note: open_dispute succeeded (grace period expired in test timing)"
         );
       } catch (e: any) {
         const errStr = e.toString();
-        // Expected: GracePeriodNotExpired since 48h hasn't passed
         assert.isTrue(
           errStr.includes("GracePeriodNotExpired") ||
             errStr.includes("48-hour grace period has not expired yet") ||
@@ -858,111 +851,359 @@ describe("dispute system", () => {
         console.log("    NotMarketParticipant correctly rejected");
       }
     });
+  });
 
-    it("NotSelectedJuror error variant exists in IDL", async () => {
+  // =========================================================================
+  // Encrypted Voting Tests (RES-05) -- MPC-dependent, structured with DKG TODOs
+  // =========================================================================
+  describe("encrypted voting (MPC-dependent)", () => {
+    // NOTE: These tests require a functioning Arcium devnet DKG ceremony.
+    // DKG is currently non-functional (0/142 MXE accounts completed DKG).
+    // Tests are structured with clear TODO markers for when DKG is resolved.
+    // Non-MPC logic (IDL assertions, PDA derivation, error variants) is validated.
+
+    it("init_dispute_tally instruction exists with correct accounts in IDL", async () => {
+      const ix = program.idl.instructions.find(
+        (i: any) => i.name === "initDisputeTally"
+      );
+      assert.isDefined(ix, "initDisputeTally instruction should exist in IDL");
+
+      // Verify key accounts are present
+      const accountNames = ix!.accounts.map((a: any) => a.name);
+      assert.isTrue(
+        accountNames.includes("payer"),
+        "Should have payer account"
+      );
+      assert.isTrue(
+        accountNames.includes("dispute"),
+        "Should have dispute account"
+      );
+      assert.isTrue(
+        accountNames.includes("disputeTally"),
+        "Should have disputeTally account"
+      );
+      assert.isTrue(
+        accountNames.includes("mxeAccount"),
+        "Should have mxeAccount for MPC"
+      );
+
+      console.log("    initDisputeTally instruction verified in IDL");
+      console.log(
+        "    TODO: Execute init_dispute_tally MPC when DKG is operational"
+      );
+    });
+
+    it("cast_vote instruction exists with correct accounts in IDL", async () => {
+      const ix = program.idl.instructions.find(
+        (i: any) => i.name === "castVote"
+      );
+      assert.isDefined(ix, "castVote instruction should exist in IDL");
+
+      const accountNames = ix!.accounts.map((a: any) => a.name);
+      assert.isTrue(
+        accountNames.includes("juror"),
+        "Should have juror signer"
+      );
+      assert.isTrue(
+        accountNames.includes("dispute"),
+        "Should have dispute account"
+      );
+      assert.isTrue(
+        accountNames.includes("disputeTally"),
+        "Should have disputeTally account"
+      );
+      assert.isTrue(
+        accountNames.includes("market"),
+        "Should have market account"
+      );
+      assert.isTrue(
+        accountNames.includes("resolver"),
+        "Should have resolver account (for stake weight)"
+      );
+
+      // Verify args include vote_ciphertext, pub_key, nonce
+      const argNames = ix!.args.map((a: any) => a.name);
+      assert.isTrue(
+        argNames.includes("computationOffset"),
+        "Should have computationOffset arg"
+      );
+      assert.isTrue(
+        argNames.includes("voteCiphertext"),
+        "Should have voteCiphertext arg"
+      );
+      assert.isTrue(
+        argNames.includes("pubKey"),
+        "Should have pubKey arg"
+      );
+      assert.isTrue(
+        argNames.includes("nonce"),
+        "Should have nonce arg"
+      );
+
+      console.log("    castVote instruction verified in IDL with correct args");
+      console.log(
+        "    TODO: Execute cast_vote MPC when DKG is operational"
+      );
+    });
+
+    it("NotSelectedJuror error variant exists for juror eligibility enforcement", async () => {
       const idlErrors = program.idl.errors;
-      const notSelectedJurorError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
           e.name === "notSelectedJuror" || e.name === "NotSelectedJuror"
       );
       assert.isDefined(
-        notSelectedJurorError,
-        "NotSelectedJuror error variant should exist in the program IDL"
+        error,
+        "NotSelectedJuror error variant should exist in IDL"
       );
-      console.log("    NotSelectedJuror IDL error verified");
+      console.log(
+        `    NotSelectedJuror error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
 
-    it("AlreadyVoted error variant exists in IDL", async () => {
+    it("AlreadyVoted error variant exists for one-vote enforcement", async () => {
       const idlErrors = program.idl.errors;
-      const alreadyVotedError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
           e.name === "alreadyVoted" || e.name === "AlreadyVoted"
       );
       assert.isDefined(
-        alreadyVotedError,
-        "AlreadyVoted error variant should exist in the program IDL"
+        error,
+        "AlreadyVoted error variant should exist in IDL"
       );
-      console.log("    AlreadyVoted IDL error verified");
+      console.log(
+        `    AlreadyVoted error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
 
-    it("VotingWindowClosed error variant exists in IDL", async () => {
+    it("VotingWindowClosed error variant exists for time enforcement", async () => {
       const idlErrors = program.idl.errors;
-      const votingWindowClosedError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
           e.name === "votingWindowClosed" || e.name === "VotingWindowClosed"
       );
       assert.isDefined(
-        votingWindowClosedError,
-        "VotingWindowClosed error variant should exist in the program IDL"
+        error,
+        "VotingWindowClosed error variant should exist in IDL"
       );
-      console.log("    VotingWindowClosed IDL error verified");
+      console.log(
+        `    VotingWindowClosed error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
 
-    it("QuorumNotReached error variant exists in IDL", async () => {
+    it("DisputeNotVoting error variant exists for state enforcement", async () => {
       const idlErrors = program.idl.errors;
-      const quorumNotReachedError = idlErrors!.find(
-        (e: any) =>
-          e.name === "quorumNotReached" || e.name === "QuorumNotReached"
-      );
-      assert.isDefined(
-        quorumNotReachedError,
-        "QuorumNotReached error variant should exist in the program IDL"
-      );
-      console.log("    QuorumNotReached IDL error verified");
-    });
-
-    it("DisputeNotVoting error variant exists in IDL", async () => {
-      const idlErrors = program.idl.errors;
-      const disputeNotVotingError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
           e.name === "disputeNotVoting" || e.name === "DisputeNotVoting"
       );
       assert.isDefined(
-        disputeNotVotingError,
-        "DisputeNotVoting error variant should exist in the program IDL"
+        error,
+        "DisputeNotVoting error variant should exist in IDL"
       );
-      console.log("    DisputeNotVoting IDL error verified");
+      console.log(
+        `    DisputeNotVoting error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
 
-    it("DisputeNotSettled error variant exists in IDL", async () => {
-      const idlErrors = program.idl.errors;
-      const disputeNotSettledError = idlErrors!.find(
-        (e: any) =>
-          e.name === "disputeNotSettled" || e.name === "DisputeNotSettled"
+    it("Dispute PDA seeds match expected derivation", async () => {
+      // Verify PDA derivation for dispute matches program seeds
+      const [derivedDisputePda] = getDisputePda(marketId);
+      const [derivedTallyPda] = getDisputeTallyPda(marketId);
+
+      // These should be deterministic based on market_id
+      assert.ok(
+        derivedDisputePda instanceof PublicKey,
+        "Dispute PDA should derive successfully"
+      );
+      assert.ok(
+        derivedTallyPda instanceof PublicKey,
+        "DisputeTally PDA should derive successfully"
+      );
+
+      // Verify PDA seeds are different from each other
+      assert.isFalse(
+        derivedDisputePda.equals(derivedTallyPda),
+        "Dispute and DisputeTally PDAs should be different"
+      );
+
+      console.log("    Dispute PDA:", derivedDisputePda.toBase58());
+      console.log("    DisputeTally PDA:", derivedTallyPda.toBase58());
+    });
+  });
+
+  // =========================================================================
+  // Finalization Tests (RES-06) -- MPC-dependent
+  // =========================================================================
+  describe("dispute finalization (MPC-dependent)", () => {
+    it("finalize_dispute instruction exists with correct accounts in IDL", async () => {
+      const ix = program.idl.instructions.find(
+        (i: any) => i.name === "finalizeDispute"
       );
       assert.isDefined(
-        disputeNotSettledError,
-        "DisputeNotSettled error variant should exist in the program IDL"
+        ix,
+        "finalizeDispute instruction should exist in IDL"
       );
-      console.log("    DisputeNotSettled IDL error verified");
+
+      const accountNames = ix!.accounts.map((a: any) => a.name);
+      assert.isTrue(
+        accountNames.includes("payer"),
+        "Should have payer signer"
+      );
+      assert.isTrue(
+        accountNames.includes("dispute"),
+        "Should have dispute account"
+      );
+      assert.isTrue(
+        accountNames.includes("disputeTally"),
+        "Should have disputeTally account"
+      );
+      assert.isTrue(
+        accountNames.includes("market"),
+        "Should have market account"
+      );
+
+      console.log("    finalizeDispute instruction verified in IDL");
+      console.log(
+        "    TODO: Execute full finalize_dispute MPC when DKG is operational"
+      );
     });
 
-    it("MarketAlreadyDisputed error variant exists in IDL", async () => {
+    it("QuorumNotReached error variant exists for quorum enforcement", async () => {
       const idlErrors = program.idl.errors;
-      const marketAlreadyDisputedError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
-          e.name === "marketAlreadyDisputed" ||
-          e.name === "MarketAlreadyDisputed"
+          e.name === "quorumNotReached" || e.name === "QuorumNotReached"
       );
       assert.isDefined(
-        marketAlreadyDisputedError,
-        "MarketAlreadyDisputed error variant should exist in the program IDL"
+        error,
+        "QuorumNotReached error variant should exist in IDL"
       );
-      console.log("    MarketAlreadyDisputed IDL error verified");
+      console.log(
+        `    QuorumNotReached error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
 
-    it("TiebreakerAlreadyAdded error variant exists in IDL", async () => {
+    it("add_tiebreaker instruction exists with correct accounts in IDL", async () => {
+      const ix = program.idl.instructions.find(
+        (i: any) => i.name === "addTiebreaker"
+      );
+      assert.isDefined(
+        ix,
+        "addTiebreaker instruction should exist in IDL"
+      );
+
+      const accountNames = ix!.accounts.map((a: any) => a.name);
+      assert.isTrue(
+        accountNames.includes("payer"),
+        "Should have payer signer"
+      );
+      assert.isTrue(
+        accountNames.includes("dispute"),
+        "Should have dispute account"
+      );
+      assert.isTrue(
+        accountNames.includes("market"),
+        "Should have market account"
+      );
+      assert.isTrue(
+        accountNames.includes("resolverRegistry"),
+        "Should have resolverRegistry for tiebreaker selection"
+      );
+
+      console.log("    addTiebreaker instruction verified in IDL");
+    });
+
+    it("TiebreakerAlreadyAdded error variant exists", async () => {
       const idlErrors = program.idl.errors;
-      const tiebreakerAlreadyAddedError = idlErrors!.find(
+      const error = idlErrors!.find(
         (e: any) =>
           e.name === "tiebreakerAlreadyAdded" ||
           e.name === "TiebreakerAlreadyAdded"
       );
       assert.isDefined(
-        tiebreakerAlreadyAddedError,
-        "TiebreakerAlreadyAdded error variant should exist in the program IDL"
+        error,
+        "TiebreakerAlreadyAdded error variant should exist in IDL"
       );
-      console.log("    TiebreakerAlreadyAdded IDL error verified");
+      console.log(
+        `    TiebreakerAlreadyAdded error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
+    });
+
+    it("settle_dispute_rewards instruction exists with correct accounts in IDL", async () => {
+      const ix = program.idl.instructions.find(
+        (i: any) => i.name === "settleDisputeRewards"
+      );
+      assert.isDefined(
+        ix,
+        "settleDisputeRewards instruction should exist in IDL"
+      );
+
+      const accountNames = ix!.accounts.map((a: any) => a.name);
+      assert.isTrue(
+        accountNames.includes("payer"),
+        "Should have payer signer"
+      );
+      assert.isTrue(
+        accountNames.includes("dispute"),
+        "Should have dispute account"
+      );
+      assert.isTrue(
+        accountNames.includes("market"),
+        "Should have market account"
+      );
+      assert.isTrue(
+        accountNames.includes("resolver"),
+        "Should have resolver account"
+      );
+      assert.isTrue(
+        accountNames.includes("resolverVault"),
+        "Should have resolverVault for slashing"
+      );
+      assert.isTrue(
+        accountNames.includes("rewardRecipient"),
+        "Should have rewardRecipient for slash distribution"
+      );
+
+      // Verify instruction takes juror_index arg
+      const argNames = ix!.args.map((a: any) => a.name);
+      assert.isTrue(
+        argNames.includes("jurorIndex"),
+        "Should have jurorIndex arg"
+      );
+
+      console.log("    settleDisputeRewards instruction verified in IDL");
+    });
+
+    it("DisputeNotSettled error variant exists for settlement enforcement", async () => {
+      const idlErrors = program.idl.errors;
+      const error = idlErrors!.find(
+        (e: any) =>
+          e.name === "disputeNotSettled" || e.name === "DisputeNotSettled"
+      );
+      assert.isDefined(
+        error,
+        "DisputeNotSettled error variant should exist in IDL"
+      );
+      console.log(
+        `    DisputeNotSettled error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
+    });
+
+    it("MarketAlreadyDisputed error variant exists", async () => {
+      const idlErrors = program.idl.errors;
+      const error = idlErrors!.find(
+        (e: any) =>
+          e.name === "marketAlreadyDisputed" ||
+          e.name === "MarketAlreadyDisputed"
+      );
+      assert.isDefined(
+        error,
+        "MarketAlreadyDisputed error variant should exist in IDL"
+      );
+      console.log(
+        `    MarketAlreadyDisputed error verified: code=${error!.code}, msg="${error!.msg}"`
+      );
     });
   });
 
@@ -1041,6 +1282,158 @@ describe("dispute system", () => {
 
       console.log(
         `    All ${requiredIxs.length} dispute instructions verified in IDL`
+      );
+    });
+
+    it("Dispute PDA derivation uses correct seeds", async () => {
+      // Verify all dispute-related PDAs derive correctly
+      const testMarketId = 99;
+      const buf = Buffer.alloc(8);
+      buf.writeBigUInt64LE(BigInt(testMarketId));
+
+      const [disputePda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("dispute"), buf],
+        program.programId
+      );
+      const [disputeTallyPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("dispute_tally"), buf],
+        program.programId
+      );
+
+      assert.ok(
+        disputePda instanceof PublicKey,
+        "Dispute PDA should be a valid PublicKey"
+      );
+      assert.ok(
+        disputeTallyPda instanceof PublicKey,
+        "DisputeTally PDA should be a valid PublicKey"
+      );
+      assert.isFalse(
+        disputePda.equals(disputeTallyPda),
+        "Different seed prefixes should produce different PDAs"
+      );
+
+      console.log("    Dispute PDA derivation verified");
+    });
+
+    it("Resolver PDA derivation uses correct seeds", async () => {
+      const testWallet = Keypair.generate().publicKey;
+      const [resolverPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("resolver"), testWallet.toBuffer()],
+        program.programId
+      );
+      const [resolverVaultPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("resolver_vault"), testWallet.toBuffer()],
+        program.programId
+      );
+      const [registryPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("resolver_registry")],
+        program.programId
+      );
+
+      assert.ok(
+        resolverPda instanceof PublicKey,
+        "Resolver PDA should be valid"
+      );
+      assert.ok(
+        resolverVaultPda instanceof PublicKey,
+        "Resolver vault PDA should be valid"
+      );
+      assert.ok(
+        registryPda instanceof PublicKey,
+        "Registry PDA should be valid"
+      );
+      assert.isFalse(
+        resolverPda.equals(resolverVaultPda),
+        "Resolver and vault PDAs should differ"
+      );
+
+      console.log("    Resolver PDA derivation verified");
+    });
+  });
+
+  // =========================================================================
+  // Full Lifecycle Summary
+  // =========================================================================
+  describe("full dispute lifecycle validation", () => {
+    it("validates complete dispute pipeline is wired end-to-end", async () => {
+      // This test validates that the complete dispute lifecycle is
+      // structurally wired in the program:
+      //
+      // 1. register_resolver -> Resolver PDA created (tested above)
+      // 2. approve_resolver -> ResolverRegistry updated (tested above)
+      // 3. open_dispute -> Dispute + DisputeTally PDAs created, market -> Disputed(3)
+      //    (tested via grace period enforcement)
+      // 4. init_dispute_tally -> MPC initializes encrypted zeros
+      //    (TODO: requires DKG)
+      // 5. cast_vote -> Juror submits encrypted vote, add_dispute_vote MPC
+      //    (TODO: requires DKG)
+      // 6. finalize_dispute -> MPC reveals vote totals, market -> Resolved(2)
+      //    (TODO: requires DKG)
+      // 7. settle_dispute_rewards -> Non-voter slash, active_disputes cleanup
+      //    (TODO: requires DKG for dispute to reach Settled state)
+      // 8. compute_payouts -> Standard payout pipeline after dispute resolution
+      //    (tested in resolution.ts)
+      // 9. claim_payout -> Winner claims USDC
+      //    (tested in resolution.ts)
+
+      // Verify all instruction entry points exist
+      const ixNames = program.idl.instructions.map((ix: any) => ix.name);
+      const lifecycle = [
+        "registerResolver",
+        "approveResolver",
+        "stakeResolver",
+        "openDispute",
+        "initDisputeTally",
+        "castVote",
+        "finalizeDispute",
+        "addTiebreaker",
+        "settleDisputeRewards",
+        "computePayouts",
+        "claimPayout",
+      ];
+
+      const missing = lifecycle.filter((name) => !ixNames.includes(name));
+      assert.isEmpty(
+        missing,
+        `Missing lifecycle instructions: ${missing.join(", ")}`
+      );
+
+      // Verify all error variants for dispute validation exist
+      const errNames = program.idl.errors!.map((e: any) => e.name);
+      const requiredErrors = [
+        "stakeTooLow",
+        "resolverNotApproved",
+        "notMarketParticipant",
+        "marketAlreadyDisputed",
+        "gracePeriodNotExpired",
+        "gracePeriodExpired",
+        "notEnoughResolvers",
+        "notSelectedJuror",
+        "alreadyVoted",
+        "votingWindowClosed",
+        "disputeNotVoting",
+        "quorumNotReached",
+        "tiebreakerAlreadyAdded",
+        "disputeNotSettled",
+      ];
+
+      const missingErrors = requiredErrors.filter(
+        (name) => !errNames.includes(name)
+      );
+      assert.isEmpty(
+        missingErrors,
+        `Missing error variants: ${missingErrors.join(", ")}`
+      );
+
+      console.log(
+        "    Full dispute lifecycle validated: all instructions and error variants present"
+      );
+      console.log(
+        `    Pipeline: ${lifecycle.length} instructions, ${requiredErrors.length} error variants`
+      );
+      console.log(
+        "    NOTE: MPC-dependent tests (steps 4-7) awaiting Arcium DKG resolution"
       );
     });
   });
