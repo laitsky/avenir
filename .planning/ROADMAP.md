@@ -41,7 +41,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
 - [x] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
 - [x] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts (completed 2026-03-04)
-- [ ] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet
+- [x] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet (completed 2026-03-04)
 - [ ] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation
 - [ ] **Phase 9: Portfolio & Search** - Portfolio view, full-text search, responsive design
 - [ ] **Phase 10: RTG Submission** - Open-source repo, documentation, architecture diagram
@@ -170,12 +170,12 @@ Plans:
   4. Bet placement submits real USDC transaction with client-side Arcium encryption
   5. Sentiment bucket updates in UI after MPC callback completes
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 07-01: Wallet adapter, Anchor program setup, PDA helpers, types, encryption wrapper (Wave 1)
-- [ ] 07-02: Homepage market feed wired to live on-chain data with category tabs and sorting (Wave 2)
-- [ ] 07-03: Market detail page with live data, bet transaction flow, resolution/claim UI (Wave 2)
+- [x] 07-01: Wallet adapter, Anchor program setup, PDA helpers, types, encryption wrapper (Wave 1)
+- [x] 07-02: Homepage market feed wired to live on-chain data with category tabs and sorting (Wave 2)
+- [x] 07-03: Market detail page with live data, bet transaction flow, resolution/claim UI (Wave 2)
 
 ### Phase 8: Dispute System
 **Goal**: Community members can escalate unresolved or contested markets to an encrypted jury that determines the outcome via stake-weighted voting
@@ -245,7 +245,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 4. Design System & Fog | 4/4 | Complete | 2026-03-03 |
 | 5. Encrypted Betting | 3/4 | Gap closure | - |
 | 6. Resolution & Payouts | 5/5 | Complete | 2026-03-04 |
-| 7. Core UI Integration | 0/3 | Planned | - |
+| 7. Core UI Integration | 3/3 | Complete | 2026-03-04 |
 | 8. Dispute System | 0/6 | Not started | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |

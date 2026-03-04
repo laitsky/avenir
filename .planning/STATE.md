@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-04T09:31:58Z"
+last_updated: "2026-03-04T09:35:02Z"
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 29
-  completed_plans: 28
+  completed_plans: 29
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 7 of 10 (Core UI Integration)
-Plan: 2 of 3 in current phase (2 complete)
-Status: Phase 7 In Progress
-Last activity: 2026-03-04 -- Completed 07-02-PLAN.md (Live Market Feed)
+Plan: 3 of 3 in current phase (3 complete)
+Status: Phase 7 Complete
+Last activity: 2026-03-04 -- Completed 07-03-PLAN.md (Market Detail & Bet Flow)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░] 90%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 93%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 28
 - Average duration: 6min
-- Total execution time: 2.00 hours
+- Total execution time: 2.08 hours
 
 **By Phase:**
 
@@ -46,11 +46,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
-| 7. Core UI Integration | 2/3 | 7min | 4min |
+| 7. Core UI Integration | 3/3 | 12min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 1min, 4min, 3min
-- Trend: Phase 7 progress -- live market feed hooks and homepage adaptation in 3min
+- Last 5 plans: 2min, 1min, 4min, 3min, 5min
+- Trend: Phase 7 complete -- all 3 plans finished, frontend fully wired to on-chain data
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -77,6 +77,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 06 P05 | 1min | 2 tasks | 4 files |
 | Phase 07 P01 | 4min | 2 tasks | 13 files |
 | Phase 07 P02 | 3min | 2 tasks | 7 files |
+| Phase 07 P03 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -170,6 +171,10 @@ Recent decisions affecting current work:
 - [07-02]: sentimentToPercent maps enum to visual-only bar percentages (65/50/35) since pool data is encrypted
 - [07-02]: Live market pool totals show "Encrypted" behind fog overlay; finalized markets show revealed USDC amounts
 - [07-02]: CategoryTabs imports CATEGORIES from constants for single source of truth across all category code
+- [07-03]: getBetPanelMode state machine drives all BetPlacement UI modes based on market state, position, and wallet
+- [07-03]: @arcium-hq/client externalized from client bundle via rollupOptions.external due to Node.js crypto dependency
+- [07-03]: Websocket subscriptions on both market and position PDAs for real-time updates after MPC callbacks
+- [07-03]: Exponential backoff retry (2s, 4s, 8s, 16s, 32s) for MPC lock contention with max 5 attempts
 
 ### Pending Todos
 
@@ -185,6 +190,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 07-02-PLAN.md
-Resume file: .planning/phases/07-core-ui-integration/07-02-SUMMARY.md
-Note: Phase 7 Plan 02 complete (useMarkets, useUsdcBalance hooks, homepage adapted to OnChainMarket). Plan 03 remaining.
+Stopped at: Completed 07-03-PLAN.md
+Resume file: .planning/phases/07-core-ui-integration/07-03-SUMMARY.md
+Note: Phase 7 complete (all 3 plans). Frontend fully wired to on-chain data. Ready for Phase 8 (Dispute System) and Phase 9 (Portfolio & Search).

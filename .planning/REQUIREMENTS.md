@@ -39,7 +39,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 ### User Experience
 
 - [x] **UX-01**: Homepage displays a tiled market feed with category tabs and sorting (trending, newest, ending soon)
-- [ ] **UX-02**: Market detail page shows question, description, deadline countdown, fog-wrapped sentiment, and bet placement interface
+- [x] **UX-02**: Market detail page shows question, description, deadline countdown, fog-wrapped sentiment, and bet placement interface
 - [x] **UX-03**: User can connect Solana wallet (Phantom, Solflare, Backpack)
 - [ ] **UX-04**: Portfolio view shows active positions, potential payouts, and resolved bet history
 - [ ] **UX-05**: Full-text search across market questions, descriptions, and categories
@@ -135,7 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RES-08 | Phase 6: Resolution & Payouts | Complete |
 | RES-09 | Phase 6: Resolution & Payouts | Complete |
 | UX-01 | Phase 7: Core UI Integration | Complete |
-| UX-02 | Phase 7: Core UI Integration | Pending |
+| UX-02 | Phase 7: Core UI Integration | Complete |
 | UX-03 | Phase 7: Core UI Integration | Complete |
 | UX-04 | Phase 9: Portfolio & Search | Pending |
 | UX-05 | Phase 9: Portfolio & Search | Pending |
