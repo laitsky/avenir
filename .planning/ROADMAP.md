@@ -258,9 +258,11 @@ Plans:
   2. New markets accept their first bet without MPC failure due to uninitialized pool
   3. Each encrypt call in encryption.ts uses a unique nonce (no nonce reuse between isYes and amount)
 
+**Plans:** 2 plans in 1 wave
+
 Plans:
-- [ ] 12-01: init_pool auto-trigger after create_market
-- [ ] 12-02: Fix nonce reuse in encryption.ts with unique nonce per ciphertext
+- [ ] 12-01: useCreateMarket hook (create_market + init_pool chaining) + pool-initializing gate in BetPlacement (Wave 1)
+- [ ] 12-02: Fix nonce reuse in encryption.ts with unique nonce per ciphertext field (Wave 1)
 
 ## Progress
 
