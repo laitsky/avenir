@@ -7,8 +7,7 @@ interface CountdownTimerProps {
 }
 
 function formatRemaining(deadline: Date): string {
-  const now = Date.now()
-  const diff = deadline.getTime() - now
+  const diff = deadline.getTime() - Date.now()
 
   if (diff <= 0) return 'Ended'
 
@@ -22,28 +21,27 @@ function formatRemaining(deadline: Date): string {
   return `${minutes}m ${seconds % 60}s`
 }
 
-function isUrgent(deadline: Date): boolean {
-  return deadline.getTime() - Date.now() > 0 && deadline.getTime() - Date.now() < 3600_000
-}
-
 export function CountdownTimer({ deadline, className }: CountdownTimerProps) {
   const [text, setText] = useState(() => formatRemaining(deadline))
-  const [urgent, setUrgent] = useState(() => isUrgent(deadline))
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setText(formatRemaining(deadline))
-      setUrgent(isUrgent(deadline))
-    }, 1000)
+    const id = setInterval(() => setText(formatRemaining(deadline)), 1000)
     return () => clearInterval(id)
   }, [deadline])
+
+  const ended = deadline.getTime() - Date.now() <= 0
+  const urgent = !ended && deadline.getTime() - Date.now() < 3600_000
 
   return (
     <span
       className={cn(
-        'text-xs',
-        urgent ? 'text-destructive-foreground' : 'text-muted-foreground',
-        className,
+        'font-mono text-xs tabular-nums',
+        urgent
+          ? 'text-destructive-foreground animate-pulse'
+          : ended
+            ? 'text-muted-foreground/50'
+            : 'text-muted-foreground',
+        className
       )}
     >
       {text}

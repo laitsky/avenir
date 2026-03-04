@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Wallet } from 'lucide-react'
-import { Button } from '#/components/ui/button'
 
 export const Route = createFileRoute('/portfolio')({
   component: Portfolio,
@@ -8,46 +7,30 @@ export const Route = createFileRoute('/portfolio')({
 
 function Portfolio() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Portfolio</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Track your positions and betting history
-        </p>
-      </div>
+    <div>
+      <h1 className="mb-2 font-serif text-3xl italic">Portfolio</h1>
+      <p className="mb-12 text-sm text-muted-foreground">
+        Your positions and betting history
+      </p>
 
-      {/* Wallet connection prompt */}
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
-        <div className="mx-auto max-w-sm space-y-4">
-          <Wallet className="mx-auto size-12 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Connect Your Wallet</h2>
-          <p className="text-sm text-muted-foreground">
-            Connect your Solana wallet to view your active positions, potential
-            payouts, and betting history.
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="max-w-xs text-center">
+          <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-card">
+            <Wallet className="size-6 text-muted-foreground" />
+          </div>
+          <p className="mb-2 font-serif text-lg italic">No wallet connected</p>
+          <p className="mb-6 text-xs leading-relaxed text-muted-foreground">
+            Connect your Solana wallet to view active positions, payouts, and
+            history.
           </p>
-          <Button variant="outline">Connect Wallet</Button>
+          <button
+            type="button"
+            className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-5 py-2.5 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
+          >
+            Connect Wallet
+          </button>
         </div>
       </div>
-
-      {/* Active positions */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Active Positions</h2>
-        <div className="rounded-xl border border-border bg-card p-6">
-          <p className="text-center text-sm text-muted-foreground">
-            No active positions yet
-          </p>
-        </div>
-      </section>
-
-      {/* Resolved bets */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Resolved Bets</h2>
-        <div className="rounded-xl border border-border bg-card p-6">
-          <p className="text-center text-sm text-muted-foreground">
-            No resolved bets yet
-          </p>
-        </div>
-      </section>
     </div>
   )
 }

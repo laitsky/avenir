@@ -1,7 +1,13 @@
-import { Tabs } from 'radix-ui'
 import { cn } from '#/lib/utils'
 
-const CATEGORIES = ['All', 'Politics', 'Crypto', 'Sports', 'Culture', 'Economics'] as const
+const CATEGORIES = [
+  'All',
+  'Crypto',
+  'Politics',
+  'Sports',
+  'Culture',
+  'Economics',
+] as const
 
 interface CategoryTabsProps {
   value: string
@@ -15,18 +21,22 @@ export function CategoryTabs({
   className,
 }: CategoryTabsProps) {
   return (
-    <Tabs.Root value={value} onValueChange={onValueChange}>
-      <Tabs.List className={cn('flex gap-1', className)}>
-        {CATEGORIES.map((category) => (
-          <Tabs.Trigger
-            key={category}
-            value={category}
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-gold/10 data-[state=active]:text-gold"
-          >
-            {category}
-          </Tabs.Trigger>
-        ))}
-      </Tabs.List>
-    </Tabs.Root>
+    <div className={cn('flex gap-2 overflow-x-auto', className)}>
+      {CATEGORIES.map((category) => (
+        <button
+          key={category}
+          type="button"
+          onClick={() => onValueChange(category)}
+          className={cn(
+            'cursor-pointer whitespace-nowrap rounded-full px-4 py-1.5 text-[13px] font-medium transition-all',
+            value === category
+              ? 'bg-primary/15 text-primary ring-1 ring-primary/20'
+              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+          )}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
   )
 }

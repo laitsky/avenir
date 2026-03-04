@@ -6,67 +6,79 @@ interface BetPlacementProps {
   market: MockMarket
 }
 
+const QUICK_AMOUNTS = [10, 25, 50, 100] as const
+
 export function BetPlacement({ market }: BetPlacementProps) {
   const isResolved = market.status === 'resolved'
 
   if (isResolved) {
     return (
-      <div className="rounded-xl border bg-card p-6">
-        <h2 className="mb-4 text-lg font-semibold">Market Resolved</h2>
-        <div className="space-y-2 text-center">
-          <p className="text-sm text-muted-foreground">
-            This market has been resolved.
-          </p>
-          <p
-            className={cn(
-              'text-xl font-bold',
-              market.outcome === 'yes' ? 'text-emerald' : 'text-destructive-foreground'
-            )}
-          >
-            Outcome: {market.outcome === 'yes' ? 'Yes' : 'No'}
-          </p>
-        </div>
+      <div className="rounded-xl bg-card p-6">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Outcome
+        </span>
+        <p className={cn(
+          'mt-3 font-serif text-2xl italic',
+          market.outcome === 'yes' ? 'text-primary' : 'text-destructive-foreground'
+        )}>
+          {market.outcome === 'yes' ? 'Yes' : 'No'}
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          This market has been resolved.
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-xl border bg-card p-6">
-      <h2 className="mb-4 text-lg font-semibold">Place Your Bet</h2>
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-6 flex items-baseline justify-between">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Place Bet
+        </span>
+        <span className="font-mono text-[11px] text-muted-foreground/50">USDC</span>
+      </div>
 
-      {/* Amount input */}
-      <div className="mb-4">
-        <label
-          htmlFor="bet-amount"
-          className="mb-1.5 block text-sm font-medium text-foreground"
-        >
-          Amount (USDC)
-        </label>
-        <div className="relative">
-          <input
-            id="bet-amount"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="Min $1"
-            className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-            USDC
-          </span>
+      {/* Big terminal-style input */}
+      <input
+        type="number"
+        min="1"
+        step="1"
+        placeholder="0"
+        className="mb-4 w-full bg-transparent font-mono text-4xl font-light tabular-nums text-foreground outline-none placeholder:text-muted-foreground/15"
+      />
+
+      {/* Quick amounts */}
+      <div className="mb-6 flex gap-2">
+        {QUICK_AMOUNTS.map((amount) => (
+          <button
+            key={amount}
+            type="button"
+            className="cursor-pointer rounded-lg bg-secondary px-3 py-1.5 font-mono text-[11px] tabular-nums text-secondary-foreground transition-colors hover:bg-secondary/70"
+          >
+            {amount}
+          </button>
+        ))}
+      </div>
+
+      {/* Probability preview */}
+      <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-3">
+        <div className="flex justify-between text-[11px]">
+          <span className="text-muted-foreground">Potential return</span>
+          <span className="font-mono tabular-nums text-accent">—</span>
         </div>
       </div>
 
-      {/* Yes/No buttons */}
+      {/* Yes / No */}
       <div className="grid grid-cols-2 gap-3">
         <Button
-          className="bg-gold text-gold-foreground hover:bg-gold/90 font-semibold"
+          className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
           size="lg"
         >
-          Yes
+          Bet Yes
         </Button>
         <Button variant="secondary" size="lg" className="font-semibold">
-          No
+          Bet No
         </Button>
       </div>
     </div>

@@ -9,7 +9,7 @@ type SortMode = 'trending' | 'newest' | 'ending'
 const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: 'trending', label: 'Trending' },
   { value: 'newest', label: 'Newest' },
-  { value: 'ending', label: 'Ending Soon' },
+  { value: 'ending', label: 'Ending soon' },
 ]
 
 function sortMarkets(markets: MockMarket[], mode: SortMode): MockMarket[] {
@@ -18,9 +18,7 @@ function sortMarkets(markets: MockMarket[], mode: SortMode): MockMarket[] {
     case 'trending':
       return sorted.sort((a, b) => b.betCount - a.betCount)
     case 'newest':
-      return sorted.sort(
-        (a, b) => b.deadline.getTime() - a.deadline.getTime(),
-      )
+      return sorted.sort((a, b) => b.deadline.getTime() - a.deadline.getTime())
     case 'ending': {
       const live = sorted
         .filter((m) => m.status === 'live')
@@ -38,30 +36,30 @@ interface MarketGridProps {
 
 export function MarketGrid({ markets, className }: MarketGridProps) {
   const [sort, setSort] = useState<SortMode>('trending')
-  const sortedMarkets = sortMarkets(markets, sort)
+  const sorted = sortMarkets(markets, sort)
 
   if (markets.length === 0) {
     return (
-      <div className="py-12 text-center text-muted-foreground">
-        No markets found
+      <div className="py-20 text-center text-sm text-muted-foreground">
+        No markets in this category yet.
       </div>
     )
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Sorting controls */}
-      <div className="flex items-center gap-2">
+    <div className={cn('space-y-6', className)}>
+      <div className="flex items-center gap-4 text-[13px]">
+        <span className="text-muted-foreground/50">Sort</span>
         {SORT_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => setSort(option.value)}
             className={cn(
-              'rounded-full px-3 py-1 text-xs transition-colors',
+              'cursor-pointer transition-colors',
               sort === option.value
-                ? 'bg-sage/10 text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground/70'
             )}
           >
             {option.label}
@@ -69,16 +67,18 @@ export function MarketGrid({ markets, className }: MarketGridProps) {
         ))}
       </div>
 
-      {/* Market card grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {sortedMarkets.map((market) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((market, i) => (
           <Link
             key={market.id}
             to="/market/$id"
             params={{ id: market.id }}
             className="no-underline"
           >
-            <MarketCard market={market} />
+            <MarketCard
+              market={market}
+              style={{ animationDelay: `${i * 60}ms` }}
+            />
           </Link>
         ))}
       </div>

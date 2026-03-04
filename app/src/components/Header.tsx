@@ -1,30 +1,41 @@
 import { Link } from '@tanstack/react-router'
-import { Button } from '#/components/ui/button'
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
-      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-6">
+    <header className="fixed top-0 z-50 w-full">
+      {/* Gradient backdrop */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-transparent" />
+
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <Link
+          to="/"
+          className="font-sans text-xl font-extralight tracking-[0.15em] uppercase text-foreground transition-colors hover:text-primary no-underline"
+        >
+          Avenir
+        </Link>
+
+        <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-lg font-bold tracking-tight text-foreground no-underline"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
+            activeProps={{ className: 'active text-foreground' }}
+            activeOptions={{ exact: true }}
           >
-            Avenir
+            Markets
           </Link>
-        </div>
-
-        <div className="flex items-center gap-4">
           <Link
             to="/portfolio"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
             activeProps={{ className: 'active text-foreground' }}
           >
             Portfolio
           </Link>
-          <Button variant="outline" size="sm">
+          <button
+            type="button"
+            className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
+          >
             Connect Wallet
-          </Button>
+          </button>
         </div>
       </nav>
     </header>

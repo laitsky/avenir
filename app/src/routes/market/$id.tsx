@@ -12,21 +12,17 @@ function MarketDetailPage() {
   const market = MOCK_MARKETS.find((m) => m.id === id) ?? MOCK_MARKETS[0]
 
   return (
-    <div className="space-y-6">
-      {/* Back link */}
+    <div>
       <Link
         to="/"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="mb-10 inline-flex cursor-pointer items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
       >
-        &larr; Back to Markets
+        &larr; Markets
       </Link>
 
-      {/* Sidebar layout: info left, bet form sticky right */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <MarketDetail market={market} />
-        </div>
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+      <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
+        <MarketDetail market={market} />
+        <aside className="lg:sticky lg:top-28 lg:self-start">
           <BetPlacement market={market} />
         </aside>
       </div>

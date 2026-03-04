@@ -6,6 +6,7 @@ export interface MockMarket {
   deadline: Date
   resolutionSource: string
   sentiment: 'Leaning Yes' | 'Even' | 'Leaning No'
+  yesPercent: number
   poolTotal: string
   betCount: number
   status: 'live' | 'resolved'
@@ -35,6 +36,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(45),
     resolutionSource: 'CoinGecko aggregate price',
     sentiment: 'Leaning Yes',
+    yesPercent: 65,
     poolTotal: '48,200 USDC',
     betCount: 312,
     status: 'live',
@@ -48,6 +50,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(14),
     resolutionSource: 'Federal Reserve press release',
     sentiment: 'Even',
+    yesPercent: 48,
     poolTotal: '31,500 USDC',
     betCount: 247,
     status: 'live',
@@ -61,6 +64,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(90),
     resolutionSource: 'UEFA official results',
     sentiment: 'Leaning No',
+    yesPercent: 35,
     poolTotal: '18,750 USDC',
     betCount: 189,
     status: 'live',
@@ -74,6 +78,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(7, 12),
     resolutionSource: 'Academy of Motion Picture Arts and Sciences',
     sentiment: 'Leaning Yes',
+    yesPercent: 72,
     poolTotal: '5,400 USDC',
     betCount: 78,
     status: 'live',
@@ -87,6 +92,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(28),
     resolutionSource: 'DefiLlama Solana TVL',
     sentiment: 'Leaning No',
+    yesPercent: 38,
     poolTotal: '12,300 USDC',
     betCount: 156,
     status: 'live',
@@ -100,6 +106,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(120),
     resolutionSource: 'US Election Project',
     sentiment: 'Even',
+    yesPercent: 51,
     poolTotal: '22,100 USDC',
     betCount: 203,
     status: 'live',
@@ -113,6 +120,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: pastDate(30),
     resolutionSource: 'Ethereum Foundation',
     sentiment: 'Leaning Yes',
+    yesPercent: 88,
     poolTotal: '52,800 USDC',
     betCount: 421,
     status: 'resolved',
@@ -127,6 +135,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: pastDate(60),
     resolutionSource: 'European Commission',
     sentiment: 'Leaning No',
+    yesPercent: 28,
     poolTotal: '34,600 USDC',
     betCount: 287,
     status: 'resolved',
@@ -141,6 +150,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(60),
     resolutionSource: 'IMF World Economic Outlook',
     sentiment: 'Leaning Yes',
+    yesPercent: 62,
     poolTotal: '8,900 USDC',
     betCount: 94,
     status: 'live',
@@ -154,6 +164,7 @@ export const MOCK_MARKETS: MockMarket[] = [
     deadline: futureDate(3, 6),
     resolutionSource: 'Rockstar Games official announcement',
     sentiment: 'Leaning No',
+    yesPercent: 22,
     poolTotal: '680 USDC',
     betCount: 15,
     status: 'live',
