@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Solana program skeleton, account model, USDC vault, and frontend scaffolding
 - [x] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
 - [x] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption (completed 2026-03-03)
-- [ ] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
+- [x] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
 - [ ] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
 - [ ] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts
 - [ ] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet
@@ -119,8 +119,8 @@ Plans:
 Plans:
 - [x] 04-01: Design tokens (forest/fog oklch palette) and FogOverlay component with reveal animation (Wave 1)
 - [x] 04-02: Mock market data, CountdownTimer, and MarketCard with fog overlays (Wave 2)
-- [ ] 04-03: Market detail page with sidebar layout and bet placement form (Wave 2)
-- [ ] 04-04: Homepage feed with category tabs, responsive grid, sorting, and portfolio shell (Wave 3)
+- [x] 04-03: Market detail page with sidebar layout and bet placement form (Wave 2)
+- [x] 04-04: Homepage feed with category tabs, responsive grid, sorting, and portfolio shell (Wave 3)
 
 ### Phase 5: Encrypted Betting
 **Goal**: Users can place USDC bets on binary markets with their amounts encrypted, pool totals hidden, and a fuzzy sentiment bucket visible
@@ -241,7 +241,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 1. Foundation | 3/3 | Complete | 2026-03-02 |
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
 | 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
-| 4. Design System & Fog | 2/4 | In progress | - |
+| 4. Design System & Fog | 4/4 | Complete | 2026-03-03 |
 | 5. Encrypted Betting | 0/5 | Not started | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
 | 7. Core UI Integration | 0/6 | Not started | - |
