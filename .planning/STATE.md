@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-04T11:21:20Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-04T11:28:32.647Z"
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 35
-  completed_plans: 30
+  completed_plans: 31
 ---
 
 # Project State
@@ -19,23 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 8 in progress -- dispute system resolver pool and staking
+**Current focus:** Phase 8 in progress -- dispute filing and juror selection
 
 ## Current Position
 
 Phase: 8 of 10 (Dispute System)
-Plan: 1 of 6 in current phase (1 complete)
+Plan: 2 of 6 in current phase (2 complete)
 Status: Phase 8 In Progress
-Last activity: 2026-03-04 -- Completed 08-01-PLAN.md (Resolver Pool Staking)
+Last activity: 2026-03-04 -- Completed 08-02-PLAN.md (Dispute Filing)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░] 86%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░] 89%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 30
 - Average duration: 6min
-- Total execution time: 2.11 hours
+- Total execution time: 2.14 hours
 
 **By Phase:**
 
@@ -48,11 +48,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
-| 8. Dispute System | 1/6 | 2min | 2min |
+| 8. Dispute System | 2/6 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 1min, 4min, 3min, 5min, 2min
-- Trend: Phase 8 started -- resolver pool staking complete, dispute system foundation laid
+- Last 5 plans: 4min, 3min, 5min, 2min, 2min
+- Trend: Phase 8 progressing -- dispute filing and juror selection complete
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -81,6 +81,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 07 P02 | 3min | 2 tasks | 7 files |
 | Phase 07 P03 | 5min | 2 tasks | 10 files |
 | Phase 08 P01 | 2min | 2 tasks | 11 files |
+| Phase 08 P02 | 2min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -182,6 +183,9 @@ Recent decisions affecting current work:
 - [08-01]: ResolverRegistry uses init_if_needed to lazily create on first approval
 - [08-01]: Two-phase withdrawal pattern: request sets timestamp+amount, execute validates 7-day cooldown
 - [08-01]: Full withdrawal (stake=0) auto-revokes approval and removes from registry
+- [08-02]: LCG-based deterministic juror selection using market_id XOR slot as seed
+- [08-02]: DisputeTally mirrors MarketPool fixed-layout pattern (offset 16, length 64) for MPC
+- [08-02]: Remaining accounts pattern for Resolver PDA validation and active_disputes increment
 
 ### Pending Todos
 
@@ -196,7 +200,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T11:21:20Z
-**Stopped at:** Completed 08-01-PLAN.md
-**Resume file:** .planning/phases/08-dispute-system/08-02-PLAN.md
-**Note:** Phase 8 plan 1 complete. Resolver pool staking subsystem and 48h grace period implemented. Ready for 08-02 (Dispute Filing).
+**Last session:** 2026-03-04T11:28:32.039Z
+**Stopped at:** Completed 08-02-PLAN.md
+**Resume file:** .planning/phases/08-dispute-system/08-03-PLAN.md
+**Note:** Phase 8 plan 2 complete. Dispute filing with deterministic juror selection implemented. Ready for 08-03 (init_dispute_tally MPC circuit).
