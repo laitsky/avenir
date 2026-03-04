@@ -189,13 +189,15 @@ Plans:
   4. Dispute outcome is determined by stake-weighted encrypted vote tally and the market resolves accordingly
   5. Dispute UI shows fog-wrapped vote status, fog clears when outcome revealed
 
+**Plans:** 6 plans in 5 waves
+
 Plans:
-- [ ] 08-01: Resolver pool registration and USDC staking instructions
-- [ ] 08-02: Dispute escalation trigger and dispute state machine
-- [ ] 08-03: add_dispute_vote MPC circuit (encrypted vote accumulation)
-- [ ] 08-04: finalize_dispute MPC circuit (reveal vote outcome)
-- [ ] 08-05: Dispute resolution, payout redirection, and resolver reward/slash
-- [ ] 08-06: Dispute UI integration (escalation, voting, fog-reveal outcome)
+- [ ] 08-01: Resolver pool staking subsystem and 48h grace period enforcement (Wave 1)
+- [ ] 08-02: Dispute escalation trigger, state machine, and juror selection (Wave 2)
+- [ ] 08-03: Encrypted voting circuits and cast_vote instruction (Wave 3)
+- [ ] 08-04: finalize_dispute circuit, tie-breaking, and resolver rewards (Wave 4)
+- [ ] 08-05: Integration tests for full dispute lifecycle (Wave 5)
+- [ ] 08-06: Dispute UI integration -- badges, voting panel, fog-reveal (Wave 5)
 
 ### Phase 9: Portfolio & Search
 **Goal**: Users can track their positions, search for markets, and use the app comfortably on mobile browsers
@@ -246,6 +248,6 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 5. Encrypted Betting | 3/4 | Gap closure | - |
 | 6. Resolution & Payouts | 5/5 | Complete | 2026-03-04 |
 | 7. Core UI Integration | 3/3 | Complete | 2026-03-04 |
-| 8. Dispute System | 0/6 | Not started | - |
+| 8. Dispute System | 0/6 | Planned | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
