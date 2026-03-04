@@ -39,7 +39,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Market Creation** - Whitelisted creators can create binary markets with categories and deadline enforcement
 - [x] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption (completed 2026-03-03)
 - [x] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
-- [ ] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
+- [x] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
 - [ ] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts
 - [ ] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet
 - [ ] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation
@@ -135,8 +135,8 @@ Plans:
 
 Plans:
 - [x] 05-01: Market struct extensions, error variants, place_bet instruction with USDC transfer + validation + lock timeout + MPC queue (Wave 1)
-- [ ] 05-02: update_pool_callback refactor with UserPosition update (success) and USDC refund (failure) (Wave 2)
-- [ ] 05-03: Integration tests for place_bet happy path, validation errors, lock behavior (Wave 3)
+- [x] 05-02: update_pool_callback refactor with UserPosition update (success) and USDC refund (failure) (Wave 2)
+- [x] 05-03: Integration tests for place_bet happy path, validation errors, lock behavior (Wave 3)
 
 ### Phase 6: Resolution & Payouts
 **Goal**: Market creators can declare winners and winning bettors receive instant proportional USDC payouts with protocol fee deducted
