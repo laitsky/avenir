@@ -170,13 +170,12 @@ Plans:
   4. Bet placement submits real USDC transaction with client-side Arcium encryption
   5. Sentiment bucket updates in UI after MPC callback completes
 
+**Plans:** 3 plans
+
 Plans:
-- [ ] 07-01: Solana wallet adapter integration (Phantom, Solflare, Backpack)
-- [ ] 07-02: On-chain data fetching with TanStack Query (markets, positions, sentiment)
-- [ ] 07-03: Market feed page wired to live data with category filtering and sorting
-- [ ] 07-04: Market detail page wired to live data with functional bet placement
-- [ ] 07-05: Bet transaction flow (encrypt → submit → await callback → update UI)
-- [ ] 07-06: Resolution and claim UI flow
+- [ ] 07-01: Wallet adapter, Anchor program setup, PDA helpers, types, encryption wrapper (Wave 1)
+- [ ] 07-02: Homepage market feed wired to live on-chain data with category tabs and sorting (Wave 2)
+- [ ] 07-03: Market detail page with live data, bet transaction flow, resolution/claim UI (Wave 2)
 
 ### Phase 8: Dispute System
 **Goal**: Community members can escalate unresolved or contested markets to an encrypted jury that determines the outcome via stake-weighted voting
@@ -246,7 +245,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 4. Design System & Fog | 4/4 | Complete | 2026-03-03 |
 | 5. Encrypted Betting | 3/4 | Gap closure | - |
 | 6. Resolution & Payouts | 5/5 | Complete | 2026-03-04 |
-| 7. Core UI Integration | 0/6 | Not started | - |
+| 7. Core UI Integration | 0/3 | Planned | - |
 | 8. Dispute System | 0/6 | Not started | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
