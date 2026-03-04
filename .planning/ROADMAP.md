@@ -42,7 +42,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
 - [x] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts (completed 2026-03-04)
 - [x] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet (completed 2026-03-04)
-- [ ] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation
+- [x] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation (completed 2026-03-04)
 - [ ] **Phase 9: Portfolio & Search** - Portfolio view, full-text search, responsive design
 - [ ] **Phase 10: RTG Submission** - Open-source repo, documentation, architecture diagram
 
@@ -197,7 +197,7 @@ Plans:
 - [x] 08-03: Encrypted voting circuits and cast_vote instruction (Wave 3)
 - [x] 08-04: finalize_dispute circuit, tie-breaking, and resolver rewards (Wave 4)
 - [x] 08-05: Integration tests for full dispute lifecycle (Wave 5)
-- [ ] 08-06: Dispute UI integration -- badges, voting panel, fog-reveal (Wave 5)
+- [x] 08-06: Dispute UI integration -- badges, voting panel, fog-reveal (Wave 5)
 
 ### Phase 9: Portfolio & Search
 **Goal**: Users can track their positions, search for markets, and use the app comfortably on mobile browsers
