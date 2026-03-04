@@ -266,4 +266,61 @@ pub mod avenir {
         );
         Ok(())
     }
+
+    // MPC instructions -- compute_payouts
+    pub fn init_compute_payouts_comp_def(ctx: Context<InitComputePayoutsCompDef>) -> Result<()> {
+        instructions::mpc::init_compute_payouts_comp_def::handler(ctx)
+    }
+
+    pub fn compute_payouts(ctx: Context<ComputePayouts>, computation_offset: u64) -> Result<()> {
+        instructions::mpc::compute_payouts::handler(ctx, computation_offset)
+    }
+
+    #[arcium_callback(encrypted_ix = "compute_payouts")]
+    pub fn compute_payouts_callback(
+        ctx: Context<ComputePayoutsCallback>,
+        output: SignedComputationOutputs<ComputePayoutsOutput>,
+    ) -> Result<()> {
+        // compute_payouts returns (u64, u64) with both .reveal()'d
+        // Generated output structure:
+        //   ComputePayoutsOutput { field_0: ComputePayoutsOutputStruct0 }
+        //   ComputePayoutsOutputStruct0 { field_0: u64, field_1: u64 }
+        let result = match output.verify_output(
+            &ctx.accounts.cluster_account,
+            &ctx.accounts.computation_account,
+        ) {
+            Ok(ComputePayoutsOutput { field_0 }) => field_0,
+            Err(e) => {
+                msg!("compute_payouts computation failed: {}", e);
+
+                // Clear lock on failure -- no refund needed (compute_payouts holds no user funds)
+                let market = &mut ctx.accounts.market;
+                market.mpc_lock = false;
+                market.lock_timestamp = 0;
+
+                return Err(arcium_anchor::ArciumError::AbortedComputation.into());
+            }
+        };
+
+        // === Success path ===
+
+        // Write revealed pool totals to Market
+        let market = &mut ctx.accounts.market;
+        market.revealed_yes_pool = result.field_0;
+        market.revealed_no_pool = result.field_1;
+
+        // Transition to Finalized state (4)
+        market.state = 4;
+
+        // Clear lock
+        market.mpc_lock = false;
+        market.lock_timestamp = 0;
+
+        msg!(
+            "compute_payouts complete - revealed_yes_pool={}, revealed_no_pool={}, state=Finalized",
+            market.revealed_yes_pool,
+            market.revealed_no_pool,
+        );
+        Ok(())
+    }
 }

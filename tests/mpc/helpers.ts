@@ -373,6 +373,12 @@ export async function initCompDef(
           .accountsPartial(accounts)
           .rpc({ skipPreflight: true, commitment: "confirmed" });
         break;
+      case "compute_payouts":
+        await program.methods
+          .initComputePayoutsCompDef()
+          .accountsPartial(accounts)
+          .rpc({ skipPreflight: true, commitment: "confirmed" });
+        break;
       default:
         throw new Error(`Unknown comp_def name: ${compDefName}`);
     }
