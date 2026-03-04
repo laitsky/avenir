@@ -3,6 +3,7 @@
 /// is retained for Phase 3 test compatibility.
 
 use anchor_lang::prelude::*;
+use anchor_spl::token::Token;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
@@ -63,7 +64,7 @@ pub fn handler(
         )
         .build();
 
-    // Build callback with both MarketPool and Market as writable accounts
+    // Build callback with 6 accounts matching UpdatePoolCallback struct ordering
     let callback_accounts = vec![
         CallbackAccount {
             pubkey: ctx.accounts.market_pool.key(),
@@ -72,6 +73,22 @@ pub fn handler(
         CallbackAccount {
             pubkey: ctx.accounts.market.key(),
             is_writable: true,
+        },
+        CallbackAccount {
+            pubkey: ctx.accounts.user_position.key(),
+            is_writable: true,
+        },
+        CallbackAccount {
+            pubkey: ctx.accounts.market_vault.key(),
+            is_writable: true,
+        },
+        CallbackAccount {
+            pubkey: ctx.accounts.bettor_token_account.key(),
+            is_writable: true,
+        },
+        CallbackAccount {
+            pubkey: ctx.accounts.token_program.key(),
+            is_writable: false,
         },
     ];
 
@@ -115,6 +132,23 @@ pub struct UpdatePool<'info> {
         constraint = market_pool.market_id == market.id,
     )]
     pub market_pool: Account<'info, MarketPool>,
+
+    /// UserPosition PDA (needed for callback account matching).
+    /// CHECK: Passed through to callback -- not validated in standalone update_pool.
+    #[account(mut)]
+    pub user_position: UncheckedAccount<'info>,
+
+    /// Market vault token account (needed for callback account matching).
+    /// CHECK: Passed through to callback -- not validated in standalone update_pool.
+    #[account(mut)]
+    pub market_vault: UncheckedAccount<'info>,
+
+    /// Bettor's token account (needed for callback account matching).
+    /// CHECK: Passed through to callback -- not validated in standalone update_pool.
+    #[account(mut)]
+    pub bettor_token_account: UncheckedAccount<'info>,
+
+    pub token_program: Program<'info, Token>,
 
     #[account(
         address = derive_mxe_pda!()

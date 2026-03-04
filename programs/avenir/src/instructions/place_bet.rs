@@ -107,8 +107,23 @@ pub fn handler(
         amount,
     )?;
 
+    // 7b. Initialize UserPosition fields on first creation
+    // Extract market_id from the existing market borrow, then use a scoped
+    // re-borrow of user_position to avoid overlapping mutable borrows.
+    let market_id_val = market.id;
+    let bettor_key = ctx.accounts.bettor.key();
+    let user_position_bump = ctx.bumps.user_position;
+    {
+        let user_position = &mut ctx.accounts.user_position;
+        if user_position.market_id == 0 {
+            user_position.market_id = market_id_val;
+            user_position.user = bettor_key;
+            user_position.bump = user_position_bump;
+        }
+    }
+
     // 8. Store pending bet data on Market
-    market.pending_bettor = ctx.accounts.bettor.key();
+    market.pending_bettor = bettor_key;
     market.pending_amount = amount;
     market.pending_is_yes = is_yes;
     market.mpc_lock = true;
