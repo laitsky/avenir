@@ -142,9 +142,9 @@ Plans:
 ### Phase 6: Resolution & Payouts
 **Goal**: Market creators can declare winners and winning bettors receive instant proportional USDC payouts with protocol fee deducted
 **Depends on**: Phase 5
-**Requirements**: RES-01, RES-02, RES-07, RES-08, RES-09
+**Requirements**: RES-01, RES-07, RES-08, RES-09
 **Success Criteria** (what must be TRUE):
-  1. Market creator can resolve the market by declaring the winning outcome within the 48-hour grace period
+  1. Market creator can resolve the market by declaring the winning outcome after the deadline passes
   2. Pool totals are decrypted at resolution via compute_payouts MPC circuit
   3. Winners receive USDC proportional to their share of the winning pool
   4. Protocol fee of 1-2% is deducted from winning payouts before distribution
@@ -181,7 +181,7 @@ Plans:
 **Goal**: Community members can escalate unresolved or contested markets to an encrypted jury that determines the outcome via stake-weighted voting
 **Depends on**: Phase 6
 **Parallel with**: Phase 9
-**Requirements**: RES-03, RES-04, RES-05, RES-06
+**Requirements**: RES-02, RES-03, RES-04, RES-05, RES-06
 **Success Criteria** (what must be TRUE):
   1. After the 48-hour grace period expires without resolution, any market participant can trigger dispute escalation
   2. Resolver pool members who have staked USDC are eligible to be selected as jurors
