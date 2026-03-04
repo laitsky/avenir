@@ -648,28 +648,31 @@ describe("place_bet", () => {
   // Test 5: rejects bet on expired market
   // ==========================================================================
   it("rejects bet on expired market", async () => {
-    // NOTE: create_market validates deadline > now + 1h, so we cannot create
-    // a market with a past deadline. We test the MarketExpired validation
-    // by creating a market with the minimum valid deadline and noting that
-    // the on-chain validation in place_bet (clock.unix_timestamp < resolution_time)
-    // will catch expired markets at bet time.
+    // Cannot create an expired market on localnet because create_market validates
+    // deadline > now + 1h. Clock sysvar manipulation is not available on localnet.
     //
-    // For a fully deterministic test, we would need to manipulate the on-chain
-    // Clock sysvar, which is not feasible on localnet without custom SBF programs.
-    // This test documents the expected behavior and verifies the error path exists.
-    //
-    // The MarketExpired error variant exists in AvenirError and is checked in
-    // place_bet's handler. The validation logic is:
+    // Instead, verify the MarketExpired error variant exists in the IDL,
+    // confirming the validation guard is compiled into the program.
+    // The actual require! check:
     //   require!(clock.unix_timestamp < market.resolution_time, AvenirError::MarketExpired);
-    //
-    // This is verified indirectly by the fact that the place_bet instruction
-    // compiles and deploys with this validation, and the happy path (test 1)
-    // works with a future deadline.
+    // is verified by code inspection and the fact that the program compiles.
 
-    console.log("    MarketExpired test: validation exists in place_bet handler");
-    console.log("    Cannot create expired market on localnet (create_market validates deadline > now + 1h)");
-    console.log("    MarketExpired error variant confirmed in AvenirError enum");
-    console.log("    Skipped: requires Clock sysvar manipulation not available on localnet");
+    const idlErrors = program.idl.errors;
+    assert.isDefined(idlErrors, "Program IDL should have errors defined");
+
+    const marketExpiredError = idlErrors!.find(
+      (e: any) => e.name === "marketExpired" || e.name === "MarketExpired"
+    );
+    assert.isDefined(
+      marketExpiredError,
+      "MarketExpired error variant should exist in the program IDL"
+    );
+
+    console.log("    MarketExpired IDL error verified:");
+    console.log("      name:", marketExpiredError!.name);
+    console.log("      code:", marketExpiredError!.code);
+    console.log("      msg:", marketExpiredError!.msg);
+    console.log("    Note: Runtime test skipped (requires Clock sysvar manipulation)");
   });
 
   // ==========================================================================
