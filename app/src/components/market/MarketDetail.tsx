@@ -1,61 +1,118 @@
+import { useRef, useEffect, useState } from 'react'
 import { cn } from '#/lib/utils'
 import { FogOverlay } from '#/components/fog/FogOverlay'
 import { CountdownTimer } from '#/components/market/CountdownTimer'
-import type { MockMarket } from '#/lib/mock-data'
+import type { OnChainMarket } from '#/lib/types'
+import { CATEGORY_MAP, SENTIMENT_MAP } from '#/lib/types'
 
 interface MarketDetailProps {
-  market: MockMarket
+  market: OnChainMarket
 }
 
 export function MarketDetail({ market }: MarketDetailProps) {
-  const isResolved = market.status === 'resolved'
+  const category = CATEGORY_MAP[market.category] ?? 'Unknown'
+  const deadline = new Date(market.resolutionTime * 1000)
+  const sentimentLabel = SENTIMENT_MAP[market.sentiment] ?? 'Unknown'
+  const isFinalized = market.state === 4
+  const isResolved = market.state === 2
+  const isOpen = market.state === 0
+
+  // Track previous state to detect live finalization transition
+  const prevStateRef = useRef(market.state)
+  const [animateReveal, setAnimateReveal] = useState(false)
+
+  useEffect(() => {
+    // If user is on the page when market transitions from Resolved(2) to Finalized(4)
+    if (prevStateRef.current === 2 && market.state === 4) {
+      setAnimateReveal(true)
+    }
+    prevStateRef.current = market.state
+  }, [market.state])
+
+  // For finalized markets: if user arrived after finalization, show already revealed
+  const fogRevealed = isFinalized
+
+  // Status display
+  const statusDisplay = isOpen
+    ? 'Live'
+    : isFinalized
+      ? 'Finalized'
+      : isResolved
+        ? 'Resolved'
+        : 'Locked'
+
+  // Probability bar: sentiment-based for live, revealed pool ratio for finalized
+  let yesPercent = 50 // default even
+  if (isFinalized && (market.revealedYesPool > 0 || market.revealedNoPool > 0)) {
+    const total = market.revealedYesPool + market.revealedNoPool
+    yesPercent = Math.round((market.revealedYesPool / total) * 100)
+  } else {
+    // Sentiment-based approximation for live markets
+    if (market.sentiment === 1) yesPercent = 65 // Leaning Yes
+    else if (market.sentiment === 2) yesPercent = 50 // Even
+    else if (market.sentiment === 3) yesPercent = 35 // Leaning No
+  }
 
   return (
     <div>
       {/* Status */}
       <div className="mb-5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider">
-        <span className="text-primary/50">{market.category}</span>
+        <span className="text-primary/50">{category}</span>
         <span className="text-border">|</span>
-        {isResolved ? (
-          <span className={market.outcome === 'yes' ? 'text-primary' : 'text-destructive-foreground'}>
-            Resolved {market.outcome === 'yes' ? 'Yes' : 'No'}
+        {isFinalized ? (
+          <span
+            className={
+              market.winningOutcome === 1
+                ? 'text-primary'
+                : 'text-destructive-foreground'
+            }
+          >
+            Resolved {market.winningOutcome === 1 ? 'Yes' : 'No'}
           </span>
+        ) : isResolved ? (
+          <span className="text-muted-foreground">Awaiting Reveal</span>
         ) : (
           <span className="flex items-center gap-1.5 text-primary">
             <span className="size-1.5 animate-pulse rounded-full bg-primary" />
-            Live
+            {statusDisplay}
           </span>
         )}
       </div>
 
-      {/* Question — large serif italic */}
+      {/* Question */}
       <h1 className="mb-4 font-serif text-3xl italic leading-tight md:text-4xl">
         {market.question}
       </h1>
 
       <p className="mb-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        {market.description}
+        {market.resolutionSource}
       </p>
 
-      {/* Probability bar — large */}
+      {/* Probability bar */}
       <div className="mb-8">
         <div className="relative">
           <div className="flex h-3 overflow-hidden rounded-full bg-secondary">
             <div
               className="rounded-full bg-primary/70 transition-all duration-700"
-              style={{ width: `${market.yesPercent}%` }}
+              style={{ width: `${yesPercent}%` }}
             />
           </div>
-          {!isResolved && (
-            <FogOverlay density="light" revealed={isResolved} className="absolute inset-0 rounded-full">
+          {!fogRevealed && (
+            <FogOverlay
+              density="light"
+              revealed={false}
+              className="absolute inset-0 rounded-full"
+            >
               <div className="h-3" />
             </FogOverlay>
           )}
         </div>
-        {isResolved && (
+        {fogRevealed && (
           <div className="mt-2 flex justify-between font-mono text-xs tabular-nums">
-            <span className="text-primary">{market.yesPercent}% Yes</span>
-            <span className="text-muted-foreground">{100 - market.yesPercent}% No</span>
+            <span className="text-primary">{yesPercent}% Yes</span>
+            <span className="text-muted-foreground">
+              {100 - yesPercent}% No
+            </span>
           </div>
         )}
       </div>
@@ -63,42 +120,94 @@ export function MarketDetail({ market }: MarketDetailProps) {
       {/* Data grid */}
       <dl className="mb-8 grid grid-cols-2 gap-x-8 gap-y-5 border-t border-border pt-6 sm:grid-cols-3">
         <div>
-          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Source</dt>
+          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Source
+          </dt>
           <dd className="mt-1 text-sm">{market.resolutionSource}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Deadline</dt>
+          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Deadline
+          </dt>
           <dd className="mt-1">
-            <CountdownTimer deadline={market.deadline} className="text-sm" />
+            <CountdownTimer deadline={deadline} className="text-sm" />
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Bets</dt>
-          <dd className="mt-1 font-mono text-sm tabular-nums">{market.betCount}</dd>
+          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Bets
+          </dt>
+          <dd className="mt-1 font-mono text-sm tabular-nums">
+            {market.totalBets}
+          </dd>
         </div>
       </dl>
 
       {/* Fogged sections */}
       <div className="space-y-5 border-t border-border pt-6">
         <div>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Sentiment</span>
-          <FogOverlay density="light" revealed={isResolved} className="mt-1">
-            <p className={cn(
-              'text-lg font-semibold',
-              market.sentiment === 'Leaning Yes' && 'text-primary',
-              market.sentiment === 'Even' && 'text-muted-foreground',
-              market.sentiment === 'Leaning No' && 'text-destructive-foreground'
-            )}>
-              {market.sentiment}
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Sentiment
+          </span>
+          <FogOverlay density="light" revealed={fogRevealed} className="mt-1">
+            <p
+              className={cn(
+                'text-lg font-semibold',
+                sentimentLabel === 'Leaning Yes' && 'text-primary',
+                sentimentLabel === 'Even' && 'text-muted-foreground',
+                sentimentLabel === 'Leaning No' &&
+                  'text-destructive-foreground',
+              )}
+            >
+              {sentimentLabel}
             </p>
           </FogOverlay>
         </div>
         <div>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Pool</span>
-          <FogOverlay density="heavy" revealed={isResolved} className="mt-1">
-            <p className="font-mono text-2xl font-bold tabular-nums text-accent">{market.poolTotal}</p>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Pool
+          </span>
+          <FogOverlay
+            density="heavy"
+            revealed={fogRevealed}
+            className="mt-1"
+          >
+            {isFinalized ? (
+              <div className="space-y-1">
+                <p className="font-mono text-2xl font-bold tabular-nums text-accent">
+                  {(market.revealedYesPool / 1_000_000).toLocaleString()} USDC
+                  Yes /{' '}
+                  {(market.revealedNoPool / 1_000_000).toLocaleString()} USDC No
+                </p>
+              </div>
+            ) : (
+              <p className="font-mono text-2xl font-bold tabular-nums text-accent">
+                Encrypted
+              </p>
+            )}
           </FogOverlay>
         </div>
+
+        {/* Outcome badge for finalized markets */}
+        {isFinalized && (
+          <div className="mt-4">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Outcome
+            </span>
+            <div className="mt-2">
+              <span
+                className={cn(
+                  'inline-flex items-center rounded-full px-4 py-1.5 font-serif text-lg italic font-semibold',
+                  market.winningOutcome === 1
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-destructive/10 text-destructive-foreground',
+                )}
+              >
+                {market.winningOutcome === 1 ? 'Yes' : 'No'}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

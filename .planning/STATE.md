@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-04T09:25:29Z"
+last_updated: "2026-03-04T09:31:58Z"
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
 ---
 
 # Project State
@@ -23,16 +23,16 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 7 of 10 (Core UI Integration)
-Plan: 1 of 3 in current phase (1 complete)
+Plan: 2 of 3 in current phase (2 complete)
 Status: Phase 7 In Progress
-Last activity: 2026-03-04 -- Completed 07-01-PLAN.md (Wallet & Integration Foundation)
+Last activity: 2026-03-04 -- Completed 07-02-PLAN.md (Live Market Feed)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░] 68%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
+- Total plans completed: 27
 - Average duration: 6min
 - Total execution time: 2.00 hours
 
@@ -46,11 +46,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
-| 7. Core UI Integration | 1/3 | 4min | 4min |
+| 7. Core UI Integration | 2/3 | 7min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 1min, 4min
-- Trend: Phase 7 started -- wallet + integration foundation in 4min
+- Last 5 plans: 2min, 2min, 1min, 4min, 3min
+- Trend: Phase 7 progress -- live market feed hooks and homepage adaptation in 3min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -76,6 +76,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 06 P04 | 2min | 1 tasks | 1 files |
 | Phase 06 P05 | 1min | 2 tasks | 4 files |
 | Phase 07 P01 | 4min | 2 tasks | 13 files |
+| Phase 07 P02 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -166,6 +167,9 @@ Recent decisions affecting current work:
 - [07-01]: useReadOnlyProgram provides Anchor access without wallet for unauthenticated market data fetching
 - [07-01]: encryptBetForMPC uses dynamic import for @arcium-hq/client to handle potential browser incompatibility
 - [07-01]: FallbackLayout renders same visual structure during SSR to prevent layout shift
+- [07-02]: sentimentToPercent maps enum to visual-only bar percentages (65/50/35) since pool data is encrypted
+- [07-02]: Live market pool totals show "Encrypted" behind fog overlay; finalized markets show revealed USDC amounts
+- [07-02]: CategoryTabs imports CATEGORIES from constants for single source of truth across all category code
 
 ### Pending Todos
 
@@ -181,6 +185,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 07-01-PLAN.md
-Resume file: .planning/phases/07-core-ui-integration/07-01-SUMMARY.md
-Note: Phase 7 Plan 01 complete (wallet adapter, Anchor hooks, PDA helpers, encryption wrapper). Plans 02 and 03 remaining.
+Stopped at: Completed 07-02-PLAN.md
+Resume file: .planning/phases/07-core-ui-integration/07-02-SUMMARY.md
+Note: Phase 7 Plan 02 complete (useMarkets, useUsdcBalance hooks, homepage adapted to OnChainMarket). Plan 03 remaining.

@@ -1,34 +1,141 @@
+import { useState, useEffect } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { cn } from '#/lib/utils'
 import { Button } from '#/components/ui/button'
-import type { MockMarket } from '#/lib/mock-data'
+import { FogOverlay } from '#/components/fog/FogOverlay'
+import type { OnChainMarket, OnChainPosition } from '#/lib/types'
+import { usePlaceBet } from '#/hooks/usePlaceBet'
+import { useResolveMarket } from '#/hooks/useResolveMarket'
+import { useComputePayouts } from '#/hooks/useComputePayouts'
+import { useClaimPayout } from '#/hooks/useClaimPayout'
 
 interface BetPlacementProps {
-  market: MockMarket
+  market: OnChainMarket
+  position: OnChainPosition | null
 }
+
+type PanelMode =
+  | 'bet'
+  | 'resolve'
+  | 'reveal-payouts'
+  | 'claim-payout'
+  | 'lost'
+  | 'claimed'
+  | 'resolved-no-position'
+  | 'expired'
 
 const QUICK_AMOUNTS = [10, 25, 50, 100] as const
 
-export function BetPlacement({ market }: BetPlacementProps) {
-  const isResolved = market.status === 'resolved'
+function getBetPanelMode(
+  market: OnChainMarket,
+  position: OnChainPosition | null,
+  walletPubkey: string | null,
+): PanelMode {
+  const deadlinePassed = market.resolutionTime < Date.now() / 1000
+  const isCreator =
+    walletPubkey != null && market.creator.toBase58() === walletPubkey
 
-  if (isResolved) {
-    return (
-      <div className="rounded-xl bg-card p-6">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Outcome
-        </span>
-        <p className={cn(
-          'mt-3 font-serif text-2xl italic',
-          market.outcome === 'yes' ? 'text-primary' : 'text-destructive-foreground'
-        )}>
-          {market.outcome === 'yes' ? 'Yes' : 'No'}
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          This market has been resolved.
-        </p>
-      </div>
-    )
+  // Finalized (state=4)
+  if (market.state === 4) {
+    if (!position) return 'resolved-no-position'
+    if (position.claimed) return 'claimed'
+    const isWinner =
+      (market.winningOutcome === 1 && position.yesAmount > 0) ||
+      (market.winningOutcome === 2 && position.noAmount > 0)
+    return isWinner ? 'claim-payout' : 'lost'
   }
+
+  // Resolved (state=2) -- awaiting payout computation
+  if (market.state === 2) return 'reveal-payouts'
+
+  // Open (state=0) + deadline passed + creator -> resolve mode
+  if (market.state === 0 && deadlinePassed && isCreator) return 'resolve'
+
+  // Open (state=0) + before deadline -> bet mode
+  if (market.state === 0 && !deadlinePassed) return 'bet'
+
+  return 'expired'
+}
+
+export function BetPlacement({ market, position }: BetPlacementProps) {
+  const { publicKey, connected } = useWallet()
+  const { setVisible } = useWalletModal()
+  const walletPubkey = publicKey?.toBase58() ?? null
+  const mode = getBetPanelMode(market, position, walletPubkey)
+
+  switch (mode) {
+    case 'bet':
+      return (
+        <BetMode
+          market={market}
+          position={position}
+          connected={connected}
+          onOpenWallet={() => setVisible(true)}
+        />
+      )
+    case 'resolve':
+      return <ResolveMode market={market} />
+    case 'reveal-payouts':
+      return <RevealPayoutsMode market={market} />
+    case 'claim-payout':
+      return <ClaimPayoutMode market={market} position={position!} />
+    case 'lost':
+      return <LostMode market={market} position={position!} />
+    case 'claimed':
+      return <ClaimedMode />
+    case 'resolved-no-position':
+      return <ResolvedNoPositionMode market={market} />
+    case 'expired':
+      return <ExpiredMode />
+  }
+}
+
+// =============================================================================
+// BET MODE
+// =============================================================================
+
+function BetMode({
+  market,
+  position,
+  connected,
+  onOpenWallet,
+}: {
+  market: OnChainMarket
+  position: OnChainPosition | null
+  connected: boolean
+  onOpenWallet: () => void
+}) {
+  const [amount, setAmount] = useState('')
+  const [pendingBet, setPendingBet] = useState<{
+    amount: number
+    isYes: boolean
+  } | null>(null)
+  const placeBet = usePlaceBet(market.id)
+
+  // Auto-execute pending bet after wallet connects
+  useEffect(() => {
+    if (connected && pendingBet) {
+      placeBet.mutate(pendingBet)
+      setPendingBet(null)
+    }
+  }, [connected, pendingBet])
+
+  function handleBet(isYes: boolean) {
+    const numAmount = parseFloat(amount)
+    if (!numAmount || numAmount <= 0) return
+
+    if (!connected) {
+      setPendingBet({ amount: numAmount, isYes })
+      onOpenWallet()
+      return
+    }
+
+    placeBet.mutate({ amount: numAmount, isYes })
+  }
+
+  const hasPosition = position && (position.yesAmount > 0 || position.noAmount > 0)
+  const isActive = placeBet.step !== 'idle' && placeBet.step !== 'error'
 
   return (
     <div className="rounded-xl bg-card p-6">
@@ -36,51 +143,472 @@ export function BetPlacement({ market }: BetPlacementProps) {
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Place Bet
         </span>
-        <span className="font-mono text-[11px] text-muted-foreground/50">USDC</span>
+        <span className="font-mono text-[11px] text-muted-foreground/50">
+          USDC
+        </span>
       </div>
 
-      {/* Big terminal-style input */}
-      <input
-        type="number"
-        min="1"
-        step="1"
-        placeholder="0"
-        className="mb-4 w-full bg-transparent font-mono text-4xl font-light tabular-nums text-foreground outline-none placeholder:text-muted-foreground/15"
-      />
-
-      {/* Quick amounts */}
-      <div className="mb-6 flex gap-2">
-        {QUICK_AMOUNTS.map((amount) => (
-          <button
-            key={amount}
-            type="button"
-            className="cursor-pointer rounded-lg bg-secondary px-3 py-1.5 font-mono text-[11px] tabular-nums text-secondary-foreground transition-colors hover:bg-secondary/70"
-          >
-            {amount}
-          </button>
-        ))}
-      </div>
-
-      {/* Probability preview */}
-      <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-3">
-        <div className="flex justify-between text-[11px]">
-          <span className="text-muted-foreground">Potential return</span>
-          <span className="font-mono tabular-nums text-accent">—</span>
+      {/* Position display */}
+      {hasPosition && (
+        <div className="mb-4 rounded-lg bg-secondary/50 px-4 py-3">
+          <span className="text-xs text-muted-foreground">Your position:</span>
+          <span className="ml-2 font-mono text-sm">
+            {position.yesAmount > 0
+              ? `${(position.yesAmount / 1_000_000).toFixed(2)} USDC on Yes`
+              : ''}
+            {position.yesAmount > 0 && position.noAmount > 0 ? ' + ' : ''}
+            {position.noAmount > 0
+              ? `${(position.noAmount / 1_000_000).toFixed(2)} USDC on No`
+              : ''}
+          </span>
         </div>
+      )}
+
+      {/* Multi-step progress indicator */}
+      {isActive ? (
+        <BetProgress step={placeBet.step} retryCount={placeBet.retryCount} />
+      ) : (
+        <>
+          {/* Big terminal-style input */}
+          <input
+            type="number"
+            min="1"
+            step="1"
+            placeholder="0"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="mb-4 w-full bg-transparent font-mono text-4xl font-light tabular-nums text-foreground outline-none placeholder:text-muted-foreground/15"
+          />
+
+          {/* Quick amounts */}
+          <div className="mb-6 flex gap-2">
+            {QUICK_AMOUNTS.map((qa) => (
+              <button
+                key={qa}
+                type="button"
+                onClick={() => setAmount(String(qa))}
+                className="cursor-pointer rounded-lg bg-secondary px-3 py-1.5 font-mono text-[11px] tabular-nums text-secondary-foreground transition-colors hover:bg-secondary/70"
+              >
+                {qa}
+              </button>
+            ))}
+          </div>
+
+          {/* Potential return placeholder */}
+          <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-3">
+            <div className="flex justify-between text-[11px]">
+              <span className="text-muted-foreground">Potential return</span>
+              <span className="font-mono tabular-nums text-accent">--</span>
+            </div>
+          </div>
+
+          {/* Yes / No buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+              size="lg"
+              onClick={() => handleBet(true)}
+              disabled={!amount || parseFloat(amount) <= 0}
+            >
+              Bet Yes
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="font-semibold"
+              onClick={() => handleBet(false)}
+              disabled={!amount || parseFloat(amount) <= 0}
+            >
+              Bet No
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Error state with retry */}
+      {placeBet.step === 'error' && (
+        <div className="mt-4">
+          <p className="mb-3 text-center text-sm text-destructive-foreground">
+            Transaction failed
+          </p>
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => placeBet.reset()}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// BET PROGRESS INDICATOR
+// =============================================================================
+
+function BetProgress({
+  step,
+  retryCount,
+}: {
+  step: string
+  retryCount: number
+}) {
+  const steps = [
+    { key: 'encrypting', label: 'Encrypting...' },
+    { key: 'submitting', label: 'Submitting...' },
+    { key: 'confirming', label: 'Awaiting confirmation...' },
+  ]
+
+  if (step === 'retrying') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+        <p className="text-center text-sm text-muted-foreground">
+          Market busy -- retrying... (attempt {retryCount})
+        </p>
+      </div>
+    )
+  }
+
+  if (step === 'success') {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
+          <svg
+            className="size-5 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <p className="text-center text-sm font-medium text-primary">
+          Bet placed!
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3 py-6">
+      {steps.map((s, i) => {
+        const isActive = s.key === step
+        const stepIndex = steps.findIndex((ss) => ss.key === step)
+        const isDone = i < stepIndex
+
+        return (
+          <div key={s.key} className="flex items-center gap-3">
+            <div
+              className={cn(
+                'flex size-6 items-center justify-center rounded-full text-xs font-medium transition-colors',
+                isDone && 'bg-primary/10 text-primary',
+                isActive && 'bg-primary text-primary-foreground',
+                !isDone && !isActive && 'bg-secondary text-muted-foreground',
+              )}
+            >
+              {isDone ? (
+                <svg
+                  className="size-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              ) : (
+                i + 1
+              )}
+            </div>
+            <span
+              className={cn(
+                'text-sm',
+                isActive && 'font-medium text-foreground',
+                isDone && 'text-muted-foreground',
+                !isDone && !isActive && 'text-muted-foreground/50',
+              )}
+            >
+              {s.label}
+            </span>
+            {isActive && (
+              <div className="ml-auto size-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// =============================================================================
+// RESOLVE MODE
+// =============================================================================
+
+function ResolveMode({ market }: { market: OnChainMarket }) {
+  const resolveMarket = useResolveMarket(market.id)
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-6">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Resolve Market
+        </span>
+        <p className="mt-2 text-sm text-muted-foreground">
+          As the market creator, select the winning outcome.
+        </p>
       </div>
 
-      {/* Yes / No */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
-          size="lg"
-        >
-          Bet Yes
-        </Button>
-        <Button variant="secondary" size="lg" className="font-semibold">
-          Bet No
-        </Button>
+      {resolveMarket.isPending ? (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <div className="size-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+          <p className="text-sm text-muted-foreground">Resolving market...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+            size="lg"
+            onClick={() => resolveMarket.mutate(1)}
+          >
+            Resolve Yes
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
+            className="font-semibold"
+            onClick={() => resolveMarket.mutate(2)}
+          >
+            Resolve No
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// REVEAL PAYOUTS MODE
+// =============================================================================
+
+function RevealPayoutsMode({ market }: { market: OnChainMarket }) {
+  const computePayouts = useComputePayouts(market.id)
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-6">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Reveal Payouts
+        </span>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Market has been resolved. Trigger the MPC computation to reveal pool
+          totals and enable claims.
+        </p>
       </div>
+
+      {computePayouts.isPending ? (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <div className="size-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+          <p className="text-sm text-muted-foreground">
+            Computing payouts via MPC...
+          </p>
+        </div>
+      ) : (
+        <Button
+          className="w-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+          size="lg"
+          onClick={() => computePayouts.mutate()}
+        >
+          Reveal Payouts
+        </Button>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// CLAIM PAYOUT MODE (winner)
+// =============================================================================
+
+function ClaimPayoutMode({
+  market,
+  position,
+}: {
+  market: OnChainMarket
+  position: OnChainPosition
+}) {
+  const claimPayout = useClaimPayout(market.id)
+
+  // Calculate estimated payout
+  const totalPool = market.revealedYesPool + market.revealedNoPool
+  const userWinning =
+    market.winningOutcome === 1 ? position.yesAmount : position.noAmount
+  const winningPool =
+    market.winningOutcome === 1
+      ? market.revealedYesPool
+      : market.revealedNoPool
+
+  let netPayout = 0
+  if (winningPool > 0) {
+    const gross = (userWinning * totalPool) / winningPool
+    // Default 2% fee (200 bps) -- approximate for display
+    const feeBps = 200
+    netPayout = gross - (gross * feeBps) / 10000
+  }
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <FogOverlay density="heavy" revealed className="mb-4 rounded-lg">
+        <div className="px-4 py-6 text-center">
+          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-primary">
+            You won!
+          </p>
+          <p className="font-mono text-3xl font-bold tabular-nums text-accent">
+            {(netPayout / 1_000_000).toFixed(2)} USDC
+          </p>
+        </div>
+      </FogOverlay>
+
+      {claimPayout.isPending ? (
+        <div className="flex flex-col items-center gap-3 py-4">
+          <div className="size-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+          <p className="text-sm text-muted-foreground">Claiming payout...</p>
+        </div>
+      ) : (
+        <Button
+          className="w-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+          size="lg"
+          onClick={() => claimPayout.mutate()}
+        >
+          Claim {(netPayout / 1_000_000).toFixed(2)} USDC
+        </Button>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// LOST MODE
+// =============================================================================
+
+function LostMode({
+  market,
+  position,
+}: {
+  market: OnChainMarket
+  position: OnChainPosition
+}) {
+  const losingAmount =
+    market.winningOutcome === 1 ? position.noAmount : position.yesAmount
+  const losingSide = market.winningOutcome === 1 ? 'No' : 'Yes'
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        Result
+      </span>
+      <div className="mt-4 rounded-lg bg-destructive/5 px-4 py-3">
+        <p className="text-sm text-destructive-foreground/70">
+          Your position: {(losingAmount / 1_000_000).toFixed(2)} USDC on{' '}
+          {losingSide}
+        </p>
+        <p className="mt-1 text-sm text-destructive-foreground/70">
+          Market resolved {market.winningOutcome === 1 ? 'Yes' : 'No'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// CLAIMED MODE
+// =============================================================================
+
+function ClaimedMode() {
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="flex flex-col items-center gap-3 py-6">
+        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+          <svg
+            className="size-6 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <p className="font-medium text-primary">Payout claimed</p>
+        <p className="text-center text-xs text-muted-foreground">
+          Your winnings have been transferred to your wallet.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// RESOLVED NO POSITION MODE
+// =============================================================================
+
+function ResolvedNoPositionMode({ market }: { market: OnChainMarket }) {
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        Outcome
+      </span>
+      <p
+        className={cn(
+          'mt-3 font-serif text-2xl italic',
+          market.winningOutcome === 1
+            ? 'text-primary'
+            : 'text-destructive-foreground',
+        )}
+      >
+        {market.winningOutcome === 1 ? 'Yes' : 'No'}
+      </p>
+      {market.revealedYesPool > 0 || market.revealedNoPool > 0 ? (
+        <p className="mt-2 font-mono text-xs text-muted-foreground">
+          {(market.revealedYesPool / 1_000_000).toLocaleString()} USDC Yes /{' '}
+          {(market.revealedNoPool / 1_000_000).toLocaleString()} USDC No
+        </p>
+      ) : null}
+      <p className="mt-2 text-xs text-muted-foreground">
+        This market has been resolved.
+      </p>
+    </div>
+  )
+}
+
+// =============================================================================
+// EXPIRED MODE
+// =============================================================================
+
+function ExpiredMode() {
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        Market Expired
+      </span>
+      <p className="mt-3 text-sm text-muted-foreground">
+        The deadline has passed and this market is no longer accepting bets.
+      </p>
     </div>
   )
 }

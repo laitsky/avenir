@@ -17,6 +17,13 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  build: {
+    rollupOptions: {
+      // @arcium-hq/client uses Node.js crypto module which fails in browser builds.
+      // It's only used via dynamic import at runtime, so exclude from client bundle.
+      external: ['@arcium-hq/client'],
+    },
+  },
 })
 
 export default config
