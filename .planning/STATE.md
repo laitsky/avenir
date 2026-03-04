@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-04T08:42:15.767Z"
+status: in-progress
+last_updated: "2026-03-04T09:25:29Z"
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 6
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 29
+  completed_plans: 27
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 6 complete (including gap closure). Ready for Phase 7+
+**Current focus:** Phase 7 in progress -- connecting frontend to on-chain data
 
 ## Current Position
 
-Phase: 6 of 10 (Resolution & Payouts) -- COMPLETE
-Plan: 5 of 5 in current phase (5 complete)
-Status: Phase 6 Complete
-Last activity: 2026-03-04 -- Completed 06-05-PLAN.md (RES-02 Reclassification Gap Closure)
+Phase: 7 of 10 (Core UI Integration)
+Plan: 1 of 3 in current phase (1 complete)
+Status: Phase 7 In Progress
+Last activity: 2026-03-04 -- Completed 07-01-PLAN.md (Wallet & Integration Foundation)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░] 64%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░] 68%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
+- Total plans completed: 26
 - Average duration: 6min
-- Total execution time: 1.93 hours
+- Total execution time: 2.00 hours
 
 **By Phase:**
 
@@ -46,10 +46,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
+| 7. Core UI Integration | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 2min, 2min, 1min
-- Trend: Phase 6 complete -- all 5 plans in 12min total (including gap closure)
+- Last 5 plans: 2min, 2min, 1min, 4min
+- Trend: Phase 7 started -- wallet + integration foundation in 4min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -74,6 +75,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░
 | Phase 06 P03 | 2min | 2 tasks | 3 files |
 | Phase 06 P04 | 2min | 1 tasks | 1 files |
 | Phase 06 P05 | 1min | 2 tasks | 4 files |
+| Phase 07 P01 | 4min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -159,6 +161,11 @@ Recent decisions affecting current work:
 - [06-04]: No Anchor.toml changes needed -- existing glob pattern tests/**/*.ts covers resolution.ts
 - [06-04]: 10 test cases (2 beyond minimum) covering full resolve->compute_payouts->claim_payout lifecycle
 - [06-05]: RES-02 deferred to Phase 8 per CONTEXT.md locked decision -- 48h upper bound requires dispute escalation fallback
+- [07-01]: ClientOnly wraps entire wallet provider tree in __root.tsx to prevent SSR hydration mismatch
+- [07-01]: wallets={[]} enables Wallet Standard auto-detection -- no per-wallet adapter packages for Phantom/Solflare/Backpack
+- [07-01]: useReadOnlyProgram provides Anchor access without wallet for unauthenticated market data fetching
+- [07-01]: encryptBetForMPC uses dynamic import for @arcium-hq/client to handle potential browser incompatibility
+- [07-01]: FallbackLayout renders same visual structure during SSR to prevent layout shift
 
 ### Pending Todos
 
@@ -169,11 +176,11 @@ None yet.
 - [RESOLVED]: Encrypted state relay pattern validated in Phase 3 (store-read-reprocess cycle works)
 - [ACTIVE]: Arcium devnet DKG ceremony non-functional -- 0/142 MXE accounts completed DKG, blocks all encryption/MPC on devnet
 - [ACTIVE]: MPC latency still estimated (2-10s) -- actual measurement blocked by DKG, affects sequential lock UX viability
-- [Research]: TanStack Start + wallet adapter SSR hydration mismatch risk -- needs early spike in Phase 7
+- [RESOLVED]: TanStack Start + wallet adapter SSR hydration -- solved with ClientOnly wrapping entire provider tree in Phase 7
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-core-ui-integration/07-CONTEXT.md
-Note: Phase 7 context captured (wallet UX, bet flow, live data, resolution/claim). Ready for /gsd:plan-phase 7.
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-core-ui-integration/07-01-SUMMARY.md
+Note: Phase 7 Plan 01 complete (wallet adapter, Anchor hooks, PDA helpers, encryption wrapper). Plans 02 and 03 remaining.
