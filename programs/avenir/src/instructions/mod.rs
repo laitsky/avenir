@@ -5,6 +5,7 @@ pub mod initialize;
 pub mod mpc;
 pub mod place_bet;
 pub mod remove_creator;
+pub mod resolve_market;
 
 #[allow(ambiguous_glob_reexports)]
 pub use add_creator::*;
@@ -14,3 +15,4 @@ pub use initialize::*;
 pub use mpc::*;
 pub use place_bet::*;
 pub use remove_creator::*;
+pub use resolve_market::*;

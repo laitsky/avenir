@@ -64,6 +64,19 @@ mod circuits {
         (pool_ctxt.owner.from_arcis(pool), sentiment.reveal())
     }
 
+    /// Reveal encrypted pool totals at market resolution.
+    ///
+    /// Takes the encrypted PoolTotals and returns both values as plaintext.
+    /// This ends pool privacy -- totals become public at resolution.
+    /// Payout math uses these revealed values on-chain (RES-09).
+    #[instruction]
+    pub fn compute_payouts(
+        pool_ctxt: Enc<Mxe, PoolTotals>,
+    ) -> (u64, u64) {
+        let pool = pool_ctxt.to_arcis();
+        (pool[0].reveal(), pool[1].reveal())
+    }
+
     /// Hello-world circuit for environment validation.
     /// Takes two encrypted u64 inputs (Shared) and returns their sum (Mxe-owned).
     /// Validates: Enc<Shared, T> input, Enc<Mxe, T> output, basic arithmetic, to_arcis/from_arcis lifecycle.

@@ -33,6 +33,10 @@ pub mod avenir {
         instructions::cancel_market::handler(ctx)
     }
 
+    pub fn resolve_market(ctx: Context<ResolveMarket>, winning_outcome: u8) -> Result<()> {
+        instructions::resolve_market::handler(ctx, winning_outcome)
+    }
+
     pub fn place_bet(
         ctx: Context<PlaceBet>,
         amount: u64,
