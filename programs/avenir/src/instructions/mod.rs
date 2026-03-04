@@ -1,5 +1,6 @@
 pub mod add_creator;
 pub mod cancel_market;
+pub mod claim_payout;
 pub mod create_market;
 pub mod initialize;
 pub mod mpc;
@@ -10,6 +11,7 @@ pub mod resolve_market;
 #[allow(ambiguous_glob_reexports)]
 pub use add_creator::*;
 pub use cancel_market::*;
+pub use claim_payout::*;
 pub use create_market::*;
 pub use initialize::*;
 pub use mpc::*;

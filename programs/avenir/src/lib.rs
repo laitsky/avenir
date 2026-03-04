@@ -37,6 +37,10 @@ pub mod avenir {
         instructions::resolve_market::handler(ctx, winning_outcome)
     }
 
+    pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
+        instructions::claim_payout::handler(ctx)
+    }
+
     pub fn place_bet(
         ctx: Context<PlaceBet>,
         amount: u64,
