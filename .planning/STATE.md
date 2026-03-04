@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T03:25:27.000Z"
+last_updated: "2026-03-04T06:56:13.000Z"
 progress:
   total_phases: 5
   completed_phases: 5
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 21
+  completed_plans: 21
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 5 of 10 (Encrypted Betting)
-Plan: 3 of 3 in current phase (3 complete)
-Status: Phase 5 complete
-Last activity: 2026-03-04 -- Completed 05-03-PLAN.md (Place Bet Integration Tests)
+Plan: 4 of 4 in current phase (4 complete)
+Status: Phase 5 complete (with gap closure)
+Last activity: 2026-03-04 -- Completed 05-04-PLAN.md (Gap Closure)
 
 Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 7min
-- Total execution time: 1.68 hours
+- Total execution time: 1.75 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
-| 5. Encrypted Betting | 3/3 | 10min | 3min |
+| 5. Encrypted Betting | 4/4 | 14min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 3min, 2min, 5min
-- Trend: Phase 5 complete -- 3 plans in 10min total
+- Last 5 plans: 2min, 3min, 2min, 5min, 4min
+- Trend: Phase 5 complete with gap closure -- 4 plans in 14min total
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -67,6 +67,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 | Phase 05 P01 | 3min | 2 tasks | 6 files |
 | Phase 05 P02 | 2min | 2 tasks | 3 files |
 | Phase 05 P03 | 5min | 2 tasks | 2 files |
+| Phase 05 P04 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,9 @@ Recent decisions affecting current work:
 - [05-03]: Tests await MPC callback between stateful test cases to ensure lock is released before next test
 - [05-03]: MarketExpired test skipped -- create_market validates deadline > now + 1h, Clock sysvar manipulation unavailable on localnet
 - [05-03]: WrongSide test uses accumulated state from prior tests (bettor has Yes position, attempts No bet)
+- [05-04]: Scope-based re-borrow for UserPosition init to avoid overlapping mutable borrows with market
+- [05-04]: UncheckedAccount fields on UpdatePool struct for callback pass-through (not dummy pubkeys)
+- [05-04]: IDL error variant assertion for MarketExpired test (Clock sysvar manipulation unavailable on localnet)
 
 ### Pending Todos
 
@@ -152,6 +156,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 05-03-PLAN.md (Phase 5 complete)
-Resume file: .planning/phases/05-encrypted-betting/05-03-SUMMARY.md
-Note: Phase 5 complete -- all 3 plans done. place_bet instruction, update_pool_callback, and integration tests. Ready for Phase 6 (Resolution + Payout).
+Stopped at: Completed 05-04-PLAN.md (Gap Closure)
+Resume file: .planning/phases/05-encrypted-betting/05-04-SUMMARY.md
+Note: Phase 5 complete with gap closure -- all 4 plans done. UserPosition initialization, callback vector fix, and test assertion fix. Ready for Phase 6 (Resolution + Payout).
