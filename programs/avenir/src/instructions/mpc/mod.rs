@@ -1,5 +1,8 @@
+pub mod compute_payouts;
+pub mod compute_payouts_callback;
 pub mod hello_world;
 pub mod hello_world_callback;
+pub mod init_compute_payouts_comp_def;
 pub mod init_hello_world_comp_def;
 pub mod init_pool;
 pub mod init_pool_callback;
@@ -9,8 +12,11 @@ pub mod update_pool;
 pub mod update_pool_callback;
 
 #[allow(ambiguous_glob_reexports)]
+pub use compute_payouts::*;
+pub use compute_payouts_callback::*;
 pub use hello_world::*;
 pub use hello_world_callback::*;
+pub use init_compute_payouts_comp_def::*;
 pub use init_hello_world_comp_def::*;
 pub use init_pool::*;
 pub use init_pool_callback::*;
