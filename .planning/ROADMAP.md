@@ -150,11 +150,13 @@ Plans:
   4. Protocol fee of 1-2% is deducted from winning payouts before distribution
   5. Losers cannot claim any payout; winners can claim immediately after resolution
 
+**Plans:** 4 plans
+
 Plans:
-- [ ] 06-01: resolve_market instruction with creator validation and grace period enforcement
-- [ ] 06-02: compute_payouts MPC circuit (reveal pool totals at resolution)
-- [ ] 06-03: claim_payout instruction with proportional USDC distribution and protocol fee
-- [ ] 06-04: Edge cases: all bets on one side, single bet market, dust handling
+- [ ] 06-01: resolve_market instruction, Market struct extensions, error variants, compute_payouts circuit (Wave 1)
+- [ ] 06-02: compute_payouts MPC infrastructure -- comp_def, queue, callback (Wave 2)
+- [ ] 06-03: claim_payout instruction with proportional USDC distribution and protocol fee (Wave 3)
+- [ ] 06-04: Integration tests for resolution, MPC reveal, payout, and edge cases (Wave 4)
 
 ### Phase 7: Core UI Integration
 **Goal**: The frontend connects to live on-chain data — users can browse real markets, place real bets through the fog-themed UI, and see live sentiment updates
