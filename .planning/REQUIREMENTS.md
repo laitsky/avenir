@@ -30,7 +30,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [x] **RES-02**: Resolution has a 48-hour grace period after market deadline
 - [x] **RES-03**: After grace period, any market participant can trigger dispute escalation
 - [x] **RES-04**: Dedicated resolver pool members can stake USDC to become eligible jurors
-- [ ] **RES-05**: Resolver votes are encrypted via Arcium MPC (no juror sees other votes)
+- [x] **RES-05**: Resolver votes are encrypted via Arcium MPC (no juror sees other votes)
 - [ ] **RES-06**: Dispute outcome is determined by stake-weighted encrypted vote tally
 - [x] **RES-07**: Winners receive instant USDC payout proportional to their share of the winning pool
 - [x] **RES-08**: Protocol fee of 1-2% is deducted from winning payouts
@@ -129,7 +129,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RES-02 | Phase 8: Dispute System | Complete |
 | RES-03 | Phase 8: Dispute System | Complete |
 | RES-04 | Phase 8: Dispute System | Complete |
-| RES-05 | Phase 8: Dispute System | Pending |
+| RES-05 | Phase 8: Dispute System | Complete |
 | RES-06 | Phase 8: Dispute System | Pending |
 | RES-07 | Phase 6: Resolution & Payouts | Complete |
 | RES-08 | Phase 6: Resolution & Payouts | Complete |
