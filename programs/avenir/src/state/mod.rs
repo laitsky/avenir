@@ -1,5 +1,7 @@
 pub mod config;
 pub mod creator_whitelist;
+pub mod dispute;
+pub mod dispute_tally;
 pub mod market;
 pub mod market_pool;
 pub mod resolver;
@@ -8,6 +10,8 @@ pub mod user_position;
 
 pub use config::*;
 pub use creator_whitelist::*;
+pub use dispute::*;
+pub use dispute_tally::*;
 pub use market::*;
 pub use market_pool::*;
 pub use resolver::*;
