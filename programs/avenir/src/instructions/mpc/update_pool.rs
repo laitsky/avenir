@@ -1,3 +1,7 @@
+/// NOTE: This instruction is superseded by `place_bet` for production use.
+/// place_bet atomically transfers USDC + queues MPC. This standalone version
+/// is retained for Phase 3 test compatibility.
+
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;

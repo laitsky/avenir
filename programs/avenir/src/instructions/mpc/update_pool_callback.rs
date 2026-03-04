@@ -1,8 +1,9 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Transfer, Token, TokenAccount};
 use arcium_anchor::prelude::*;
 
 use crate::errors::ErrorCode;
-use crate::state::{Market, MarketPool};
+use crate::state::{Market, MarketPool, UserPosition};
 use crate::{ID, ID_CONST};
 
 #[callback_accounts("update_pool")]
@@ -36,7 +37,23 @@ pub struct UpdatePoolCallback<'info> {
     #[account(mut)]
     pub market_pool: Account<'info, MarketPool>,
 
-    /// The Market account to update sentiment, mpc_lock, and total_bets.
+    /// The Market account to update sentiment, mpc_lock, pending fields, and total_bets.
     #[account(mut)]
     pub market: Account<'info, Market>,
+
+    /// The UserPosition PDA to accumulate bet amounts on success.
+    /// Pre-created in place_bet with init_if_needed.
+    #[account(mut)]
+    pub user_position: Account<'info, UserPosition>,
+
+    /// The market vault holding USDC -- source for failure refund.
+    #[account(mut)]
+    pub market_vault: Account<'info, TokenAccount>,
+
+    /// The bettor's token account -- destination for failure refund.
+    #[account(mut)]
+    pub bettor_token_account: Account<'info, TokenAccount>,
+
+    /// SPL Token program for transfer CPI on failure refund.
+    pub token_program: Program<'info, Token>,
 }
