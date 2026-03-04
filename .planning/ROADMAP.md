@@ -40,7 +40,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Arcium MPC Core** - Encrypted state relay POC, update_pool circuit, client-side encryption (completed 2026-03-03)
 - [x] **Phase 4: Design System & Fog** - Forest/fog design tokens, fog gradient primitives, layout shells with mock data
 - [x] **Phase 5: Encrypted Betting** - Users place bets into encrypted pools with sentiment buckets and sequential lock
-- [ ] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts
+- [x] **Phase 6: Resolution & Payouts** - Creator resolves markets, winners receive proportional USDC payouts (completed 2026-03-04)
 - [ ] **Phase 7: Core UI Integration** - Connect frontend to on-chain: market feed, market detail, bet placement, wallet
 - [ ] **Phase 8: Dispute System** - Resolver pool, encrypted jury voting, community-triggered dispute escalation
 - [ ] **Phase 9: Portfolio & Search** - Portfolio view, full-text search, responsive design
@@ -150,13 +150,14 @@ Plans:
   4. Protocol fee of 1-2% is deducted from winning payouts before distribution
   5. Losers cannot claim any payout; winners can claim immediately after resolution
 
-**Plans:** 4 plans
+**Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 06-01: resolve_market instruction, Market struct extensions, error variants, compute_payouts circuit (Wave 1)
-- [ ] 06-02: compute_payouts MPC infrastructure -- comp_def, queue, callback (Wave 2)
-- [ ] 06-03: claim_payout instruction with proportional USDC distribution and protocol fee (Wave 3)
-- [ ] 06-04: Integration tests for resolution, MPC reveal, payout, and edge cases (Wave 4)
+- [x] 06-01: resolve_market instruction, Market struct extensions, error variants, compute_payouts circuit (Wave 1)
+- [x] 06-02: compute_payouts MPC infrastructure -- comp_def, queue, callback (Wave 2)
+- [x] 06-03: claim_payout instruction with proportional USDC distribution and protocol fee (Wave 3)
+- [x] 06-04: Integration tests for resolution, MPC reveal, payout, and edge cases (Wave 4)
+- [x] 06-05: Gap closure -- RES-02 reclassification from Phase 6 to Phase 8 (Wave 1)
 
 ### Phase 7: Core UI Integration
 **Goal**: The frontend connects to live on-chain data — users can browse real markets, place real bets through the fog-themed UI, and see live sentiment updates
@@ -244,7 +245,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
 | 4. Design System & Fog | 4/4 | Complete | 2026-03-03 |
 | 5. Encrypted Betting | 3/4 | Gap closure | - |
-| 6. Resolution & Payouts | 0/4 | Not started | - |
+| 6. Resolution & Payouts | 5/5 | Complete | 2026-03-04 |
 | 7. Core UI Integration | 0/6 | Not started | - |
 | 8. Dispute System | 0/6 | Not started | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
