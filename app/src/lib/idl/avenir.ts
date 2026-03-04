@@ -89,6 +89,284 @@ export type Avenir = {
       "args": []
     },
     {
+      "name": "addDisputeVoteCallback",
+      "discriminator": [
+        253,
+        109,
+        207,
+        16,
+        164,
+        229,
+        86,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "computationAccount"
+        },
+        {
+          "name": "clusterAccount"
+        },
+        {
+          "name": "instructionsSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "The DisputeTally PDA to write updated encrypted vote state into."
+          ],
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute PDA to clear mpc_lock on completion."
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "output",
+          "type": {
+            "defined": {
+              "name": "signedComputationOutputs",
+              "generics": [
+                {
+                  "kind": "type",
+                  "type": {
+                    "defined": {
+                      "name": "addDisputeVoteOutput"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "addTiebreaker",
+      "discriminator": [
+        188,
+        233,
+        196,
+        136,
+        188,
+        159,
+        229,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Anyone can trigger tiebreaker addition."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute PDA -- validates status and tiebreaker state."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.market_id",
+                "account": "dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The Market account -- validates state is Disputed (3)."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverRegistry",
+          "docs": [
+            "The ResolverRegistry for juror selection."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "approveResolver",
+      "discriminator": [
+        130,
+        92,
+        50,
+        130,
+        120,
+        216,
+        52,
+        26
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "resolver",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolver.wallet",
+                "account": "resolver"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverRegistry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelMarket",
       "discriminator": [
         205,
@@ -183,6 +461,212 @@ export type Avenir = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "castVote",
+      "discriminator": [
+        20,
+        212,
+        15,
+        189,
+        69,
+        180,
+        69,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "juror",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute PDA -- validates status, juror eligibility, voting window, MPC lock."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.market_id",
+                "account": "dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "The DisputeTally PDA containing encrypted vote state."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101,
+                  95,
+                  116,
+                  97,
+                  108,
+                  108,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute_tally.market_id",
+                "account": "disputeTally"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The Market account -- validates state is Disputed (3)."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolver",
+          "docs": [
+            "The Resolver PDA for the juror -- provides stake weight."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "juror"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "signPdaAccount",
+          "writable": true
+        },
+        {
+          "name": "mempoolAccount",
+          "writable": true
+        },
+        {
+          "name": "executingPool",
+          "writable": true
+        },
+        {
+          "name": "computationAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "clusterAccount",
+          "writable": true
+        },
+        {
+          "name": "poolAccount",
+          "writable": true,
+          "address": "G2sRWJvi3xoyh5k2gY49eG9L8YhAEWQPtNb1zb1GXTtC"
+        },
+        {
+          "name": "clockAccount",
+          "writable": true,
+          "address": "7EbMUTLo5DjdzbN7s8BXeZwXzEwNQb1hScfRvWg8a6ot"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        }
+      ],
+      "args": [
+        {
+          "name": "computationOffset",
+          "type": "u64"
+        },
+        {
+          "name": "voteCiphertext",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "pubKey",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nonce",
+          "type": "u128"
+        }
+      ]
     },
     {
       "name": "claimPayout",
@@ -651,6 +1135,236 @@ export type Avenir = {
       ]
     },
     {
+      "name": "finalizeDispute",
+      "discriminator": [
+        190,
+        211,
+        17,
+        122,
+        247,
+        157,
+        27,
+        223
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Anyone can trigger finalization once quorum is reached."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute PDA -- validates status, quorum, MPC lock."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.market_id",
+                "account": "dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "The DisputeTally PDA containing encrypted vote state."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101,
+                  95,
+                  116,
+                  97,
+                  108,
+                  108,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute_tally.market_id",
+                "account": "disputeTally"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The Market account -- validates state is Disputed (3)."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "signPdaAccount",
+          "writable": true
+        },
+        {
+          "name": "mempoolAccount",
+          "writable": true
+        },
+        {
+          "name": "executingPool",
+          "writable": true
+        },
+        {
+          "name": "computationAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "clusterAccount",
+          "writable": true
+        },
+        {
+          "name": "poolAccount",
+          "writable": true,
+          "address": "G2sRWJvi3xoyh5k2gY49eG9L8YhAEWQPtNb1zb1GXTtC"
+        },
+        {
+          "name": "clockAccount",
+          "writable": true,
+          "address": "7EbMUTLo5DjdzbN7s8BXeZwXzEwNQb1hScfRvWg8a6ot"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        }
+      ],
+      "args": [
+        {
+          "name": "computationOffset",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "finalizeDisputeCallback",
+      "discriminator": [
+        49,
+        125,
+        48,
+        239,
+        135,
+        84,
+        129,
+        130
+      ],
+      "accounts": [
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "computationAccount"
+        },
+        {
+          "name": "clusterAccount"
+        },
+        {
+          "name": "instructionsSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The Market account to resolve based on dispute outcome."
+          ],
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute account to update status and clear MPC lock."
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "output",
+          "type": {
+            "defined": {
+              "name": "signedComputationOutputs",
+              "generics": [
+                {
+                  "kind": "type",
+                  "type": {
+                    "defined": {
+                      "name": "finalizeDisputeOutput"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "helloWorld",
       "discriminator": [
         11,
@@ -807,6 +1521,53 @@ export type Avenir = {
       ]
     },
     {
+      "name": "initAddDisputeVoteCompDef",
+      "discriminator": [
+        209,
+        124,
+        124,
+        202,
+        106,
+        28,
+        42,
+        156
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mxeAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount",
+          "docs": [
+            "Can't check it here as it's not initialized yet."
+          ],
+          "writable": true
+        },
+        {
+          "name": "addressLookupTable",
+          "writable": true
+        },
+        {
+          "name": "lutProgram"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initComputePayoutsCompDef",
       "discriminator": [
         180,
@@ -817,6 +1578,293 @@ export type Avenir = {
         26,
         202,
         93
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mxeAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount",
+          "docs": [
+            "Can't check it here as it's not initialized yet."
+          ],
+          "writable": true
+        },
+        {
+          "name": "addressLookupTable",
+          "writable": true
+        },
+        {
+          "name": "lutProgram"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initDisputeTally",
+      "discriminator": [
+        69,
+        161,
+        224,
+        227,
+        240,
+        138,
+        107,
+        245
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute PDA -- validates status is Voting."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.market_id",
+                "account": "dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "The DisputeTally PDA that will receive the encrypted vote state in the callback.",
+            "Must already be initialized by open_dispute."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101,
+                  95,
+                  116,
+                  97,
+                  108,
+                  108,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute_tally.market_id",
+                "account": "disputeTally"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "signPdaAccount",
+          "writable": true
+        },
+        {
+          "name": "mempoolAccount",
+          "writable": true
+        },
+        {
+          "name": "executingPool",
+          "writable": true
+        },
+        {
+          "name": "computationAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "clusterAccount",
+          "writable": true
+        },
+        {
+          "name": "poolAccount",
+          "writable": true,
+          "address": "G2sRWJvi3xoyh5k2gY49eG9L8YhAEWQPtNb1zb1GXTtC"
+        },
+        {
+          "name": "clockAccount",
+          "writable": true,
+          "address": "7EbMUTLo5DjdzbN7s8BXeZwXzEwNQb1hScfRvWg8a6ot"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        }
+      ],
+      "args": [
+        {
+          "name": "computationOffset",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initDisputeTallyCallback",
+      "discriminator": [
+        82,
+        158,
+        236,
+        248,
+        235,
+        35,
+        27,
+        72
+      ],
+      "accounts": [
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "compDefAccount"
+        },
+        {
+          "name": "mxeAccount"
+        },
+        {
+          "name": "computationAccount"
+        },
+        {
+          "name": "clusterAccount"
+        },
+        {
+          "name": "instructionsSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "The DisputeTally PDA to write encrypted zero state into."
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "output",
+          "type": {
+            "defined": {
+              "name": "signedComputationOutputs",
+              "generics": [
+                {
+                  "kind": "type",
+                  "type": {
+                    "defined": {
+                      "name": "initDisputeTallyOutput"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initDisputeTallyCompDef",
+      "discriminator": [
+        102,
+        39,
+        82,
+        228,
+        155,
+        178,
+        176,
+        121
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mxeAccount",
+          "writable": true
+        },
+        {
+          "name": "compDefAccount",
+          "docs": [
+            "Can't check it here as it's not initialized yet."
+          ],
+          "writable": true
+        },
+        {
+          "name": "addressLookupTable",
+          "writable": true
+        },
+        {
+          "name": "lutProgram"
+        },
+        {
+          "name": "arciumProgram",
+          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initFinalizeDisputeCompDef",
+      "discriminator": [
+        251,
+        22,
+        72,
+        63,
+        251,
+        69,
+        169,
+        194
       ],
       "accounts": [
         {
@@ -1212,6 +2260,187 @@ export type Avenir = {
       ]
     },
     {
+      "name": "openDispute",
+      "discriminator": [
+        137,
+        25,
+        99,
+        119,
+        23,
+        223,
+        161,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "escalator",
+          "docs": [
+            "The market participant escalating to dispute (pays for PDA creation)"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The market being disputed"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userPosition",
+          "docs": [
+            "Caller's position on this market (proves they are a participant)"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              },
+              {
+                "kind": "account",
+                "path": "escalator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverRegistry",
+          "docs": [
+            "Registry of approved resolvers (read-only, for juror selection)"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "Dispute PDA to be created"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "disputeTally",
+          "docs": [
+            "DisputeTally PDA to be created (fixed-layout for MPC)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101,
+                  95,
+                  116,
+                  97,
+                  108,
+                  108,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "placeBet",
       "discriminator": [
         222,
@@ -1463,6 +2692,125 @@ export type Avenir = {
       ]
     },
     {
+      "name": "registerResolver",
+      "discriminator": [
+        76,
+        101,
+        253,
+        229,
+        153,
+        242,
+        212,
+        230
+      ],
+      "accounts": [
+        {
+          "name": "resolverWallet",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "resolver",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "usdcMint"
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "removeCreator",
       "discriminator": [
         125,
@@ -1579,6 +2927,275 @@ export type Avenir = {
         {
           "name": "winningOutcome",
           "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "settleDisputeRewards",
+      "discriminator": [
+        129,
+        201,
+        135,
+        237,
+        136,
+        0,
+        157,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "docs": [
+            "The Dispute account (read-only for juror list and votes_submitted)."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.market_id",
+                "account": "dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "docs": [
+            "The Market account -- validates Resolved state."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.id",
+                "account": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolver",
+          "docs": [
+            "The Resolver PDA for the juror being settled."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolver.wallet",
+                "account": "resolver"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverVault",
+          "docs": [
+            "The Resolver's staked USDC vault."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolver.wallet",
+                "account": "resolver"
+              }
+            ]
+          }
+        },
+        {
+          "name": "rewardRecipient",
+          "docs": [
+            "Recipient token account for slashed funds (voter reward distribution).",
+            "For v1, this is the caller-specified recipient for slashed USDC."
+          ],
+          "writable": true
+        },
+        {
+          "name": "usdcMint"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "jurorIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "stakeResolver",
+      "discriminator": [
+        81,
+        248,
+        206,
+        93,
+        116,
+        223,
+        41,
+        81
+      ],
+      "accounts": [
+        {
+          "name": "resolverWallet",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "resolver",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "usdcMint"
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     },
@@ -1864,6 +3481,151 @@ export type Avenir = {
           }
         }
       ]
+    },
+    {
+      "name": "withdrawResolver",
+      "discriminator": [
+        108,
+        84,
+        197,
+        144,
+        49,
+        232,
+        216,
+        140
+      ],
+      "accounts": [
+        {
+          "name": "resolverWallet",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "resolver",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "resolverVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "resolverWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "resolverRegistry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdcMint"
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "execute",
+          "type": "bool"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1946,6 +3708,32 @@ export type Avenir = {
       ]
     },
     {
+      "name": "dispute",
+      "discriminator": [
+        36,
+        49,
+        241,
+        67,
+        40,
+        36,
+        241,
+        74
+      ]
+    },
+    {
+      "name": "disputeTally",
+      "discriminator": [
+        218,
+        187,
+        147,
+        112,
+        137,
+        80,
+        174,
+        156
+      ]
+    },
+    {
       "name": "feePool",
       "discriminator": [
         172,
@@ -1995,6 +3783,32 @@ export type Avenir = {
         224,
         174,
         203
+      ]
+    },
+    {
+      "name": "resolver",
+      "discriminator": [
+        108,
+        125,
+        211,
+        206,
+        52,
+        124,
+        132,
+        79
+      ]
+    },
+    {
+      "name": "resolverRegistry",
+      "discriminator": [
+        231,
+        42,
+        169,
+        32,
+        93,
+        212,
+        252,
+        251
       ]
     },
     {
@@ -2131,6 +3945,106 @@ export type Avenir = {
       "code": 6023,
       "name": "invalidOutcome",
       "msg": "Invalid winning outcome (must be 1=Yes or 2=No)"
+    },
+    {
+      "code": 6024,
+      "name": "stakeTooLow",
+      "msg": "Resolver stake must be at least 500 USDC"
+    },
+    {
+      "code": 6025,
+      "name": "resolverNotApproved",
+      "msg": "Resolver is not approved"
+    },
+    {
+      "code": 6026,
+      "name": "resolverAlreadyApproved",
+      "msg": "Resolver is already approved"
+    },
+    {
+      "code": 6027,
+      "name": "registryFull",
+      "msg": "Resolver registry is full"
+    },
+    {
+      "code": 6028,
+      "name": "activeDisputeExists",
+      "msg": "Cannot withdraw while active in a dispute"
+    },
+    {
+      "code": 6029,
+      "name": "cooldownNotElapsed",
+      "msg": "7-day withdrawal cooldown has not elapsed"
+    },
+    {
+      "code": 6030,
+      "name": "withdrawalNotRequested",
+      "msg": "No pending withdrawal request"
+    },
+    {
+      "code": 6031,
+      "name": "insufficientStake",
+      "msg": "Withdrawal would leave stake below minimum"
+    },
+    {
+      "code": 6032,
+      "name": "gracePeriodExpired",
+      "msg": "48-hour grace period has expired; market must resolve via dispute"
+    },
+    {
+      "code": 6033,
+      "name": "notMarketParticipant",
+      "msg": "Caller has no position on this market"
+    },
+    {
+      "code": 6034,
+      "name": "marketAlreadyDisputed",
+      "msg": "Market is already in dispute"
+    },
+    {
+      "code": 6035,
+      "name": "gracePeriodNotExpired",
+      "msg": "48-hour grace period has not expired yet"
+    },
+    {
+      "code": 6036,
+      "name": "notEnoughResolvers",
+      "msg": "Not enough approved resolvers for jury selection"
+    },
+    {
+      "code": 6037,
+      "name": "notSelectedJuror",
+      "msg": "Caller is not a selected juror for this dispute"
+    },
+    {
+      "code": 6038,
+      "name": "alreadyVoted",
+      "msg": "Juror has already submitted a vote"
+    },
+    {
+      "code": 6039,
+      "name": "votingWindowClosed",
+      "msg": "Dispute voting window has closed"
+    },
+    {
+      "code": 6040,
+      "name": "disputeNotVoting",
+      "msg": "Dispute is not in voting state"
+    },
+    {
+      "code": 6041,
+      "name": "quorumNotReached",
+      "msg": "Not enough votes to finalize dispute"
+    },
+    {
+      "code": 6042,
+      "name": "tiebreakerAlreadyAdded",
+      "msg": "Tiebreaker juror has already been added"
+    },
+    {
+      "code": 6043,
+      "name": "disputeNotSettled",
+      "msg": "Dispute is not settled"
     }
   ],
   "types": [
@@ -2152,6 +4066,32 @@ export type Avenir = {
             "type": {
               "defined": {
                 "name": "epoch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "addDisputeVoteOutput",
+      "docs": [
+        "The output of the callback instruction. Provided as a struct with ordered fields",
+        "as anchor does not support tuples and tuple structs yet."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field0",
+            "type": {
+              "defined": {
+                "name": "mxeEncryptedStruct",
+                "generics": [
+                  {
+                    "kind": "const",
+                    "value": "2"
+                  }
+                ]
               }
             }
           }
@@ -2602,6 +4542,193 @@ export type Avenir = {
       }
     },
     {
+      "name": "dispute",
+      "docs": [
+        "Per-market dispute PDA tracking juror panel, voting state, and dispute lifecycle.",
+        "Seeds: [b\"dispute\", market_id.to_le_bytes()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketId",
+            "docs": [
+              "Market ID this dispute belongs to"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Dispute status: 0=Voting, 1=Finalizing, 2=Settled"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "jurors",
+            "docs": [
+              "Selected juror wallet pubkeys (7 initial + 1 optional tiebreaker = 8 max)"
+            ],
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "jurorStakes",
+            "docs": [
+              "Stake weight snapshot for each juror (same index as jurors Vec)"
+            ],
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "votesSubmitted",
+            "docs": [
+              "Which jurors have voted (bitfield: bit N = juror N has voted)"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "voteCount",
+            "docs": [
+              "Total votes cast so far"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "quorum",
+            "docs": [
+              "Required votes for quorum (initially 5, increases with tiebreaker)"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "votingStart",
+            "docs": [
+              "Unix timestamp when voting window opens"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "votingEnd",
+            "docs": [
+              "Unix timestamp when voting window closes (initially voting_start + 172800)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "tiebreakerAdded",
+            "docs": [
+              "Whether a tiebreaker juror has been added"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "escalator",
+            "docs": [
+              "The wallet that triggered the dispute escalation"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "mpcLock",
+            "docs": [
+              "Sequential MPC lock for dispute vote processing"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "lockTimestamp",
+            "docs": [
+              "Timestamp when mpc_lock was set"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "tallyBump",
+            "docs": [
+              "Associated DisputeTally PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "disputeTally",
+      "docs": [
+        "Fixed-layout account for encrypted dispute vote accumulators, used as MPC read/write target.",
+        "",
+        "This follows the MarketPool pattern exactly -- fixed-layout fields only, no variable-length data.",
+        "The MPC circuit reads/writes encrypted vote accumulators at known byte offsets.",
+        "",
+        "Byte offsets for ArgBuilder.account():",
+        "- yes_votes_encrypted offset: 8 (discriminator) + 8 (market_id) = 16 bytes",
+        "- no_votes_encrypted offset: 16 + 32 = 48 bytes",
+        "- Total ciphertext length: 64 bytes (32 yes_votes + 32 no_votes)",
+        "",
+        "PDA seeds: [b\"dispute_tally\", market_id.to_le_bytes()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketId",
+            "docs": [
+              "Market ID this tally belongs to"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "yesVotesEncrypted",
+            "docs": [
+              "Encrypted yes-weighted vote accumulator"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "noVotesEncrypted",
+            "docs": [
+              "Encrypted no-weighted vote accumulator"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "docs": [
+              "Arcium nonce for MXE ciphertext"
+            ],
+            "type": "u128"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "epoch",
       "docs": [
         "The network epoch"
@@ -2626,6 +4753,42 @@ export type Avenir = {
       }
     },
     {
+      "name": "finalizeDisputeOutput",
+      "docs": [
+        "The output of the callback instruction. Provided as a struct with ordered fields",
+        "as anchor does not support tuples and tuple structs yet."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field0",
+            "type": {
+              "defined": {
+                "name": "finalizeDisputeOutputStruct0"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "finalizeDisputeOutputStruct0",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field0",
+            "type": "u64"
+          },
+          {
+            "name": "field1",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "helloWorldOutput",
       "docs": [
         "The output of the callback instruction. Provided as a struct with ordered fields",
@@ -2643,6 +4806,32 @@ export type Avenir = {
                   {
                     "kind": "const",
                     "value": "1"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "initDisputeTallyOutput",
+      "docs": [
+        "The output of the callback instruction. Provided as a struct with ordered fields",
+        "as anchor does not support tuples and tuple structs yet."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field0",
+            "type": {
+              "defined": {
+                "name": "mxeEncryptedStruct",
+                "generics": [
+                  {
+                    "kind": "const",
+                    "value": "2"
                   }
                 ]
               }
@@ -3291,6 +5480,103 @@ export type Avenir = {
           },
           {
             "name": "plaintextPoint"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resolver",
+      "docs": [
+        "Per-resolver PDA tracking stake, approval status, and withdrawal state.",
+        "Seeds: [b\"resolver\", resolver_wallet.key().as_ref()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "docs": [
+              "Resolver's wallet address"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "stakedAmount",
+            "docs": [
+              "Current USDC stake amount (in token units, 6 decimals)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "approved",
+            "docs": [
+              "Whether admin has approved this resolver"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "activeDisputes",
+            "docs": [
+              "Number of disputes this resolver is currently serving as juror on"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "withdrawalRequestedAt",
+            "docs": [
+              "Unix timestamp of last withdrawal request (0 if none pending)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "withdrawalAmount",
+            "docs": [
+              "Amount requested for withdrawal"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "vaultBump",
+            "docs": [
+              "Resolver vault token account bump",
+              "Vault seeds: [b\"resolver_vault\", resolver_wallet.key().as_ref()]"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resolverRegistry",
+      "docs": [
+        "Singleton PDA containing the list of active, approved resolver wallet pubkeys.",
+        "Seeds: [b\"resolver_registry\"]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "resolvers",
+            "docs": [
+              "Active, approved resolver wallet pubkeys"
+            ],
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
           }
         ]
       }
