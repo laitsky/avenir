@@ -2,20 +2,24 @@ import { useRef, useEffect, useState } from 'react'
 import { cn } from '#/lib/utils'
 import { FogOverlay } from '#/components/fog/FogOverlay'
 import { CountdownTimer } from '#/components/market/CountdownTimer'
-import type { OnChainMarket } from '#/lib/types'
+import { DisputeBanner } from '#/components/dispute/DisputeBanner'
+import { DisputeStepper } from '#/components/dispute/DisputeStepper'
+import type { OnChainMarket, OnChainDispute } from '#/lib/types'
 import { CATEGORY_MAP, SENTIMENT_MAP } from '#/lib/types'
 
 interface MarketDetailProps {
   market: OnChainMarket
+  dispute?: OnChainDispute | null
 }
 
-export function MarketDetail({ market }: MarketDetailProps) {
+export function MarketDetail({ market, dispute = null }: MarketDetailProps) {
   const category = CATEGORY_MAP[market.category] ?? 'Unknown'
   const deadline = new Date(market.resolutionTime * 1000)
   const sentimentLabel = SENTIMENT_MAP[market.sentiment] ?? 'Unknown'
   const isFinalized = market.state === 4
   const isResolved = market.state === 2
   const isOpen = market.state === 0
+  const isDisputed = market.state === 3
 
   // Track previous state to detect live finalization transition
   const prevStateRef = useRef(market.state)
@@ -24,6 +28,10 @@ export function MarketDetail({ market }: MarketDetailProps) {
   useEffect(() => {
     // If user is on the page when market transitions from Resolved(2) to Finalized(4)
     if (prevStateRef.current === 2 && market.state === 4) {
+      setAnimateReveal(true)
+    }
+    // Also trigger reveal on dispute settlement (Disputed->Resolved via dispute)
+    if (prevStateRef.current === 3 && (market.state === 2 || market.state === 4)) {
       setAnimateReveal(true)
     }
     prevStateRef.current = market.state
@@ -35,11 +43,13 @@ export function MarketDetail({ market }: MarketDetailProps) {
   // Status display
   const statusDisplay = isOpen
     ? 'Live'
-    : isFinalized
-      ? 'Finalized'
-      : isResolved
-        ? 'Resolved'
-        : 'Locked'
+    : isDisputed
+      ? 'Disputed'
+      : isFinalized
+        ? 'Finalized'
+        : isResolved
+          ? 'Resolved'
+          : 'Locked'
 
   // Probability bar: sentiment-based for live, revealed pool ratio for finalized
   let yesPercent = 50 // default even
@@ -71,6 +81,11 @@ export function MarketDetail({ market }: MarketDetailProps) {
           </span>
         ) : isResolved ? (
           <span className="text-muted-foreground">Awaiting Reveal</span>
+        ) : isDisputed ? (
+          <span className="flex items-center gap-1.5 text-purple-400">
+            <span className="size-1.5 animate-pulse rounded-full bg-purple-400" />
+            {statusDisplay}
+          </span>
         ) : (
           <span className="flex items-center gap-1.5 text-primary">
             <span className="size-1.5 animate-pulse rounded-full bg-primary" />
@@ -78,6 +93,35 @@ export function MarketDetail({ market }: MarketDetailProps) {
           </span>
         )}
       </div>
+
+      {/* Dispute banner and stepper */}
+      {(isDisputed || (isOpen && market.resolutionTime < Date.now() / 1000)) && (
+        <div className="mb-6 space-y-4">
+          <DisputeBanner market={market} dispute={dispute} />
+          {dispute && isDisputed && <DisputeStepper dispute={dispute} />}
+        </div>
+      )}
+
+      {/* Dispute outcome reveal with fog-clear animation */}
+      {dispute?.status === 2 && isFinalized && (
+        <FogOverlay density="heavy" revealed={fogRevealed || animateReveal}>
+          <div className="mb-6 rounded-lg border border-purple-500/20 bg-purple-500/5 px-4 py-3 text-center">
+            <p className="text-xs font-medium uppercase tracking-wider text-purple-400">
+              Dispute Outcome
+            </p>
+            <p
+              className={cn(
+                'mt-1 font-serif text-xl italic font-semibold',
+                market.winningOutcome === 1
+                  ? 'text-primary'
+                  : 'text-destructive-foreground',
+              )}
+            >
+              Jury decided: {market.winningOutcome === 1 ? 'Yes' : 'No'}
+            </p>
+          </div>
+        </FogOverlay>
+      )}
 
       {/* Question */}
       <h1 className="mb-4 font-serif text-3xl italic leading-tight md:text-4xl">

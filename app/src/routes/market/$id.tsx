@@ -4,6 +4,7 @@ import { MarketDetail } from '#/components/market/MarketDetail'
 import { BetPlacement } from '#/components/market/BetPlacement'
 import { useMarket } from '#/hooks/useMarket'
 import { useUserPosition } from '#/hooks/useUserPosition'
+import { useDisputeData } from '#/hooks/useDisputeData'
 
 export const Route = createFileRoute('/market/$id')({
   component: MarketDetailPage,
@@ -14,6 +15,7 @@ function MarketDetailPage() {
   const marketId = parseInt(id, 10)
   const { data: market, isLoading, isError } = useMarket(marketId)
   const { data: position } = useUserPosition(marketId)
+  const { dispute } = useDisputeData(marketId)
 
   if (isLoading) {
     return (
@@ -57,9 +59,9 @@ function MarketDetailPage() {
       </Link>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
-        <MarketDetail market={market} />
+        <MarketDetail market={market} dispute={dispute} />
         <aside className="lg:sticky lg:top-28 lg:self-start">
-          <BetPlacement market={market} position={position ?? null} />
+          <BetPlacement market={market} position={position ?? null} dispute={dispute} />
         </aside>
       </div>
     </div>

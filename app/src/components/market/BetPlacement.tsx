@@ -4,15 +4,21 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { cn } from '#/lib/utils'
 import { Button } from '#/components/ui/button'
 import { FogOverlay } from '#/components/fog/FogOverlay'
-import type { OnChainMarket, OnChainPosition } from '#/lib/types'
+import { CountdownTimer } from '#/components/market/CountdownTimer'
+import { JurorVotePanel } from '#/components/dispute/JurorVotePanel'
+import type { OnChainMarket, OnChainPosition, OnChainDispute } from '#/lib/types'
 import { usePlaceBet } from '#/hooks/usePlaceBet'
 import { useResolveMarket } from '#/hooks/useResolveMarket'
 import { useComputePayouts } from '#/hooks/useComputePayouts'
 import { useClaimPayout } from '#/hooks/useClaimPayout'
 
+/** Grace period: 48h in seconds */
+const GRACE_PERIOD_SECONDS = 172_800
+
 interface BetPlacementProps {
   market: OnChainMarket
   position: OnChainPosition | null
+  dispute?: OnChainDispute | null
 }
 
 type PanelMode =
@@ -24,6 +30,10 @@ type PanelMode =
   | 'claimed'
   | 'resolved-no-position'
   | 'expired'
+  | 'dispute-escalate'
+  | 'juror-vote'
+  | 'dispute-pending'
+  | 'dispute-finalized'
 
 const QUICK_AMOUNTS = [10, 25, 50, 100] as const
 
@@ -31,8 +41,12 @@ function getBetPanelMode(
   market: OnChainMarket,
   position: OnChainPosition | null,
   walletPubkey: string | null,
+  dispute: OnChainDispute | null,
 ): PanelMode {
-  const deadlinePassed = market.resolutionTime < Date.now() / 1000
+  const now = Date.now() / 1000
+  const deadlinePassed = market.resolutionTime < now
+  const graceDeadline = market.resolutionTime + GRACE_PERIOD_SECONDS
+  const graceExpired = now > graceDeadline
   const isCreator =
     walletPubkey != null && market.creator.toBase58() === walletPubkey
 
@@ -46,11 +60,37 @@ function getBetPanelMode(
     return isWinner ? 'claim-payout' : 'lost'
   }
 
+  // Disputed (state=3)
+  if (market.state === 3 && dispute) {
+    // Dispute settled -- awaiting compute_payouts
+    if (dispute.status === 2) return 'dispute-finalized'
+
+    // Check if connected wallet is a selected juror who hasn't voted yet
+    if (walletPubkey && dispute.status === 0) {
+      const jurorIndex = dispute.jurors.findIndex(
+        (j) => j.toBase58() === walletPubkey,
+      )
+      if (jurorIndex >= 0) {
+        // Check if already voted (bitfield)
+        const hasVoted = ((dispute.votesSubmitted >> jurorIndex) & 1) === 1
+        if (!hasVoted) return 'juror-vote'
+      }
+    }
+
+    return 'dispute-pending'
+  }
+
   // Resolved (state=2) -- awaiting payout computation
   if (market.state === 2) return 'reveal-payouts'
 
-  // Open (state=0) + deadline passed + creator -> resolve mode
+  // Open (state=0) + deadline passed + grace expired -> escalate
+  if (market.state === 0 && deadlinePassed && graceExpired) return 'dispute-escalate'
+
+  // Open (state=0) + deadline passed + creator (within grace) -> resolve mode
   if (market.state === 0 && deadlinePassed && isCreator) return 'resolve'
+
+  // Open (state=0) + deadline passed + grace not expired -> expired (waiting)
+  if (market.state === 0 && deadlinePassed) return 'expired'
 
   // Open (state=0) + before deadline -> bet mode
   if (market.state === 0 && !deadlinePassed) return 'bet'
@@ -58,11 +98,11 @@ function getBetPanelMode(
   return 'expired'
 }
 
-export function BetPlacement({ market, position }: BetPlacementProps) {
+export function BetPlacement({ market, position, dispute = null }: BetPlacementProps) {
   const { publicKey, connected } = useWallet()
   const { setVisible } = useWalletModal()
   const walletPubkey = publicKey?.toBase58() ?? null
-  const mode = getBetPanelMode(market, position, walletPubkey)
+  const mode = getBetPanelMode(market, position, walletPubkey, dispute)
 
   switch (mode) {
     case 'bet':
@@ -86,6 +126,20 @@ export function BetPlacement({ market, position }: BetPlacementProps) {
       return <ClaimedMode />
     case 'resolved-no-position':
       return <ResolvedNoPositionMode market={market} />
+    case 'dispute-escalate':
+      return (
+        <DisputeEscalateMode
+          market={market}
+          connected={connected}
+          onOpenWallet={() => setVisible(true)}
+        />
+      )
+    case 'juror-vote':
+      return <JurorVotePanel market={market} dispute={dispute!} />
+    case 'dispute-pending':
+      return <DisputePendingMode dispute={dispute!} />
+    case 'dispute-finalized':
+      return <DisputeFinalizedMode market={market} />
     case 'expired':
       return <ExpiredMode />
   }
@@ -592,6 +646,142 @@ function ResolvedNoPositionMode({ market }: { market: OnChainMarket }) {
       <p className="mt-2 text-xs text-muted-foreground">
         This market has been resolved.
       </p>
+    </div>
+  )
+}
+
+// =============================================================================
+// DISPUTE ESCALATE MODE
+// =============================================================================
+
+function DisputeEscalateMode({
+  market,
+  connected,
+  onOpenWallet,
+}: {
+  market: OnChainMarket
+  connected: boolean
+  onOpenWallet: () => void
+}) {
+  const [loading, setLoading] = useState(false)
+
+  async function handleEscalate() {
+    if (!connected) {
+      onOpenWallet()
+      return
+    }
+    // Escalation requires on-chain transaction -- placeholder for open_dispute hook
+    setLoading(true)
+    // The actual open_dispute transaction would be wired here via a useOpenDispute hook
+    // For now, show loading state to indicate the flow
+    setLoading(false)
+  }
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-4">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-amber-400">
+          Market Unresolved
+        </span>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This market was not resolved by its creator within the grace period.
+          You can escalate it to dispute resolution.
+        </p>
+      </div>
+
+      <Button
+        className="w-full bg-amber-500/20 font-semibold text-amber-400 hover:bg-amber-500/30"
+        size="lg"
+        onClick={handleEscalate}
+        disabled={loading}
+      >
+        {loading ? (
+          <div className="flex items-center gap-2">
+            <div className="size-4 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+            Escalating...
+          </div>
+        ) : (
+          'Escalate to Dispute'
+        )}
+      </Button>
+    </div>
+  )
+}
+
+// =============================================================================
+// DISPUTE PENDING MODE
+// =============================================================================
+
+function DisputePendingMode({ dispute }: { dispute: OnChainDispute }) {
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-purple-400">
+        Dispute in Progress
+      </span>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Awaiting jury verdict. Votes are encrypted -- no leaning signal is
+        available.
+      </p>
+      <div className="mt-4 rounded-lg bg-purple-500/5 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-purple-300/70">Votes submitted</span>
+          <span className="font-mono text-sm tabular-nums text-purple-400">
+            {dispute.voteCount}/{dispute.jurors.length}
+          </span>
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-purple-300/70">Quorum required</span>
+          <span className="font-mono text-sm tabular-nums text-purple-400">
+            {dispute.quorum}
+          </span>
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-purple-300/70">Voting ends</span>
+          <CountdownTimer
+            deadline={new Date(dispute.votingEnd * 1000)}
+            className="text-xs text-purple-400"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// DISPUTE FINALIZED MODE
+// =============================================================================
+
+function DisputeFinalizedMode({ market }: { market: OnChainMarket }) {
+  const computePayouts = useComputePayouts(market.id)
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-4">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-purple-400">
+          Dispute Settled
+        </span>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The dispute has been settled by the jury. Trigger payout computation to
+          reveal pool totals and enable claims.
+        </p>
+      </div>
+
+      {computePayouts.isPending ? (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <div className="size-6 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
+          <p className="text-sm text-muted-foreground">
+            Computing payouts via MPC...
+          </p>
+        </div>
+      ) : (
+        <Button
+          className="w-full bg-purple-500/20 font-semibold text-purple-400 hover:bg-purple-500/30"
+          size="lg"
+          onClick={() => computePayouts.mutate()}
+        >
+          Reveal Payouts
+        </Button>
+      )}
     </div>
   )
 }

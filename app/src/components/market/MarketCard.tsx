@@ -23,10 +23,20 @@ function sentimentToPercent(sentiment: number): number {
   }
 }
 
+/** Grace period: 48h in seconds */
+const GRACE_PERIOD_SECONDS = 172_800
+
 export function MarketCard({ market, className, style }: MarketCardProps) {
   const isFinalized = market.state === 4 // Finalized
   const isResolved = market.state === 2 || isFinalized // Resolved or Finalized
   const isLive = market.state === 0 || market.state === 1 // Open or Locked
+  const isDisputed = market.state === 3 // Disputed
+
+  // Grace period: market is Open, deadline passed, grace not expired
+  const now = Date.now() / 1000
+  const deadlinePassed = market.resolutionTime < now
+  const graceDeadline = market.resolutionTime + GRACE_PERIOD_SECONDS
+  const isGracePeriod = market.state === 0 && deadlinePassed && now <= graceDeadline
 
   // Compute probability display
   const yesPercent = isFinalized && (market.revealedYesPool + market.revealedNoPool) > 0
@@ -55,9 +65,19 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
           <span className="text-[11px] font-medium uppercase tracking-wider text-primary/50">
             {CATEGORY_MAP[market.category] ?? 'Other'}
           </span>
-          {isLive && (
+          {isLive && !isGracePeriod && (
             <span className="flex items-center gap-1 text-[11px] text-primary/40">
               <span className="size-1 animate-pulse rounded-full bg-primary/60" />
+            </span>
+          )}
+          {isDisputed && (
+            <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[10px] font-medium text-purple-400">
+              In Dispute
+            </span>
+          )}
+          {isGracePeriod && (
+            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+              Grace Period
             </span>
           )}
         </div>
@@ -127,7 +147,7 @@ export function MarketCard({ market, className, style }: MarketCardProps) {
       )}
 
       {/* Action chips */}
-      {isLive && (
+      {isLive && !isDisputed && !isGracePeriod && (
         <div className="flex gap-2">
           <span className="flex-1 cursor-pointer rounded-lg bg-primary/10 py-2 text-center text-xs font-medium text-primary transition-all group-hover:bg-primary/20">
             Yes
