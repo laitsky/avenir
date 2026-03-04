@@ -171,6 +171,8 @@ pub mod avenir {
         ctx: Context<UpdatePoolCallback>,
         output: SignedComputationOutputs<UpdatePoolOutput>,
     ) -> Result<()> {
+        use anchor_spl::token::{self, Transfer};
+
         // update_pool returns (Enc<Mxe, PoolTotals>, u8)
         // Generated output structure:
         //   UpdatePoolOutput { field_0: UpdatePoolOutputStruct0 }
@@ -182,11 +184,46 @@ pub mod avenir {
             Ok(UpdatePoolOutput { field_0 }) => field_0,
             Err(e) => {
                 msg!("update_pool computation failed: {}", e);
-                // Release mpc_lock even on failure so the market isn't permanently locked
-                ctx.accounts.market.mpc_lock = false;
+
+                // Extract values before CPI to satisfy borrow checker
+                let market_id = ctx.accounts.market.id;
+                let bump = ctx.accounts.market.bump;
+                let pending_amount = ctx.accounts.market.pending_amount;
+
+                // Refund pending bettor's USDC from vault
+                if pending_amount > 0 {
+                    let signer_seeds: &[&[&[u8]]] = &[&[
+                        b"market",
+                        &market_id.to_le_bytes(),
+                        &[bump],
+                    ]];
+
+                    let cpi_accounts = Transfer {
+                        from: ctx.accounts.market_vault.to_account_info(),
+                        to: ctx.accounts.bettor_token_account.to_account_info(),
+                        authority: ctx.accounts.market.to_account_info(),
+                    };
+                    let cpi_ctx = CpiContext::new_with_signer(
+                        ctx.accounts.token_program.to_account_info(),
+                        cpi_accounts,
+                        signer_seeds,
+                    );
+                    token::transfer(cpi_ctx, pending_amount)?;
+                }
+
+                // Clear lock and pending fields
+                let market = &mut ctx.accounts.market;
+                market.mpc_lock = false;
+                market.lock_timestamp = 0;
+                market.pending_bettor = Pubkey::default();
+                market.pending_amount = 0;
+                market.pending_is_yes = false;
+
                 return Err(arcium_anchor::ArciumError::AbortedComputation.into());
             }
         };
+
+        // === Success path ===
 
         // Write updated pool ciphertexts back to MarketPool
         let market_pool = &mut ctx.accounts.market_pool;
@@ -198,17 +235,30 @@ pub mod avenir {
         let market = &mut ctx.accounts.market;
         market.sentiment = result.field_1;
 
-        // Release mpc_lock
-        market.mpc_lock = false;
+        // Update UserPosition with pending bet amount
+        let position = &mut ctx.accounts.user_position;
+        if market.pending_is_yes {
+            position.yes_amount = position.yes_amount.checked_add(market.pending_amount).unwrap();
+        } else {
+            position.no_amount = position.no_amount.checked_add(market.pending_amount).unwrap();
+        }
 
         // Increment total_bets
-        market.total_bets += 1;
+        market.total_bets = market.total_bets.checked_add(1).unwrap();
+
+        // Clear lock and pending fields
+        market.mpc_lock = false;
+        market.lock_timestamp = 0;
+        market.pending_bettor = Pubkey::default();
+        market.pending_amount = 0;
+        market.pending_is_yes = false;
 
         msg!(
-            "update_pool complete - MarketPool {} updated, sentiment={}, total_bets={}",
+            "update_pool complete - MarketPool {} updated, sentiment={}, total_bets={}, position updated for {}",
             market_pool.market_id,
             market.sentiment,
-            market.total_bets
+            market.total_bets,
+            position.user
         );
         Ok(())
     }

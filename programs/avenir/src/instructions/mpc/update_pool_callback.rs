@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Transfer, Token, TokenAccount};
+use anchor_spl::token::{Token, TokenAccount};
 use arcium_anchor::prelude::*;
 
 use crate::errors::ErrorCode;
