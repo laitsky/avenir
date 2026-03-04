@@ -8,7 +8,7 @@ progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State
@@ -23,16 +23,16 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 5 of 10 (Encrypted Betting)
-Plan: 2 of 3 in current phase (2 complete)
-Status: Executing phase 5
-Last activity: 2026-03-04 -- Completed 05-02-PLAN.md (Update Pool Callback)
+Plan: 3 of 3 in current phase (3 complete)
+Status: Phase 5 complete
+Last activity: 2026-03-04 -- Completed 05-03-PLAN.md (Place Bet Integration Tests)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 49%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 7min
 - Total execution time: 1.68 hours
 
@@ -44,11 +44,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 49%
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
-| 5. Encrypted Betting | 2/3 | 5min | 3min |
+| 5. Encrypted Betting | 3/3 | 10min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 2min, 3min, 2min
-- Trend: Phase 5 callback in 2min -- both plans under 3min
+- Last 5 plans: 2min, 2min, 3min, 2min, 5min
+- Trend: Phase 5 complete -- 3 plans in 10min total
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -66,6 +66,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 49%
 | Phase 04 P04 | 2min | 2 tasks | 5 files |
 | Phase 05 P01 | 3min | 2 tasks | 6 files |
 | Phase 05 P02 | 2min | 2 tasks | 3 files |
+| Phase 05 P03 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -133,6 +134,9 @@ Recent decisions affecting current work:
 - [05-02]: Extract Copy values before CPI to satisfy borrow checker, re-acquire mut ref after transfer
 - [05-02]: Function-scoped imports in callback handler body to avoid unused import warnings in struct file
 - [05-02]: Skip setting UserPosition fields in callback -- already set by init_if_needed in place_bet
+- [05-03]: Tests await MPC callback between stateful test cases to ensure lock is released before next test
+- [05-03]: MarketExpired test skipped -- create_market validates deadline > now + 1h, Clock sysvar manipulation unavailable on localnet
+- [05-03]: WrongSide test uses accumulated state from prior tests (bettor has Yes position, attempts No bet)
 
 ### Pending Todos
 
@@ -148,6 +152,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 05-02-PLAN.md
-Resume file: .planning/phases/05-encrypted-betting/05-02-SUMMARY.md
-Note: Phase 5 Plan 2 complete -- update_pool_callback with full success/failure paths. Next: 05-03-PLAN.md.
+Stopped at: Completed 05-03-PLAN.md (Phase 5 complete)
+Resume file: .planning/phases/05-encrypted-betting/05-03-SUMMARY.md
+Note: Phase 5 complete -- all 3 plans done. place_bet instruction, update_pool_callback, and integration tests. Ready for Phase 6 (Resolution + Payout).
