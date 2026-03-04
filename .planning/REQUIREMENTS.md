@@ -32,8 +32,8 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [ ] **RES-04**: Dedicated resolver pool members can stake USDC to become eligible jurors
 - [ ] **RES-05**: Resolver votes are encrypted via Arcium MPC (no juror sees other votes)
 - [ ] **RES-06**: Dispute outcome is determined by stake-weighted encrypted vote tally
-- [ ] **RES-07**: Winners receive instant USDC payout proportional to their share of the winning pool
-- [ ] **RES-08**: Protocol fee of 1-2% is deducted from winning payouts
+- [x] **RES-07**: Winners receive instant USDC payout proportional to their share of the winning pool
+- [x] **RES-08**: Protocol fee of 1-2% is deducted from winning payouts
 - [x] **RES-09**: Payout calculation uses plaintext math after pool totals are revealed at resolution
 
 ### User Experience
@@ -131,8 +131,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RES-04 | Phase 8: Dispute System | Pending |
 | RES-05 | Phase 8: Dispute System | Pending |
 | RES-06 | Phase 8: Dispute System | Pending |
-| RES-07 | Phase 6: Resolution & Payouts | Pending |
-| RES-08 | Phase 6: Resolution & Payouts | Pending |
+| RES-07 | Phase 6: Resolution & Payouts | Complete |
+| RES-08 | Phase 6: Resolution & Payouts | Complete |
 | RES-09 | Phase 6: Resolution & Payouts | Complete |
 | UX-01 | Phase 7: Core UI Integration | Pending |
 | UX-02 | Phase 7: Core UI Integration | Pending |
