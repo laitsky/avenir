@@ -33,6 +33,28 @@ pub mod avenir {
         instructions::cancel_market::handler(ctx)
     }
 
+    pub fn place_bet(
+        ctx: Context<PlaceBet>,
+        amount: u64,
+        is_yes: bool,
+        computation_offset: u64,
+        is_yes_ciphertext: [u8; 32],
+        amount_ciphertext: [u8; 32],
+        pub_key: [u8; 32],
+        nonce: u128,
+    ) -> Result<()> {
+        instructions::place_bet::handler(
+            ctx,
+            amount,
+            is_yes,
+            computation_offset,
+            is_yes_ciphertext,
+            amount_ciphertext,
+            pub_key,
+            nonce,
+        )
+    }
+
     // MPC instructions -- hello_world
     pub fn init_hello_world_comp_def(ctx: Context<InitHelloWorldCompDef>) -> Result<()> {
         instructions::mpc::init_hello_world_comp_def::handler(ctx)
