@@ -138,7 +138,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Completed 04-04-PLAN.md
-Resume file: .planning/phases/04-design-system-fog/04-04-SUMMARY.md
-Note: Phase 4 complete -- all 4 plans finished. Design tokens, fog overlays, market components, detail page, homepage feed, and portfolio shell all built. Ready for Phase 5 (on-chain track) or Phase 7 (frontend integration).
+Last session: 2026-03-04
+Stopped at: Phase 5 context gathered
+Resume file: .planning/phases/05-encrypted-betting/05-CONTEXT.md
+Note: Phase 5 context captured -- multi-bet rules, lock contention UX, failure/refund paths, position privacy model all decided. Ready for planning.
