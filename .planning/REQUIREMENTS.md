@@ -26,8 +26,8 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 ### Resolution & Disputes
 
-- [ ] **RES-01**: Market creator can resolve the market by declaring the winning outcome
-- [ ] **RES-02**: Resolution has a 48-hour grace period after market deadline
+- [x] **RES-01**: Market creator can resolve the market by declaring the winning outcome
+- [x] **RES-02**: Resolution has a 48-hour grace period after market deadline
 - [ ] **RES-03**: After grace period, any market participant can trigger dispute escalation
 - [ ] **RES-04**: Dedicated resolver pool members can stake USDC to become eligible jurors
 - [ ] **RES-05**: Resolver votes are encrypted via Arcium MPC (no juror sees other votes)
@@ -125,8 +125,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MKT-02 | Phase 2: Market Creation | Complete |
 | MKT-03 | Phase 2: Market Creation | Complete |
 | MKT-04 | Phase 1: Foundation | Complete |
-| RES-01 | Phase 6: Resolution & Payouts | Pending |
-| RES-02 | Phase 6: Resolution & Payouts | Pending |
+| RES-01 | Phase 6: Resolution & Payouts | Complete |
+| RES-02 | Phase 6: Resolution & Payouts | Complete |
 | RES-03 | Phase 8: Dispute System | Pending |
 | RES-04 | Phase 8: Dispute System | Pending |
 | RES-05 | Phase 8: Dispute System | Pending |

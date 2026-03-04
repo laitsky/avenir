@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T07:03:08.645Z"
+last_updated: "2026-03-04T07:53:21Z"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
-  total_plans: 21
-  completed_plans: 21
+  total_plans: 25
+  completed_plans: 22
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 5: Encrypted Betting
+**Current focus:** Phase 6: Resolution & Payouts
 
 ## Current Position
 
-Phase: 5 of 10 (Encrypted Betting)
-Plan: 4 of 4 in current phase (4 complete)
-Status: Phase 5 complete (with gap closure)
-Last activity: 2026-03-04 -- Completed 05-04-PLAN.md (Gap Closure)
+Phase: 6 of 10 (Resolution & Payouts)
+Plan: 1 of 4 in current phase (1 complete)
+Status: Executing Phase 6
+Last activity: 2026-03-04 -- Completed 06-01-PLAN.md (Resolution Foundation)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░] 55%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 7min
-- Total execution time: 1.75 hours
+- Total plans completed: 21
+- Average duration: 6min
+- Total execution time: 1.78 hours
 
 **By Phase:**
 
@@ -45,10 +45,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
+| 6. Resolution & Payouts | 1/4 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 2min, 5min, 4min
-- Trend: Phase 5 complete with gap closure -- 4 plans in 14min total
+- Last 5 plans: 2min, 5min, 4min, 2min
+- Trend: Phase 6 started -- resolution foundation in 2min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -68,6 +69,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 50%
 | Phase 05 P02 | 2min | 2 tasks | 3 files |
 | Phase 05 P03 | 5min | 2 tasks | 2 files |
 | Phase 05 P04 | 4min | 2 tasks | 3 files |
+| Phase 06 P01 | 2min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -141,6 +143,9 @@ Recent decisions affecting current work:
 - [05-04]: Scope-based re-borrow for UserPosition init to avoid overlapping mutable borrows with market
 - [05-04]: UncheckedAccount fields on UpdatePool struct for callback pass-through (not dummy pubkeys)
 - [05-04]: IDL error variant assertion for MarketExpired test (Clock sysvar manipulation unavailable on localnet)
+- [06-01]: resolve_market transitions directly Open(0) -> Resolved(2) with no intermediate Locked(1) state
+- [06-01]: compute_payouts circuit takes only Enc<Mxe, PoolTotals> -- no user-encrypted input, simpler than update_pool
+- [06-01]: ComputePayoutsOutput type not yet generated -- requires callback handler definition in Plan 02
 
 ### Pending Todos
 
@@ -156,6 +161,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 05-04-PLAN.md (Gap Closure)
-Resume file: .planning/phases/05-encrypted-betting/05-04-SUMMARY.md
-Note: Phase 5 complete with gap closure -- all 4 plans done. UserPosition initialization, callback vector fix, and test assertion fix. Ready for Phase 6 (Resolution + Payout).
+Stopped at: Completed 06-01-PLAN.md (Resolution Foundation)
+Resume file: .planning/phases/06-resolution-payouts/06-01-SUMMARY.md
+Note: Phase 6 plan 1 complete. resolve_market instruction and compute_payouts circuit added. Market struct extended with revealed pool fields. 7 new error variants. Ready for Plan 02 (compute_payouts MPC queue/callback).
