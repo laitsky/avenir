@@ -12,6 +12,8 @@ import { useOpenDispute } from '#/hooks/useOpenDispute'
 import { useResolveMarket } from '#/hooks/useResolveMarket'
 import { useComputePayouts } from '#/hooks/useComputePayouts'
 import { useClaimPayout } from '#/hooks/useClaimPayout'
+import { useFinalizeDispute } from '#/hooks/useFinalizeDispute'
+import { useAddTiebreaker } from '#/hooks/useAddTiebreaker'
 
 /** Grace period: 48h in seconds */
 const GRACE_PERIOD_SECONDS = 172_800
@@ -138,9 +140,16 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
     case 'juror-vote':
       return <JurorVotePanel market={market} dispute={dispute!} />
     case 'dispute-pending':
-      return <DisputePendingMode dispute={dispute!} />
+      return (
+        <DisputePendingMode
+          market={market}
+          dispute={dispute!}
+          connected={connected}
+          onOpenWallet={() => setVisible(true)}
+        />
+      )
     case 'dispute-finalized':
-      return <DisputeFinalizedMode market={market} />
+      return <DisputeFinalizedMode market={market} dispute={dispute!} />
     case 'expired':
       return <ExpiredMode />
   }
@@ -856,7 +865,142 @@ function EscalateProgress({
 // DISPUTE PENDING MODE
 // =============================================================================
 
-function DisputePendingMode({ dispute }: { dispute: OnChainDispute }) {
+function DisputePendingMode({
+  market,
+  dispute,
+  connected,
+  onOpenWallet,
+}: {
+  market: OnChainMarket
+  dispute: OnChainDispute
+  connected: boolean
+  onOpenWallet: () => void
+}) {
+  const finalizeDispute = useFinalizeDispute(market.id)
+  const addTiebreaker = useAddTiebreaker(market.id)
+
+  const now = Date.now() / 1000
+  const votingExpired = now > dispute.votingEnd
+  const quorumReached = dispute.voteCount >= dispute.quorum
+
+  // Tie detection: dispute reset to Voting with votes already cast but no tiebreaker yet
+  const isTieDetected =
+    dispute.status === 0 &&
+    quorumReached &&
+    !dispute.tiebreakerAdded
+
+  // Auto-trigger tiebreaker on tie detection
+  useEffect(() => {
+    if (isTieDetected && connected && !addTiebreaker.isPending) {
+      addTiebreaker.mutate()
+    }
+  }, [isTieDetected, connected])
+
+  // Tie detected state
+  if (isTieDetected) {
+    return (
+      <div className="rounded-xl bg-card p-6">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-amber-400">
+          Tie Detected
+        </span>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Tie detected -- selecting tiebreaker juror
+        </p>
+        <div className="mt-4 flex flex-col items-center gap-3 py-4">
+          <div className="size-6 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+          <p className="text-sm text-muted-foreground">
+            {addTiebreaker.isPending
+              ? 'Adding tiebreaker juror...'
+              : connected
+                ? 'Preparing tiebreaker...'
+                : 'Connect wallet to add tiebreaker juror'}
+          </p>
+          {!connected && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onOpenWallet}
+            >
+              Connect Wallet
+            </Button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Quorum reached -- show "Reveal Outcome" button
+  if (quorumReached) {
+    return (
+      <div className="rounded-xl bg-card p-6">
+        <div className="mb-4">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-purple-400">
+            Quorum Reached
+          </span>
+          <p className="mt-2 text-sm text-muted-foreground">
+            The jury has reached quorum ({dispute.voteCount}/{dispute.quorum} votes).
+            Reveal the outcome to determine the verdict.
+          </p>
+        </div>
+
+        {finalizeDispute.isPending ? (
+          <FogOverlay density="heavy" className="rounded-lg">
+            <div className="flex flex-col items-center gap-3 py-6">
+              <div className="size-6 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
+              <p className="text-sm text-muted-foreground">
+                Revealing outcome...
+              </p>
+            </div>
+          </FogOverlay>
+        ) : (
+          <Button
+            className="w-full bg-purple-500/20 font-semibold text-purple-400 hover:bg-purple-500/30"
+            size="lg"
+            onClick={() => {
+              if (!connected) {
+                onOpenWallet()
+                return
+              }
+              finalizeDispute.mutate()
+            }}
+          >
+            Reveal Outcome
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  // Voting expired without quorum
+  if (votingExpired && !quorumReached) {
+    return (
+      <div className="rounded-xl bg-card p-6">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-purple-400">
+          Dispute in Progress
+        </span>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Voting ended -- quorum not reached ({dispute.voteCount}/{dispute.quorum}{' '}
+          required)
+        </p>
+        <div className="mt-4 rounded-lg bg-purple-500/5 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-purple-300/70">Votes submitted</span>
+            <span className="font-mono text-sm tabular-nums text-purple-400">
+              {dispute.voteCount}/{dispute.jurors.length}
+            </span>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-purple-300/70">Quorum required</span>
+            <span className="font-mono text-sm tabular-nums text-purple-400">
+              {dispute.quorum}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Default: voting active, quorum not reached
   return (
     <div className="rounded-xl bg-card p-6">
       <span className="text-[11px] font-medium uppercase tracking-wider text-purple-400">
@@ -895,8 +1039,14 @@ function DisputePendingMode({ dispute }: { dispute: OnChainDispute }) {
 // DISPUTE FINALIZED MODE
 // =============================================================================
 
-function DisputeFinalizedMode({ market }: { market: OnChainMarket }) {
-  const computePayouts = useComputePayouts(market.id)
+function DisputeFinalizedMode({
+  market,
+  dispute,
+}: {
+  market: OnChainMarket
+  dispute: OnChainDispute
+}) {
+  const finalizeDispute = useFinalizeDispute(market.id)
 
   return (
     <div className="rounded-xl bg-card p-6">
@@ -905,25 +1055,26 @@ function DisputeFinalizedMode({ market }: { market: OnChainMarket }) {
           Dispute Settled
         </span>
         <p className="mt-2 text-sm text-muted-foreground">
-          The dispute has been settled by the jury. Trigger payout computation to
-          reveal pool totals and enable claims.
+          The jury has reached a verdict. Reveal the outcome to enable payouts.
         </p>
       </div>
 
-      {computePayouts.isPending ? (
-        <div className="flex flex-col items-center gap-3 py-6">
-          <div className="size-6 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
-          <p className="text-sm text-muted-foreground">
-            Computing payouts via MPC...
-          </p>
-        </div>
+      {finalizeDispute.isPending ? (
+        <FogOverlay density="heavy" className="rounded-lg">
+          <div className="flex flex-col items-center gap-3 py-6">
+            <div className="size-6 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
+            <p className="text-sm text-muted-foreground">
+              Revealing outcome...
+            </p>
+          </div>
+        </FogOverlay>
       ) : (
         <Button
           className="w-full bg-purple-500/20 font-semibold text-purple-400 hover:bg-purple-500/30"
           size="lg"
-          onClick={() => computePayouts.mutate()}
+          onClick={() => finalizeDispute.mutate()}
         >
-          Reveal Payouts
+          Reveal Outcome
         </Button>
       )}
     </div>
