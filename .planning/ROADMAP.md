@@ -286,4 +286,4 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
 | 11. Wire Dispute Frontend Hooks | 2/2 | Complete    | 2026-03-04 |
-| 12. Pool Init & Encryption Hardening | 2/2 | Complete   | 2026-03-04 |
+| 12. Pool Init & Encryption Hardening | 2/2 | Complete    | 2026-03-04 |
