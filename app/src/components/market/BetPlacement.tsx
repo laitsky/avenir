@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { PublicKey, SystemProgram } from '@solana/web3.js'
+import BN from 'bn.js'
 import { cn } from '#/lib/utils'
 import { Button } from '#/components/ui/button'
 import { FogOverlay } from '#/components/fog/FogOverlay'
@@ -14,6 +16,10 @@ import { useComputePayouts } from '#/hooks/useComputePayouts'
 import { useClaimPayout } from '#/hooks/useClaimPayout'
 import { useFinalizeDispute } from '#/hooks/useFinalizeDispute'
 import { useAddTiebreaker } from '#/hooks/useAddTiebreaker'
+import { useMarketPool, isPoolInitialized } from '#/hooks/useMarketPool'
+import { useAnchorProgram } from '#/lib/anchor'
+import { PROGRAM_ID } from '#/lib/constants'
+import { getMarketPoolPda } from '#/lib/pda'
 
 /** Grace period: 48h in seconds */
 const GRACE_PERIOD_SECONDS = 172_800
@@ -25,6 +31,7 @@ interface BetPlacementProps {
 }
 
 type PanelMode =
+  | 'pool-initializing'
   | 'bet'
   | 'resolve'
   | 'reveal-payouts'
@@ -45,7 +52,11 @@ function getBetPanelMode(
   position: OnChainPosition | null,
   walletPubkey: string | null,
   dispute: OnChainDispute | null,
+  poolInitialized: boolean,
 ): PanelMode {
+  // Pool-initializing gate: only active markets (state=0) with uninitialized pools
+  if (market.state === 0 && !poolInitialized) return 'pool-initializing'
+
   const now = Date.now() / 1000
   const deadlinePassed = market.resolutionTime < now
   const graceDeadline = market.resolutionTime + GRACE_PERIOD_SECONDS
@@ -105,9 +116,17 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
   const { publicKey, connected } = useWallet()
   const { setVisible } = useWalletModal()
   const walletPubkey = publicKey?.toBase58() ?? null
-  const mode = getBetPanelMode(market, position, walletPubkey, dispute)
+  const poolQuery = useMarketPool(market.id)
+  // Default true to avoid flashing the gate before pool data arrives
+  // (the on-chain init_pool may have already completed)
+  const poolReady = poolQuery.data
+    ? isPoolInitialized(poolQuery.data as any)
+    : true
+  const mode = getBetPanelMode(market, position, walletPubkey, dispute, poolReady)
 
   switch (mode) {
+    case 'pool-initializing':
+      return <PoolInitializingMode market={market} />
     case 'bet':
       return (
         <BetMode
@@ -153,6 +172,141 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
     case 'expired':
       return <ExpiredMode />
   }
+}
+
+// =============================================================================
+// POOL INITIALIZING MODE
+// =============================================================================
+
+function PoolInitializingMode({ market }: { market: OnChainMarket }) {
+  const program = useAnchorProgram()
+  const { publicKey, connected } = useWallet()
+  const { connection } = useConnection()
+  const [elapsed, setElapsed] = useState(0)
+  const [recovering, setRecovering] = useState(false)
+
+  // Track elapsed time since mount
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed((prev) => prev + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  async function handleRecovery() {
+    if (!program || !publicKey || recovering) return
+
+    setRecovering(true)
+    try {
+      const [marketPoolPda] = getMarketPoolPda(market.id)
+      const computationOffset = new BN(
+        crypto.getRandomValues(new Uint8Array(8)),
+      )
+
+      // Arcium account derivation (dynamic import for browser safety)
+      const {
+        getComputationAccAddress,
+        getClusterAccAddress,
+        getMXEAccAddress,
+        getMempoolAccAddress,
+        getExecutingPoolAccAddress,
+        getCompDefAccAddress,
+        getCompDefAccOffset,
+        getArciumEnv,
+        getFeePoolAccAddress,
+        getClockAccAddress,
+        getArciumProgramId,
+      } = await import('@arcium-hq/client')
+
+      const arciumEnv = getArciumEnv()
+      const clusterOffset = arciumEnv.arciumClusterOffset
+      const compDefIndex = Buffer.from(
+        getCompDefAccOffset('init_pool'),
+      ).readUInt32LE(0)
+
+      const arciumAccounts = {
+        mxeAccount: getMXEAccAddress(PROGRAM_ID),
+        signPdaAccount: PublicKey.findProgramAddressSync(
+          [Buffer.from('ArciumSignerAccount')],
+          PROGRAM_ID,
+        )[0],
+        mempoolAccount: getMempoolAccAddress(clusterOffset),
+        executingPool: getExecutingPoolAccAddress(clusterOffset),
+        computationAccount: getComputationAccAddress(
+          clusterOffset,
+          computationOffset,
+        ),
+        compDefAccount: getCompDefAccAddress(PROGRAM_ID, compDefIndex),
+        clusterAccount: getClusterAccAddress(clusterOffset),
+        poolAccount: getFeePoolAccAddress(),
+        clockAccount: getClockAccAddress(),
+        arciumProgram: getArciumProgramId(),
+      }
+
+      const sig = await program.methods
+        .initPool(computationOffset)
+        .accounts({
+          payer: publicKey,
+          marketPool: marketPoolPda,
+          systemProgram: SystemProgram.programId,
+          ...arciumAccounts,
+        })
+        .rpc({ commitment: 'confirmed' })
+
+      await connection.confirmTransaction(sig, 'confirmed')
+    } catch {
+      // Recovery failed silently -- WebSocket will detect if it eventually succeeds
+    } finally {
+      setRecovering(false)
+    }
+  }
+
+  return (
+    <div className="rounded-xl bg-card p-6">
+      <div className="mb-4">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Market Initializing...
+        </span>
+      </div>
+
+      <div className="flex flex-col items-center gap-3 py-6">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+        <p className="text-center text-sm text-muted-foreground">
+          The encrypted pool is being initialized via MPC. This usually takes
+          10-30 seconds.
+        </p>
+      </div>
+
+      {elapsed >= 30 && (
+        <div className="mt-2">
+          {recovering ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <div className="size-5 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
+              <p className="text-center text-xs text-muted-foreground">
+                Initializing pool...
+              </p>
+            </div>
+          ) : (
+            <>
+              <Button
+                className="w-full bg-amber-500/20 font-semibold text-amber-400 hover:bg-amber-500/30"
+                size="lg"
+                onClick={handleRecovery}
+                disabled={!connected}
+              >
+                Initialize Pool
+              </Button>
+              {!connected && (
+                <p className="mt-2 text-center text-xs text-amber-400/60">
+                  Connect wallet to initialize pool
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // =============================================================================
