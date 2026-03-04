@@ -77,3 +77,58 @@ export function getConfigPda(
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync([Buffer.from('config')], programId)
 }
+
+/**
+ * Derives the Dispute PDA.
+ * Seeds: [b"dispute", market_id.to_le_bytes()]
+ */
+export function getDisputePda(
+  marketId: number,
+  programId: PublicKey = PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('dispute'), marketIdBuffer(marketId)],
+    programId,
+  )
+}
+
+/**
+ * Derives the DisputeTally PDA.
+ * Seeds: [b"dispute_tally", market_id.to_le_bytes()]
+ */
+export function getDisputeTallyPda(
+  marketId: number,
+  programId: PublicKey = PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('dispute_tally'), marketIdBuffer(marketId)],
+    programId,
+  )
+}
+
+/**
+ * Derives the Resolver PDA for a given wallet.
+ * Seeds: [b"resolver", wallet.key()]
+ */
+export function getResolverPda(
+  wallet: PublicKey,
+  programId: PublicKey = PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('resolver'), wallet.toBuffer()],
+    programId,
+  )
+}
+
+/**
+ * Derives the ResolverRegistry PDA.
+ * Seeds: [b"resolver_registry"]
+ */
+export function getResolverRegistryPda(
+  programId: PublicKey = PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('resolver_registry')],
+    programId,
+  )
+}

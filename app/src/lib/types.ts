@@ -1,6 +1,28 @@
 import { PublicKey } from '@solana/web3.js'
 import type { BN } from '@coral-xyz/anchor'
 
+export interface OnChainDispute {
+  publicKey: PublicKey
+  marketId: number
+  status: number // 0=Voting, 1=Finalizing, 2=Settled
+  jurors: PublicKey[]
+  jurorStakes: number[]
+  votesSubmitted: number // Bitfield
+  voteCount: number
+  quorum: number
+  votingStart: number
+  votingEnd: number
+  tiebreakerAdded: boolean
+  escalator: PublicKey
+  mpcLock: boolean
+}
+
+export const DISPUTE_STATUS_MAP: Record<number, string> = {
+  0: 'Voting',
+  1: 'Finalizing',
+  2: 'Settled',
+}
+
 export interface OnChainMarket {
   publicKey: PublicKey
   id: number
@@ -121,5 +143,42 @@ export function mapPositionAccount(
     yesAmount: account.yesAmount.toNumber(),
     noAmount: account.noAmount.toNumber(),
     claimed: account.claimed,
+  }
+}
+
+/**
+ * Maps a raw Anchor-decoded Dispute account to the typed OnChainDispute interface.
+ */
+export function mapDisputeAccount(
+  publicKey: PublicKey,
+  account: {
+    marketId: BN
+    status: number
+    jurors: PublicKey[]
+    jurorStakes: BN[]
+    votesSubmitted: number
+    voteCount: number
+    quorum: number
+    votingStart: BN
+    votingEnd: BN
+    tiebreakerAdded: boolean
+    escalator: PublicKey
+    mpcLock: boolean
+  },
+): OnChainDispute {
+  return {
+    publicKey,
+    marketId: account.marketId.toNumber(),
+    status: account.status,
+    jurors: account.jurors,
+    jurorStakes: account.jurorStakes.map((s) => s.toNumber()),
+    votesSubmitted: account.votesSubmitted,
+    voteCount: account.voteCount,
+    quorum: account.quorum,
+    votingStart: account.votingStart.toNumber(),
+    votingEnd: account.votingEnd.toNumber(),
+    tiebreakerAdded: account.tiebreakerAdded,
+    escalator: account.escalator,
+    mpcLock: account.mpcLock,
   }
 }
