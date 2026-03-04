@@ -245,9 +245,8 @@ Plans:
   5. DisputeFinalizedMode triggers via useFinalizeDispute and fog clears on tally reveal
 
 Plans:
-- [ ] 11-01: useOpenDispute hook and DisputeEscalateMode wiring
-- [ ] 11-02: useFinalizeDispute hook and DisputeFinalizedMode wiring
-- [ ] 11-03: init_dispute_tally auto-trigger and E2E flow verification
+- [ ] 11-01: IDL regeneration, useOpenDispute hook with init_dispute_tally auto-chain, DisputeEscalateMode wiring (Wave 1)
+- [ ] 11-02: useFinalizeDispute + useAddTiebreaker hooks, DisputeFinalizedMode + DisputePendingMode wiring (Wave 2)
 
 ### Phase 12: Pool Init & Encryption Hardening
 **Goal**: Ensure new markets have MPC-initialized pools before first bet and fix nonce reuse in client-side encryption
@@ -284,5 +283,5 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 8. Dispute System | 0/6 | Planned | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
-| 11. Wire Dispute Frontend Hooks | 0/3 | Gap closure | - |
+| 11. Wire Dispute Frontend Hooks | 0/2 | Gap closure | - |
 | 12. Pool Init & Encryption Hardening | 0/2 | Gap closure | - |
