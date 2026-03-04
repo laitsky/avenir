@@ -9,13 +9,13 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 ### Core Betting
 
-- [ ] **BET-01**: User can place a Yes or No bet on a binary market with USDC (minimum $1)
-- [ ] **BET-02**: User's bet amount is encrypted via Arcium MPC and added to the encrypted pool
+- [x] **BET-01**: User can place a Yes or No bet on a binary market with USDC (minimum $1)
+- [x] **BET-02**: User's bet amount is encrypted via Arcium MPC and added to the encrypted pool
 - [ ] **BET-03**: Pool totals (yes_pool, no_pool) remain encrypted throughout the market lifecycle
 - [ ] **BET-04**: User can view encrypted sentiment bucket (Leaning Yes / Even / Leaning No) on live markets
 - [ ] **BET-05**: Sentiment bucket is computed inside MPC using multiplication-based comparison (no division)
 - [ ] **BET-06**: User's position is locked until market resolution (no early exit)
-- [ ] **BET-07**: Minimum bet is 1 USDC (1,000,000 token units), no maximum
+- [x] **BET-07**: Minimum bet is 1 USDC (1,000,000 token units), no maximum
 
 ### Market Management
 
@@ -52,7 +52,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [x] **INF-01**: Solana program built with Anchor 0.32.1 + Arcium v0.4.0
 - [x] **INF-02**: Four MPC circuits: update_pool, compute_payouts, add_dispute_vote, finalize_dispute
 - [x] **INF-03**: Encrypted state relay pattern — ciphertext stored on-chain, passed to MPC, updated via callback
-- [ ] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
+- [x] **INF-04**: Sequential lock prevents concurrent bet race conditions (one MPC computation at a time per market)
 - [x] **INF-05**: Frontend built with TanStack Start, Tailwind v4, shadcn/ui
 - [x] **INF-06**: Forest/fog design system — deep forest green, sage, muted gold accents, warm dark background
 - [x] **INF-07**: Client-side encryption via @arcium-hq/client (x25519 key exchange, RescueCipher)
@@ -114,13 +114,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BET-01 | Phase 5: Encrypted Betting | Pending |
-| BET-02 | Phase 5: Encrypted Betting | Pending |
+| BET-01 | Phase 5: Encrypted Betting | Complete |
+| BET-02 | Phase 5: Encrypted Betting | Complete |
 | BET-03 | Phase 5: Encrypted Betting | Pending |
 | BET-04 | Phase 5: Encrypted Betting | Pending |
 | BET-05 | Phase 5: Encrypted Betting | Pending |
 | BET-06 | Phase 5: Encrypted Betting | Pending |
-| BET-07 | Phase 5: Encrypted Betting | Pending |
+| BET-07 | Phase 5: Encrypted Betting | Complete |
 | MKT-01 | Phase 2: Market Creation | Complete |
 | MKT-02 | Phase 2: Market Creation | Complete |
 | MKT-03 | Phase 2: Market Creation | Complete |
@@ -145,7 +145,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INF-01 | Phase 1: Foundation | Complete |
 | INF-02 | Phase 3: Arcium MPC Core | Complete |
 | INF-03 | Phase 3: Arcium MPC Core | Complete |
-| INF-04 | Phase 5: Encrypted Betting | Pending |
+| INF-04 | Phase 5: Encrypted Betting | Complete |
 | INF-05 | Phase 1: Foundation | Complete |
 | INF-06 | Phase 4: Design System & Fog | Complete |
 | INF-07 | Phase 3: Arcium MPC Core | Complete |

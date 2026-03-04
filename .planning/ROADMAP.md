@@ -134,11 +134,9 @@ Plans:
   5. Sequential lock prevents concurrent bets from causing race conditions on encrypted pool state
 
 Plans:
-- [ ] 05-01: place_bet instruction with USDC transfer and MPC queue orchestration
-- [ ] 05-02: update_pool callback handler and encrypted state persistence
-- [ ] 05-03: Sentiment bucket computation and on-chain storage
-- [ ] 05-04: Sequential lock (computation_pending flag) and bet rejection
-- [ ] 05-05: Position locking and bet validation (minimum amount, deadline check)
+- [x] 05-01: Market struct extensions, error variants, place_bet instruction with USDC transfer + validation + lock timeout + MPC queue (Wave 1)
+- [ ] 05-02: update_pool_callback refactor with UserPosition update (success) and USDC refund (failure) (Wave 2)
+- [ ] 05-03: Integration tests for place_bet happy path, validation errors, lock behavior (Wave 3)
 
 ### Phase 6: Resolution & Payouts
 **Goal**: Market creators can declare winners and winning bettors receive instant proportional USDC payouts with protocol fee deducted
@@ -242,7 +240,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 2. Market Creation | 2/2 | Complete | 2026-03-03 |
 | 3. Arcium MPC Core | 8/8 | Complete   | 2026-03-03 |
 | 4. Design System & Fog | 4/4 | Complete | 2026-03-03 |
-| 5. Encrypted Betting | 0/5 | Not started | - |
+| 5. Encrypted Betting | 1/3 | In progress | - |
 | 6. Resolution & Payouts | 0/4 | Not started | - |
 | 7. Core UI Integration | 0/6 | Not started | - |
 | 8. Dispute System | 0/6 | Not started | - |

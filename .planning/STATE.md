@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T16:20:18.593Z"
+last_updated: "2026-03-04T03:20:09.000Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 20
+  completed_plans: 18
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 4: Design System & Fog
+**Current focus:** Phase 5: Encrypted Betting
 
 ## Current Position
 
-Phase: 4 of 10 (Design System & Fog) -- COMPLETE
-Plan: 4 of 4 in current phase (4 complete)
-Status: Phase 4 complete
-Last activity: 2026-03-03 -- Completed 04-04-PLAN.md (Homepage Feed & Layout Shells)
+Phase: 5 of 10 (Encrypted Betting)
+Plan: 1 of 3 in current phase (1 complete)
+Status: Executing phase 5
+Last activity: 2026-03-04 -- Completed 05-01-PLAN.md (Place Bet Instruction)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓] 44%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓] 47%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 7min
-- Total execution time: 1.6 hours
+- Total execution time: 1.65 hours
 
 **By Phase:**
 
@@ -44,10 +44,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓] 44%
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
+| 5. Encrypted Betting | 1/3 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 8min, 2min, 2min, 2min, 2min
-- Trend: Phase 4 complete -- all 4 plans averaged 2min each
+- Last 5 plans: 2min, 2min, 2min, 2min, 3min
+- Trend: Phase 5 started -- place_bet instruction in 3min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -63,6 +64,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓] 44%
 | Phase 04 P02 | 2min | 2 tasks | 3 files |
 | Phase 04 P03 | 2min | 2 tasks | 3 files |
 | Phase 04 P04 | 2min | 2 tasks | 5 files |
+| Phase 05 P01 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -124,6 +126,9 @@ Recent decisions affecting current work:
 - [04-03]: lg:top-20 for sticky bet panel positioning accounts for header height (~5rem)
 - [04-04]: CategoryTabs rendered in homepage (not Header) to avoid state-lifting through root layout
 - [04-04]: Header stays minimal: logo + Portfolio link + Connect Wallet (no embedded tabs)
+- [05-01]: UncheckedAccount for pending_bettor_token_account -- only validated during timeout recovery path
+- [05-01]: init_if_needed on UserPosition PDA -- Arcium callbacks cannot create accounts, bettor pays rent upfront
+- [05-01]: Extended 6-account callback vector for update_pool_callback (market_pool, market, user_position, vault, user_token_account, token_program)
 
 ### Pending Todos
 
@@ -139,6 +144,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-encrypted-betting/05-CONTEXT.md
-Note: Phase 5 context captured -- multi-bet rules, lock contention UX, failure/refund paths, position privacy model all decided. Ready for planning.
+Stopped at: Completed 05-01-PLAN.md
+Resume file: .planning/phases/05-encrypted-betting/05-01-SUMMARY.md
+Note: Phase 5 Plan 1 complete -- place_bet instruction with USDC transfer, lock timeout recovery, UserPosition init_if_needed, MPC queue. Next: 05-02-PLAN.md (update_pool_callback extension).
