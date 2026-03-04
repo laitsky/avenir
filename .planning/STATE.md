@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 08-03-PLAN.md
+stopped_at: Completed 08-04-PLAN.md
 last_updated: "2026-03-04T11:35:54.000Z"
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 35
-  completed_plans: 32
+  completed_plans: 33
 ---
 
 # Project State
@@ -19,21 +19,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 8 in progress -- encrypted voting MPC circuits and cast_vote
+**Current focus:** Phase 8 in progress -- dispute resolution, tiebreaker, and settlement
 
 ## Current Position
 
 Phase: 8 of 10 (Dispute System)
-Plan: 3 of 6 in current phase (3 complete)
+Plan: 4 of 6 in current phase (4 complete)
 Status: Phase 8 In Progress
-Last activity: 2026-03-04 -- Completed 08-03-PLAN.md (Encrypted Voting MPC)
+Last activity: 2026-03-04 -- Completed 08-04-PLAN.md (Dispute Resolution & Settlement)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░] 91%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░] 94%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 6min
 - Total execution time: 2.22 hours
 
@@ -48,11 +48,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
-| 8. Dispute System | 3/6 | 9min | 3min |
+| 8. Dispute System | 4/6 | 14min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 3min, 5min, 2min, 2min, 5min
-- Trend: Phase 8 progressing -- encrypted voting MPC circuits complete
+- Trend: Phase 8 progressing -- dispute resolution MPC and settlement complete
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -83,6 +83,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 08 P01 | 2min | 2 tasks | 11 files |
 | Phase 08 P02 | 2min | 2 tasks | 7 files |
 | Phase 08 P03 | 5min | 2 tasks | 12 files |
+| Phase 08 P04 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -190,6 +191,9 @@ Recent decisions affecting current work:
 - [08-03]: Scoped mutable borrow of dispute to satisfy borrow checker before queue_computation call
 - [08-03]: VoteInput struct with single is_yes bool; stake weight passed as plaintext_u64 (public on Resolver)
 - [08-03]: add_dispute_vote_callback clears mpc_lock on both success AND failure paths
+- [08-04]: V1 settlement preserves vote privacy: only non-voters slashed (0.5%), no majority/minority since individual votes cannot be revealed
+- [08-04]: Tie detection in finalize_dispute_callback reverts status to Voting without resolving, enabling tiebreaker flow
+- [08-04]: Deterministic tiebreaker selection uses wrapping_mul LCG seed with market_id, XOR clock.slot and vote_count
 
 ### Pending Todos
 
@@ -204,7 +208,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T11:35:54Z
-**Stopped at:** Completed 08-03-PLAN.md
-**Resume file:** .planning/phases/08-dispute-system/08-04-PLAN.md
-**Note:** Phase 8 plan 3 complete. Encrypted voting MPC circuits and cast_vote instruction implemented. Ready for 08-04 (reveal_dispute_tally MPC).
+**Last session:** 2026-03-04T11:44:06Z
+**Stopped at:** Completed 08-04-PLAN.md
+**Resume file:** .planning/phases/08-dispute-system/08-05-PLAN.md
+**Note:** Phase 8 plan 4 complete. Dispute resolution MPC, tiebreaker, and settlement instructions implemented. Ready for 08-05 (dispute UI).
