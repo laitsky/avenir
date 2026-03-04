@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T03:20:09.000Z"
+last_updated: "2026-03-04T03:25:27.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 5 of 10 (Encrypted Betting)
-Plan: 1 of 3 in current phase (1 complete)
+Plan: 2 of 3 in current phase (2 complete)
 Status: Executing phase 5
-Last activity: 2026-03-04 -- Completed 05-01-PLAN.md (Place Bet Instruction)
+Last activity: 2026-03-04 -- Completed 05-02-PLAN.md (Update Pool Callback)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓] 47%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 49%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 7min
-- Total execution time: 1.65 hours
+- Total execution time: 1.68 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓] 47%
 | 2. Market Creation | 2 | 6min | 3min |
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
-| 5. Encrypted Betting | 1/3 | 3min | 3min |
+| 5. Encrypted Betting | 2/3 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 2min, 2min, 3min
-- Trend: Phase 5 started -- place_bet instruction in 3min
+- Last 5 plans: 2min, 2min, 2min, 3min, 2min
+- Trend: Phase 5 callback in 2min -- both plans under 3min
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -65,6 +65,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓] 47%
 | Phase 04 P03 | 2min | 2 tasks | 3 files |
 | Phase 04 P04 | 2min | 2 tasks | 5 files |
 | Phase 05 P01 | 3min | 2 tasks | 6 files |
+| Phase 05 P02 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -129,6 +130,9 @@ Recent decisions affecting current work:
 - [05-01]: UncheckedAccount for pending_bettor_token_account -- only validated during timeout recovery path
 - [05-01]: init_if_needed on UserPosition PDA -- Arcium callbacks cannot create accounts, bettor pays rent upfront
 - [05-01]: Extended 6-account callback vector for update_pool_callback (market_pool, market, user_position, vault, user_token_account, token_program)
+- [05-02]: Extract Copy values before CPI to satisfy borrow checker, re-acquire mut ref after transfer
+- [05-02]: Function-scoped imports in callback handler body to avoid unused import warnings in struct file
+- [05-02]: Skip setting UserPosition fields in callback -- already set by init_if_needed in place_bet
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-encrypted-betting/05-01-SUMMARY.md
-Note: Phase 5 Plan 1 complete -- place_bet instruction with USDC transfer, lock timeout recovery, UserPosition init_if_needed, MPC queue. Next: 05-02-PLAN.md (update_pool_callback extension).
+Stopped at: Completed 05-02-PLAN.md
+Resume file: .planning/phases/05-encrypted-betting/05-02-SUMMARY.md
+Note: Phase 5 Plan 2 complete -- update_pool_callback with full success/failure paths. Next: 05-03-PLAN.md.

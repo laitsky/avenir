@@ -11,10 +11,10 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 
 - [x] **BET-01**: User can place a Yes or No bet on a binary market with USDC (minimum $1)
 - [x] **BET-02**: User's bet amount is encrypted via Arcium MPC and added to the encrypted pool
-- [ ] **BET-03**: Pool totals (yes_pool, no_pool) remain encrypted throughout the market lifecycle
-- [ ] **BET-04**: User can view encrypted sentiment bucket (Leaning Yes / Even / Leaning No) on live markets
-- [ ] **BET-05**: Sentiment bucket is computed inside MPC using multiplication-based comparison (no division)
-- [ ] **BET-06**: User's position is locked until market resolution (no early exit)
+- [x] **BET-03**: Pool totals (yes_pool, no_pool) remain encrypted throughout the market lifecycle
+- [x] **BET-04**: User can view encrypted sentiment bucket (Leaning Yes / Even / Leaning No) on live markets
+- [x] **BET-05**: Sentiment bucket is computed inside MPC using multiplication-based comparison (no division)
+- [x] **BET-06**: User's position is locked until market resolution (no early exit)
 - [x] **BET-07**: Minimum bet is 1 USDC (1,000,000 token units), no maximum
 
 ### Market Management
@@ -116,10 +116,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | BET-01 | Phase 5: Encrypted Betting | Complete |
 | BET-02 | Phase 5: Encrypted Betting | Complete |
-| BET-03 | Phase 5: Encrypted Betting | Pending |
-| BET-04 | Phase 5: Encrypted Betting | Pending |
-| BET-05 | Phase 5: Encrypted Betting | Pending |
-| BET-06 | Phase 5: Encrypted Betting | Pending |
+| BET-03 | Phase 5: Encrypted Betting | Complete |
+| BET-04 | Phase 5: Encrypted Betting | Complete |
+| BET-05 | Phase 5: Encrypted Betting | Complete |
+| BET-06 | Phase 5: Encrypted Betting | Complete |
 | BET-07 | Phase 5: Encrypted Betting | Complete |
 | MKT-01 | Phase 2: Market Creation | Complete |
 | MKT-02 | Phase 2: Market Creation | Complete |
