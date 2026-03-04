@@ -32,4 +32,12 @@ pub enum AvenirError {
     ClusterNotSet,
     #[msg("Market MPC computation is in progress")]
     MpcLocked,
+    #[msg("Bet amount must be at least 1 USDC (1,000,000 token units)")]
+    BetTooSmall,
+    #[msg("Market deadline has passed")]
+    MarketExpired,
+    #[msg("Cannot bet on opposite side of existing position")]
+    WrongSide,
+    #[msg("Insufficient token balance")]
+    InsufficientBalance,
 }

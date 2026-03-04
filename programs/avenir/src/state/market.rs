@@ -33,6 +33,14 @@ pub struct Market {
     pub config_fee_bps: u16,
     /// Sequential MPC lock - prevents concurrent bet processing
     pub mpc_lock: bool,
+    /// Unix timestamp when mpc_lock was set (for 60s timeout detection)
+    pub lock_timestamp: i64,
+    /// Pubkey of the user whose bet is currently being processed by MPC
+    pub pending_bettor: Pubkey,
+    /// USDC amount of the pending bet (for refund on failure/timeout)
+    pub pending_amount: u64,
+    /// Which side the pending bet is on (for callback to update correct side of UserPosition)
+    pub pending_is_yes: bool,
     /// PDA bump seed for the market account
     pub bump: u8,
     /// PDA bump seed for the market vault token account
