@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 8 context gathered
-last_updated: "2026-03-04T10:27:43.428Z"
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-04T11:21:20Z"
 progress:
   total_phases: 8
   completed_phases: 7
-  total_plans: 29
-  completed_plans: 29
+  total_plans: 35
+  completed_plans: 30
 ---
 
 # Project State
@@ -19,23 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 7 in progress -- connecting frontend to on-chain data
+**Current focus:** Phase 8 in progress -- dispute system resolver pool and staking
 
 ## Current Position
 
-Phase: 7 of 10 (Core UI Integration)
-Plan: 3 of 3 in current phase (3 complete)
-Status: Phase 7 Complete
-Last activity: 2026-03-04 -- Completed 07-03-PLAN.md (Market Detail & Bet Flow)
+Phase: 8 of 10 (Dispute System)
+Plan: 1 of 6 in current phase (1 complete)
+Status: Phase 8 In Progress
+Last activity: 2026-03-04 -- Completed 08-01-PLAN.md (Resolver Pool Staking)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 93%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
+- Total plans completed: 29
 - Average duration: 6min
-- Total execution time: 2.08 hours
+- Total execution time: 2.11 hours
 
 **By Phase:**
 
@@ -48,10 +48,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
+| 8. Dispute System | 1/6 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 1min, 4min, 3min, 5min
-- Trend: Phase 7 complete -- all 3 plans finished, frontend fully wired to on-chain data
+- Last 5 plans: 1min, 4min, 3min, 5min, 2min
+- Trend: Phase 8 started -- resolver pool staking complete, dispute system foundation laid
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -79,6 +80,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 07 P01 | 4min | 2 tasks | 13 files |
 | Phase 07 P02 | 3min | 2 tasks | 7 files |
 | Phase 07 P03 | 5min | 2 tasks | 10 files |
+| Phase 08 P01 | 2min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -176,6 +178,10 @@ Recent decisions affecting current work:
 - [07-03]: @arcium-hq/client externalized from client bundle via rollupOptions.external due to Node.js crypto dependency
 - [07-03]: Websocket subscriptions on both market and position PDAs for real-time updates after MPC callbacks
 - [07-03]: Exponential backoff retry (2s, 4s, 8s, 16s, 32s) for MPC lock contention with max 5 attempts
+- [08-01]: Resolver vault uses Resolver PDA as token authority for secure token transfers
+- [08-01]: ResolverRegistry uses init_if_needed to lazily create on first approval
+- [08-01]: Two-phase withdrawal pattern: request sets timestamp+amount, execute validates 7-day cooldown
+- [08-01]: Full withdrawal (stake=0) auto-revokes approval and removes from registry
 
 ### Pending Todos
 
@@ -190,7 +196,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T10:27:43.425Z
-**Stopped at:** Phase 8 context gathered
-**Resume file:** .planning/phases/08-dispute-system/08-CONTEXT.md
-**Note:** Phase 7 complete (all 3 plans). Frontend fully wired to on-chain data. Ready for Phase 8 (Dispute System) and Phase 9 (Portfolio & Search).
+**Last session:** 2026-03-04T11:21:20Z
+**Stopped at:** Completed 08-01-PLAN.md
+**Resume file:** .planning/phases/08-dispute-system/08-02-PLAN.md
+**Note:** Phase 8 plan 1 complete. Resolver pool staking subsystem and 48h grace period implemented. Ready for 08-02 (Dispute Filing).
