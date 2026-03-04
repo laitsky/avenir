@@ -77,6 +77,51 @@ mod circuits {
         (pool[0].reveal(), pool[1].reveal())
     }
 
+    /// Encrypted dispute vote accumulators.
+    /// [yes_weighted_votes, no_weighted_votes] in USDC lamport-weighted units.
+    pub type VoteTotals = [u64; 2];
+
+    /// Vote input from juror -- encrypted with juror's shared secret.
+    pub struct VoteInput {
+        pub is_yes: bool,
+    }
+
+    /// Initializes encrypted vote counters for a new dispute.
+    ///
+    /// Creates a VoteTotals structure with zero for both yes and no weighted votes.
+    /// The counters remain encrypted and can only be updated through MPC operations.
+    #[instruction]
+    pub fn init_dispute_tally(mxe: Mxe) -> Enc<Mxe, VoteTotals> {
+        let vote_totals: VoteTotals = [0, 0];
+        mxe.from_arcis(vote_totals)
+    }
+
+    /// Accumulate a stake-weighted encrypted vote into the dispute tally.
+    ///
+    /// Takes:
+    /// - vote_ctxt: Encrypted bool (is_yes) from juror's shared secret
+    /// - tally_ctxt: Existing encrypted VoteTotals from MXE
+    /// - stake_weight: Plaintext u64 (juror's staked amount, passed as plaintext since it's public on Resolver account)
+    ///
+    /// Returns updated encrypted tally (Mxe-owned). No revealed values -- tally stays private.
+    #[instruction]
+    pub fn add_dispute_vote(
+        vote_ctxt: Enc<Shared, VoteInput>,
+        tally_ctxt: Enc<Mxe, VoteTotals>,
+        stake_weight: u64,
+    ) -> Enc<Mxe, VoteTotals> {
+        let vote = vote_ctxt.to_arcis();
+        let mut tally = tally_ctxt.to_arcis();
+
+        if vote.is_yes {
+            tally[0] += stake_weight;
+        } else {
+            tally[1] += stake_weight;
+        }
+
+        tally_ctxt.owner.from_arcis(tally)
+    }
+
     /// Hello-world circuit for environment validation.
     /// Takes two encrypted u64 inputs (Shared) and returns their sum (Mxe-owned).
     /// Validates: Enc<Shared, T> input, Enc<Mxe, T> output, basic arithmetic, to_arcis/from_arcis lifecycle.
