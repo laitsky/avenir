@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-04T15:51:47.492Z"
+status: in-progress
+stopped_at: Completed 12-02-PLAN.md (encryption nonce fix)
+last_updated: "2026-03-04T16:21:59Z"
 progress:
   total_phases: 10
   completed_phases: 9
-  total_plans: 37
-  completed_plans: 37
+  total_plans: 39
+  completed_plans: 38
 ---
 
 # Project State
@@ -19,21 +19,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** All phases complete -- v1.0 milestone feature set delivered
+**Current focus:** Phase 12 hardening -- pool init + encryption nonce fixes
 
 ## Current Position
 
-Phase: 11 of 11 (Wire Dispute Frontend Hooks)
-Plan: 2 of 2 in current phase (2 complete)
-Status: Phase 11 Complete -- v1.0 Milestone Complete
-Last activity: 2026-03-04 -- Completed 11-02-PLAN.md (useFinalizeDispute + useAddTiebreaker)
+Phase: 12 of 12 (Pool Init & Encryption Hardening)
+Plan: 2 of 2 in current phase (1 complete)
+Status: Executing Phase 12 -- 12-02 complete, 12-01 remaining
+Last activity: 2026-03-04 -- Completed 12-02-PLAN.md (encryption nonce fix)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░] 97%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 6min
 - Total execution time: 2.4 hours
 
@@ -50,10 +50,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 7. Core UI Integration | 3/3 | 12min | 4min |
 | 8. Dispute System | 6/6 | 25min | 4min |
 | 11. Wire Dispute Frontend Hooks | 2/2 | 5min | 3min |
+| 12. Pool Init & Encryption Hardening | 1/2 | 1min | 1min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 5min, 6min, 2min, 3min
-- Trend: Phase 11 complete -- all dispute frontend hooks wired
+- Last 5 plans: 5min, 6min, 2min, 3min, 1min
+- Trend: Phase 12 in progress -- encryption nonce fix complete
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -89,6 +90,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 08 P06 | 6min | 2 tasks | 11 files |
 | Phase 11 P01 | 2min | 2 tasks | 4 files |
 | Phase 11 P02 | 3min | 2 tasks | 3 files |
+| Phase 12 P02 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -210,6 +212,9 @@ Recent decisions affecting current work:
 - [11-02]: useFinalizeDispute mirrors useComputePayouts MPC queue pattern for finalize_dispute circuit
 - [11-02]: Tie detection uses composite signal: status=0 AND voteCount>=quorum AND !tiebreakerAdded
 - [11-02]: useAddTiebreaker passes first non-juror resolver PDA; slot-based on-chain selection may require retry
+- [12-02]: Deterministic nonce+1 derivation over random second nonce for reproducibility and ArgBuilder compatibility
+- [12-02]: Backward-compatible return type: nonce/nonceBN retained, nonce2/nonce2BN added
+- [12-02]: On-chain ArgBuilder change deferred: single plaintext_u128(nonce) kept, may need update if MPC decryption fails
 
 ### Pending Todos
 
@@ -224,7 +229,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T15:51:47.489Z
-**Stopped at:** Phase 12 context gathered
-**Resume file:** .planning/phases/12-pool-init-encryption-hardening/12-CONTEXT.md
-**Note:** Phase 11 complete (2/2). All dispute frontend hooks wired. Full dispute lifecycle operational: escalate -> vote -> finalize (or tie -> tiebreaker -> re-vote -> finalize). v1.0 milestone feature set delivered (37/37 plans).
+**Last session:** 2026-03-04T16:21:59Z
+**Stopped at:** Completed 12-02-PLAN.md (encryption nonce fix)
+**Resume file:** .planning/phases/12-pool-init-encryption-hardening/12-02-SUMMARY.md
+**Note:** Phase 12 plan 02 complete (1/2). Fixed nonce reuse vulnerability in encryptBetForMPC. Plan 12-01 (pool init hardening) remaining.
