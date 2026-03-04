@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T08:06:09Z"
+last_updated: "2026-03-04T08:11:23Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 25
-  completed_plans: 24
+  completed_plans: 25
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 6: Resolution & Payouts
+**Current focus:** Phase 6 complete. Ready for Phase 7+
 
 ## Current Position
 
-Phase: 6 of 10 (Resolution & Payouts)
-Plan: 3 of 4 in current phase (3 complete)
-Status: Executing Phase 6
-Last activity: 2026-03-04 -- Completed 06-03-PLAN.md (Claim Payout Instruction)
+Phase: 6 of 10 (Resolution & Payouts) -- COMPLETE
+Plan: 4 of 4 in current phase (4 complete)
+Status: Phase 6 Complete
+Last activity: 2026-03-04 -- Completed 06-04-PLAN.md (Resolution Integration Tests)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░] 61%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░] 64%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
+- Total plans completed: 24
 - Average duration: 6min
-- Total execution time: 1.90 hours
+- Total execution time: 1.93 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░
 | 3. Arcium MPC Core | 8 | 61min | 8min |
 | 4. Design System & Fog | 4/4 | 8min | 2min |
 | 5. Encrypted Betting | 4/4 | 14min | 4min |
-| 6. Resolution & Payouts | 3/4 | 9min | 3min |
+| 6. Resolution & Payouts | 4/4 | 11min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2min, 5min, 2min
-- Trend: Phase 6 progressing -- claim_payout instruction in 2min
+- Last 5 plans: 2min, 5min, 2min, 2min
+- Trend: Phase 6 complete -- all 4 plans in 11min total
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -72,6 +72,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░
 | Phase 06 P01 | 2min | 2 tasks | 6 files |
 | Phase 06 P02 | 5min | 2 tasks | 6 files |
 | Phase 06 P03 | 2min | 2 tasks | 3 files |
+| Phase 06 P04 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -153,6 +154,9 @@ Recent decisions affecting current work:
 - [06-02]: Lock timeout recovery simplified vs place_bet: clear lock+timestamp only, no pending bet fields
 - [06-03]: Market account is immutable in ClaimPayout (only UserPosition needs mut for claimed flag)
 - [06-03]: Fee transfer skipped when fee==0 (avoids empty CPI for edge case of all-bets-on-one-side with 0 bps)
+- [06-04]: Separate market with 2h deadline for MarketNotExpired runtime test (not just IDL assertion)
+- [06-04]: No Anchor.toml changes needed -- existing glob pattern tests/**/*.ts covers resolution.ts
+- [06-04]: 10 test cases (2 beyond minimum) covering full resolve->compute_payouts->claim_payout lifecycle
 
 ### Pending Todos
 
@@ -168,6 +172,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 06-03-PLAN.md (Claim Payout Instruction)
-Resume file: .planning/phases/06-resolution-payouts/06-03-SUMMARY.md
-Note: Phase 6 plan 3 complete. claim_payout instruction with proportional payout math, fee deduction, and double-claim prevention. Ready for Plan 04 (resolution integration tests).
+Stopped at: Completed 06-04-PLAN.md (Resolution Integration Tests)
+Resume file: .planning/phases/06-resolution-payouts/06-04-SUMMARY.md
+Note: Phase 6 complete (4/4 plans). Full resolution & payouts flow built and tested. Ready for Phase 7 (frontend integration) or Phase 8 (dispute system).
