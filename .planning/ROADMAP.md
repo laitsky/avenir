@@ -283,5 +283,5 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 8. Dispute System | 0/6 | Planned | - |
 | 9. Portfolio & Search | 0/4 | Not started | - |
 | 10. RTG Submission | 0/3 | Not started | - |
-| 11. Wire Dispute Frontend Hooks | 0/2 | Gap closure | - |
+| 11. Wire Dispute Frontend Hooks | 1/2 | In Progress|  |
 | 12. Pool Init & Encryption Hardening | 0/2 | Gap closure | - |

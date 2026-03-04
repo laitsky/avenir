@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Phase 11 context gathered
-last_updated: "2026-03-04T15:04:29.902Z"
+status: in-progress
+stopped_at: Completed 11-01-PLAN.md (IDL + useOpenDispute)
+last_updated: "2026-03-04T15:34:00.000Z"
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 8
-  total_plans: 35
-  completed_plans: 35
+  total_plans: 37
+  completed_plans: 36
 ---
 
 # Project State
@@ -19,23 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Phase 8 complete -- dispute system fully implemented including UI integration
+**Current focus:** Phase 11 in progress -- wiring dispute frontend hooks to on-chain instructions
 
 ## Current Position
 
-Phase: 8 of 10 (Dispute System)
-Plan: 6 of 6 in current phase (6 complete)
-Status: Phase 8 Complete
-Last activity: 2026-03-04 -- Completed 08-06-PLAN.md (Dispute Frontend Integration)
+Phase: 11 of 11 (Wire Dispute Frontend Hooks)
+Plan: 1 of 2 in current phase (1 complete)
+Status: Phase 11 In Progress
+Last activity: 2026-03-04 -- Completed 11-01-PLAN.md (IDL Regeneration + useOpenDispute Hook)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░] 97%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35
+- Total plans completed: 36
 - Average duration: 6min
-- Total execution time: 2.32 hours
+- Total execution time: 2.35 hours
 
 **By Phase:**
 
@@ -49,10 +49,11 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | 6. Resolution & Payouts | 5/5 | 12min | 2min |
 | 7. Core UI Integration | 3/3 | 12min | 4min |
 | 8. Dispute System | 6/6 | 25min | 4min |
+| 11. Wire Dispute Frontend Hooks | 1/2 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 5min, 5min, 6min
-- Trend: Phase 8 complete -- all dispute system plans executed including frontend integration
+- Last 5 plans: 2min, 5min, 5min, 6min, 2min
+- Trend: Phase 11 started -- dispute frontend hooks wiring
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 2 tasks | 9 files |
@@ -86,6 +87,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 08 P04 | 5min | 2 tasks | 10 files |
 | Phase 08 P05 | 5min | 2 tasks | 2 files |
 | Phase 08 P06 | 6min | 2 tasks | 11 files |
+| Phase 11 P01 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -202,6 +204,8 @@ Recent decisions affecting current work:
 - [08-06]: Juror eligibility check uses bitfield votesSubmitted for already-voted detection, mirroring on-chain pattern
 - [08-06]: Vote encryption uses single-field cipher.encrypt for boolean (isYes), not dual-field like usePlaceBet
 - [08-06]: BetPlacement mode state machine extended to 12 modes (8 original + 4 dispute)
+- [11-01]: anchor build regenerates IDL successfully despite stack warnings -- no manual IDL patching needed
+- [11-01]: disputeOpened state tracks partial success for retry-only-init_dispute_tally recovery pattern
 
 ### Pending Todos
 
@@ -216,7 +220,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-04T15:04:29.899Z
-**Stopped at:** Phase 11 context gathered
-**Resume file:** .planning/phases/11-wire-dispute-frontend-hooks/11-CONTEXT.md
-**Note:** Phase 8 fully complete (6/6 plans). Dispute system: resolver pool, escalation, encrypted voting, resolution MPC, settlement, integration tests, and frontend UI all implemented. Ready for Phase 9 (Portfolio & Search).
+**Last session:** 2026-03-04T15:34:00.000Z
+**Stopped at:** Completed 11-01-PLAN.md (IDL + useOpenDispute)
+**Resume file:** .planning/phases/11-wire-dispute-frontend-hooks/11-02-PLAN.md
+**Note:** Phase 11 plan 1 complete (1/2). IDL regenerated with all dispute instructions. useOpenDispute hook created and wired to DisputeEscalateMode. Ready for 11-02 (useFinalizeDispute + useAddTiebreaker).
