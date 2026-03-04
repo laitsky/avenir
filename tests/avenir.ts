@@ -54,6 +54,15 @@ describe("avenir", () => {
     );
   }
 
+  function getPositionPda(marketId: number, user: PublicKey): [PublicKey, number] {
+    const buf = Buffer.alloc(8);
+    buf.writeBigUInt64LE(BigInt(marketId));
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("position"), buf, user.toBuffer()],
+      program.programId
+    );
+  }
+
   before(async () => {
     // Airdrop SOL to creator and mint authority for transaction fees
     const airdropCreator = await connection.requestAirdrop(
