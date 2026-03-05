@@ -96,7 +96,7 @@ function SummaryBar({ positions }: { positions: EnrichedPosition[] }) {
   )
 
   return (
-    <div className="mb-8 grid grid-cols-3 gap-3">
+    <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
       {[
         { label: 'Active Positions', value: String(active.length) },
         { label: 'Total Staked', value: `${formatUsdc(totalStaked)} USDC` },
@@ -251,16 +251,16 @@ function ClaimablePositionCard({ ep }: { ep: EnrichedPosition }) {
         {market!.question}
       </p>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="font-mono text-sm text-accent">
           ~{formatUsdc(estimatedPayout)} USDC
         </p>
 
         <Button
-          size="sm"
+          size="lg"
           onClick={() => claimMutation.mutate()}
           disabled={claimMutation.isPending}
-          className="shrink-0"
+          className="w-full min-h-[44px] sm:w-auto sm:shrink-0"
         >
           {claimMutation.isPending ? (
             <>

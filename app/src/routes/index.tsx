@@ -109,7 +109,7 @@ function HomePage() {
           params={{ id: featured.id.toString() }}
           className="no-underline"
         >
-          <div className="group relative cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/5 p-8 transition-all duration-300 hover:to-primary/10">
+          <div className="group relative cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/5 p-6 md:p-8 transition-all duration-300 hover:to-primary/10">
             {/* Atmospheric glow */}
             <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/5 blur-3xl transition-all duration-500 group-hover:bg-primary/8" />
             <div className="pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-accent/3 blur-3xl" />
@@ -154,7 +154,7 @@ function HomePage() {
               </div>
 
               {/* Stats row */}
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-4 md:gap-6">
                 <span className="font-mono text-xs tabular-nums text-muted-foreground">
                   {featured.totalBets} bets
                 </span>

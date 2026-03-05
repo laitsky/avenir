@@ -59,8 +59,13 @@ function MarketDetailPage() {
       </Link>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
-        <MarketDetail market={market} dispute={dispute} />
-        <aside className="lg:sticky lg:top-28 lg:self-start">
+        {/* Main content with bottom padding on mobile to avoid overlap with fixed bet bar */}
+        <div className="pb-[220px] lg:pb-0">
+          <MarketDetail market={market} dispute={dispute} />
+        </div>
+
+        {/* BetPlacement: fixed bottom bar on mobile, sticky sidebar on lg+ */}
+        <aside className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background p-4 lg:relative lg:border-0 lg:bg-transparent lg:p-0 lg:sticky lg:top-28 lg:self-start">
           <BetPlacement market={market} position={position ?? null} dispute={dispute} />
         </aside>
       </div>

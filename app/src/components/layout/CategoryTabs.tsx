@@ -13,7 +13,7 @@ export function CategoryTabs({
   className,
 }: CategoryTabsProps) {
   return (
-    <div className={cn('flex gap-2 overflow-x-auto', className)}>
+    <div className={cn('flex gap-2 overflow-x-auto pb-1 scrollbar-none [-webkit-overflow-scrolling:touch]', className)}>
       {CATEGORIES.map((category) => (
         <button
           key={category}
