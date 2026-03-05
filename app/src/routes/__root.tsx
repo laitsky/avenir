@@ -4,6 +4,7 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
+import { ClientOnly } from '@tanstack/react-router'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { Toaster } from 'sonner'
@@ -30,9 +31,23 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: appCss },
     ],
   }),
-  ssr: false,
   component: RootLayout,
 })
+
+/**
+ * Fallback layout rendered during SSR before wallet providers hydrate.
+ * Matches the visual structure so there's no layout shift.
+ */
+function FallbackLayout() {
+  return (
+    <>
+      <Header />
+      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+        <Outlet />
+      </main>
+    </>
+  )
+}
 
 function RootLayout() {
   return (
@@ -41,17 +56,19 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <ConnectionProvider endpoint={RPC_ENDPOINT}>
-          <WalletProvider wallets={[]} autoConnect>
-            <WalletModalProvider>
-              <Header />
-              <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
-                <Outlet />
-              </main>
-              <Toaster theme="dark" position="bottom-right" />
-            </WalletModalProvider>
-          </WalletProvider>
-        </ConnectionProvider>
+        <ClientOnly fallback={<FallbackLayout />}>
+          <ConnectionProvider endpoint={RPC_ENDPOINT}>
+            <WalletProvider wallets={[]} autoConnect>
+              <WalletModalProvider>
+                <Header />
+                <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+                  <Outlet />
+                </main>
+                <Toaster theme="dark" position="bottom-right" />
+              </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </ClientOnly>
         <Scripts />
       </body>
     </html>
