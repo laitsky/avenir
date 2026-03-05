@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { ClientOnly } from '@tanstack/react-router'
 import { WalletButton } from '#/components/wallet/WalletButton'
+import { SearchBar } from '#/components/search/SearchBar'
 
 export function Header() {
   return (
@@ -16,7 +17,7 @@ export function Header() {
           Avenir
         </Link>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Link
             to="/"
             className="text-[13px] text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
@@ -32,6 +33,9 @@ export function Header() {
           >
             Portfolio
           </Link>
+          <div className="hidden md:block">
+            <SearchBar />
+          </div>
           <ClientOnly
             fallback={
               <button
