@@ -34,17 +34,6 @@ export const Route = createRootRoute({
   component: RootLayout,
 })
 
-function AppShell() {
-  return (
-    <>
-      <Header />
-      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
-        <Outlet />
-      </main>
-    </>
-  )
-}
-
 function RootLayout() {
   return (
     <html lang="en">
@@ -53,10 +42,13 @@ function RootLayout() {
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ConnectionProvider endpoint={RPC_ENDPOINT}>
-          <ClientOnly fallback={<AppShell />}>
+          <ClientOnly fallback={<div />}>
             <WalletProvider wallets={[]} autoConnect>
               <WalletModalProvider>
-                <AppShell />
+                <Header />
+                <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+                  <Outlet />
+                </main>
                 <Toaster theme="dark" position="bottom-right" />
               </WalletModalProvider>
             </WalletProvider>
