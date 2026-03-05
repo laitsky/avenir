@@ -4,7 +4,6 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
-import { ClientOnly } from '@tanstack/react-router'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { Toaster } from 'sonner'
@@ -31,19 +30,9 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: appCss },
     ],
   }),
+  ssr: false,
   component: RootLayout,
 })
-
-function AppShell() {
-  return (
-    <>
-      <Header />
-      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
-        <Outlet />
-      </main>
-    </>
-  )
-}
 
 function RootLayout() {
   return (
@@ -53,14 +42,15 @@ function RootLayout() {
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ConnectionProvider endpoint={RPC_ENDPOINT}>
-          <ClientOnly fallback={<AppShell />}>
-            <WalletProvider wallets={[]} autoConnect>
-              <WalletModalProvider>
-                <AppShell />
-                <Toaster theme="dark" position="bottom-right" />
-              </WalletModalProvider>
-            </WalletProvider>
-          </ClientOnly>
+          <WalletProvider wallets={[]} autoConnect>
+            <WalletModalProvider>
+              <Header />
+              <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+                <Outlet />
+              </main>
+              <Toaster theme="dark" position="bottom-right" />
+            </WalletModalProvider>
+          </WalletProvider>
         </ConnectionProvider>
         <Scripts />
       </body>
