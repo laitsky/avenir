@@ -227,10 +227,11 @@ Plans:
   3. Architecture diagram clearly shows encrypted vs. plaintext data flow across Solana program, Arcium MPC, and frontend layers
   4. Demo video or screenshots showing fog-reveal UX in action
 
+**Plans:** 2 plans in 1 wave
+
 Plans:
-- [ ] 10-01: Repository cleanup, licensing, and open-source preparation
-- [ ] 10-02: README with Arcium integration explanation and architecture diagram
-- [ ] 10-03: Demo preparation (screenshots, optional video walkthrough)
+- [ ] 10-01: Repository cleanup, licensing (.gitignore, LICENSE, package.json), and secrets scan
+- [ ] 10-02: README rewrite with RTG narrative, Mermaid architecture diagrams, circuit highlights, and fog UX screenshots
 
 ### Phase 11: Wire Dispute Frontend Hooks
 **Goal**: Complete the dispute E2E flows by adding missing frontend hooks that call on-chain dispute instructions
