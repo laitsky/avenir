@@ -45,7 +45,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [x] **UX-05**: Full-text search across market questions, descriptions, and categories
 - [x] **UX-06**: Fog gradients overlay encrypted data (pool amounts, sentiment, jury votes, market cards)
 - [x] **UX-07**: Fog clears with animation when data is revealed (resolution, dispute outcome)
-- [ ] **UX-08**: Responsive design works on mobile browsers
+- [x] **UX-08**: Responsive design works on mobile browsers
 
 ### Infrastructure
 
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-05 | Phase 9: Portfolio & Search | Complete |
 | UX-06 | Phase 4: Design System & Fog | Complete |
 | UX-07 | Phase 4: Design System & Fog | Complete |
-| UX-08 | Phase 9: Portfolio & Search | Pending |
+| UX-08 | Phase 9: Portfolio & Search | Complete |
 | INF-01 | Phase 1: Foundation | Complete |
 | INF-02 | Phase 3: Arcium MPC Core | Complete |
 | INF-03 | Phase 3: Arcium MPC Core | Complete |
