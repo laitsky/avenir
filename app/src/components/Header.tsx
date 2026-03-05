@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { ClientOnly } from '@tanstack/react-router'
 import { Menu, X, Search } from 'lucide-react'
 import { WalletButton } from '#/components/wallet/WalletButton'
 import { SearchBar } from '#/components/search/SearchBar'
@@ -37,7 +36,7 @@ export function Header() {
 
       <header className="fixed top-0 z-50 w-full">
         {/* Gradient backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-background/90 to-transparent" />
 
         <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link
@@ -65,18 +64,7 @@ export function Header() {
               Portfolio
             </Link>
             <SearchBar />
-            <ClientOnly
-              fallback={
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
-                >
-                  Connect Wallet
-                </button>
-              }
-            >
-              <WalletButton />
-            </ClientOnly>
+            <WalletButton />
           </div>
 
           {/* Mobile icon buttons (below md) */}
@@ -122,18 +110,7 @@ export function Header() {
                 Portfolio
               </Link>
               <div className="px-6 py-4">
-                <ClientOnly
-                  fallback={
-                    <button
-                      type="button"
-                      className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
-                    >
-                      Connect Wallet
-                    </button>
-                  }
-                >
-                  <WalletButton />
-                </ClientOnly>
+                <WalletButton />
               </div>
             </div>
           </div>

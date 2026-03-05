@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { Wallet, Loader2 } from 'lucide-react'
 import { useUserPositions, type EnrichedPosition } from '#/hooks/useUserPositions'
 import { useClaimPayout } from '#/hooks/useClaimPayout'
 import { FogOverlay } from '#/components/fog/FogOverlay'
 import { CountdownTimer } from '#/components/market/CountdownTimer'
 import { Button } from '#/components/ui/button'
+import { useWalletSelector } from '#/components/wallet/WalletSelectorProvider'
 import { CATEGORY_MAP } from '#/lib/types'
 import { cn } from '#/lib/utils'
 
@@ -334,7 +334,7 @@ function HistoryPositionCard({ ep }: { ep: EnrichedPosition }) {
 
 function Portfolio() {
   const { publicKey } = useWallet()
-  const { setVisible } = useWalletModal()
+  const { open } = useWalletSelector()
   const { data: positions, isLoading } = useUserPositions()
 
   // Wallet disconnected state
@@ -358,7 +358,7 @@ function Portfolio() {
             </p>
             <button
               type="button"
-              onClick={() => setVisible(true)}
+              onClick={open}
               className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-5 py-2.5 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
             >
               Connect Wallet

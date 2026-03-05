@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import BN from 'bn.js'
 import { cn } from '#/lib/utils'
@@ -20,6 +19,7 @@ import { useMarketPool, isPoolInitialized } from '#/hooks/useMarketPool'
 import { useAnchorProgram } from '#/lib/anchor'
 import { PROGRAM_ID } from '#/lib/constants'
 import { getMarketPoolPda } from '#/lib/pda'
+import { useWalletSelector } from '#/components/wallet/WalletSelectorProvider'
 
 /** Grace period: 48h in seconds */
 const GRACE_PERIOD_SECONDS = 172_800
@@ -114,7 +114,7 @@ function getBetPanelMode(
 
 export function BetPlacement({ market, position, dispute = null }: BetPlacementProps) {
   const { publicKey, connected } = useWallet()
-  const { setVisible } = useWalletModal()
+  const { open } = useWalletSelector()
   const walletPubkey = publicKey?.toBase58() ?? null
   const poolQuery = useMarketPool(market.id)
   // Default true to avoid flashing the gate before pool data arrives
@@ -133,7 +133,7 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
           market={market}
           position={position}
           connected={connected}
-          onOpenWallet={() => setVisible(true)}
+          onOpenWallet={open}
         />
       )
     case 'resolve':
@@ -153,7 +153,7 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
         <DisputeEscalateMode
           market={market}
           connected={connected}
-          onOpenWallet={() => setVisible(true)}
+          onOpenWallet={open}
         />
       )
     case 'juror-vote':
@@ -164,7 +164,7 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
           market={market}
           dispute={dispute!}
           connected={connected}
-          onOpenWallet={() => setVisible(true)}
+          onOpenWallet={open}
         />
       )
     case 'dispute-finalized':
