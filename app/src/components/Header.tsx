@@ -37,7 +37,7 @@ export function Header() {
 
       <header className="fixed top-0 z-50 w-full">
         {/* Gradient backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-background/90 to-transparent" />
 
         <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link
