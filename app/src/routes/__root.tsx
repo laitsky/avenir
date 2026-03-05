@@ -1,10 +1,10 @@
+import { useState, useEffect } from 'react'
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
-import { ClientOnly } from '@tanstack/react-router'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { Toaster } from 'sonner'
@@ -34,15 +34,23 @@ export const Route = createRootRoute({
   component: RootLayout,
 })
 
+function useMounted() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  return mounted
+}
+
 function RootLayout() {
+  const mounted = useMounted()
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <ConnectionProvider endpoint={RPC_ENDPOINT}>
-          <ClientOnly fallback={<div />}>
+        {mounted ? (
+          <ConnectionProvider endpoint={RPC_ENDPOINT}>
             <WalletProvider wallets={[]} autoConnect>
               <WalletModalProvider>
                 <Header />
@@ -52,8 +60,8 @@ function RootLayout() {
                 <Toaster theme="dark" position="bottom-right" />
               </WalletModalProvider>
             </WalletProvider>
-          </ClientOnly>
-        </ConnectionProvider>
+          </ConnectionProvider>
+        ) : null}
         <Scripts />
       </body>
     </html>
