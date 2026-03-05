@@ -6,6 +6,11 @@ import { cn } from '#/lib/utils'
 import { CATEGORY_MAP, STATE_MAP } from '#/lib/types'
 import type { OnChainMarket } from '#/lib/types'
 
+interface SearchBarProps {
+  mobile?: boolean
+  onClose?: () => void
+}
+
 function getStatusBadge(state: number) {
   switch (state) {
     case 0:
@@ -58,7 +63,7 @@ function filterMarkets(markets: OnChainMarket[], query: string): OnChainMarket[]
   return filtered.slice(0, 8)
 }
 
-export function SearchBar() {
+export function SearchBar({ mobile, onClose }: SearchBarProps = {}) {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
@@ -81,8 +86,28 @@ export function SearchBar() {
     inputRef.current?.focus()
   }, [close])
 
-  // Click outside to close
+  // Auto-focus in mobile overlay mode
   useEffect(() => {
+    if (mobile && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [mobile])
+
+  // Escape key closes mobile overlay
+  useEffect(() => {
+    if (!mobile) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        onClose?.()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [mobile, onClose])
+
+  // Click outside to close (desktop only)
+  useEffect(() => {
+    if (mobile) return
     function handleMouseDown(e: MouseEvent) {
       if (
         containerRef.current &&
@@ -93,7 +118,7 @@ export function SearchBar() {
     }
     document.addEventListener('mousedown', handleMouseDown)
     return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [close])
+  }, [close, mobile])
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value
@@ -135,11 +160,16 @@ export function SearchBar() {
           void navigate({ to: '/market/$id', params: { id: String(market.id) } })
           close()
           setQuery('')
+          onClose?.()
         }
         break
       case 'Escape':
         close()
-        inputRef.current?.blur()
+        if (mobile) {
+          onClose?.()
+        } else {
+          inputRef.current?.blur()
+        }
         break
     }
   }
@@ -147,8 +177,95 @@ export function SearchBar() {
   function handleResultClick() {
     close()
     setQuery('')
+    onClose?.()
   }
 
+  // Mobile overlay mode
+  if (mobile) {
+    return (
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-background p-4">
+        <div className="relative flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/50 pointer-events-none" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={handleInputChange}
+              onFocus={handleFocus}
+              onKeyDown={handleKeyDown}
+              placeholder="Search markets..."
+              className={cn(
+                'w-full bg-secondary/50 border-0 rounded-lg px-3 py-2.5 pl-8 text-[13px] text-foreground',
+                'placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/20',
+                'transition-all',
+                query ? 'pr-7' : ''
+              )}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={clearQuery}
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Close search"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
+        {/* Mobile overlay dropdown */}
+        {isOpen && query.length >= 1 && (
+          <div className="mt-2 bg-card border border-border rounded-xl shadow-lg shadow-black/20 overflow-hidden">
+            {results.length === 0 ? (
+              <div className="px-4 py-3 text-[12px] text-muted-foreground/60 text-center">
+                No markets found for &quot;{query}&quot;
+              </div>
+            ) : (
+              <ul>
+                {results.map((market, index) => (
+                  <li key={market.publicKey.toBase58()}>
+                    <Link
+                      to="/market/$id"
+                      params={{ id: String(market.id) }}
+                      onClick={handleResultClick}
+                      className={cn(
+                        'flex flex-col gap-0.5 px-4 py-2.5 transition-colors no-underline',
+                        'hover:bg-secondary/50',
+                        selectedIndex === index && 'bg-secondary/70'
+                      )}
+                    >
+                      <span className="font-serif italic text-sm text-foreground line-clamp-1">
+                        {market.question}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] uppercase tracking-wider text-primary/50">
+                          {CATEGORY_MAP[market.category] ?? 'Unknown'}
+                        </span>
+                        {getStatusBadge(market.state)}
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Desktop mode (default)
   return (
     <div ref={containerRef} className="relative w-full max-w-xs">
       {/* Input */}
