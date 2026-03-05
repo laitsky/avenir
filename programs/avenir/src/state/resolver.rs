@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 
+/// Minimum resolver stake: 500 USDC (6 decimals).
+pub const MIN_RESOLVER_STAKE: u64 = 500_000_000;
+
 /// Per-resolver PDA tracking stake, approval status, and withdrawal state.
 /// Seeds: [b"resolver", resolver_wallet.key().as_ref()]
 #[account]

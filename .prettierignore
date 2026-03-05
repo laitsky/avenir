@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+app/node_modules/
+
+# Build outputs / generated
+target/
+build/
+artifacts/
+app/.output/
+app/dist/
+app/dist-ssr/
+app/.tanstack/
+app/.nitro/
+app/.vinxi/
+
+# Generated sources
+app/src/routeTree.gen.ts
+app/src/lib/idl/avenir.ts
+app/src/lib/idl/avenir.json
+target/types/
+

@@ -28,6 +28,12 @@ import {
 } from "@arcium-hq/client";
 import { randomBytes } from "crypto";
 
+// Default for localnet tests. @arcium-hq/client requires this env var to derive
+// cluster-scoped PDAs; most local setups use offset 0.
+if (!process.env.ARCIUM_CLUSTER_OFFSET) {
+  process.env.ARCIUM_CLUSTER_OFFSET = "0";
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -95,7 +101,9 @@ export async function setupArciumContext(
 
   const mxePublicKey = await getMXEPublicKey(provider, programId);
   if (!mxePublicKey) {
-    throw new Error("Failed to get MXE public key -- is the Arcium localnet running?");
+    throw new Error(
+      "Failed to get MXE public key -- is the Arcium localnet running?"
+    );
   }
 
   const mxeAccountAddress = getMXEAccAddress(programId);
@@ -250,7 +258,8 @@ export async function createTestMarket(
   await program.methods
     .createMarket({
       question: options?.question ?? "Will BTC exceed $100k by end of month?",
-      resolutionSource: options?.resolutionSource ?? "https://coingecko.com/btc",
+      resolutionSource:
+        options?.resolutionSource ?? "https://coingecko.com/btc",
       category: options?.category ?? 1, // Crypto
       resolutionTime: new anchor.BN(resolutionTime),
     })
@@ -287,7 +296,9 @@ export function getArciumAccounts(
   computationOffset: anchor.BN,
   compDefName: string
 ): ArciumAccounts {
-  const compDefIndex = Buffer.from(getCompDefAccOffset(compDefName)).readUInt32LE(0);
+  const compDefIndex = Buffer.from(
+    getCompDefAccOffset(compDefName)
+  ).readUInt32LE(0);
   const compDefAccount = getCompDefAccAddress(programId, compDefIndex);
   const computationAccount = getComputationAccAddress(
     arciumCtx.clusterOffset,
@@ -324,7 +335,9 @@ export async function initCompDef(
   compDefName: string,
   arciumCtx: ArciumContext
 ): Promise<void> {
-  const compDefIndex = Buffer.from(getCompDefAccOffset(compDefName)).readUInt32LE(0);
+  const compDefIndex = Buffer.from(
+    getCompDefAccOffset(compDefName)
+  ).readUInt32LE(0);
 
   // Derive comp_def PDA
   const [compDefPda] = PublicKey.findProgramAddressSync(
@@ -406,7 +419,9 @@ export async function initCompDef(
       err.toString().includes("already in use") ||
       err.toString().includes("initialized")
     ) {
-      console.log(`  Comp_def ${compDefName} already initialized, continuing...`);
+      console.log(
+        `  Comp_def ${compDefName} already initialized, continuing...`
+      );
     } else {
       throw err;
     }
@@ -451,8 +466,5 @@ export function getMarketPoolPda(
  * Derives the Config PDA.
  */
 export function getConfigPda(programId: PublicKey): [PublicKey, number] {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from("config")],
-    programId
-  );
+  return PublicKey.findProgramAddressSync([Buffer.from("config")], programId);
 }

@@ -41,11 +41,15 @@ pub mod avenir {
         instructions::claim_payout::handler(ctx)
     }
 
-    pub fn open_dispute<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) -> Result<()> {
+    pub fn open_dispute<'info>(
+        ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>,
+    ) -> Result<()> {
         instructions::open_dispute::handler(ctx)
     }
 
-    pub fn add_tiebreaker<'info>(ctx: Context<'_, '_, 'info, 'info, AddTiebreaker<'info>>) -> Result<()> {
+    pub fn add_tiebreaker<'info>(
+        ctx: Context<'_, '_, 'info, 'info, AddTiebreaker<'info>>,
+    ) -> Result<()> {
         instructions::add_tiebreaker::handler(ctx)
     }
 
@@ -170,6 +174,15 @@ pub mod avenir {
             }
         };
 
+        // Guard against re-initialization: only write if still in the zeroed placeholder state.
+        let already_initialized = ctx.accounts.market_pool.yes_pool_encrypted != [0u8; 32]
+            || ctx.accounts.market_pool.no_pool_encrypted != [0u8; 32]
+            || ctx.accounts.market_pool.nonce != 0;
+        if already_initialized {
+            msg!("init_pool_callback: MarketPool already initialized; ignoring");
+            return Ok(());
+        }
+
         // Write initial encrypted zeros to MarketPool
         let market_pool = &mut ctx.accounts.market_pool;
         market_pool.yes_pool_encrypted = o.ciphertexts[0];
@@ -188,30 +201,13 @@ pub mod avenir {
         instructions::mpc::init_update_pool_comp_def::handler(ctx)
     }
 
-    pub fn update_pool(
-        ctx: Context<UpdatePool>,
-        computation_offset: u64,
-        is_yes_ciphertext: [u8; 32],
-        amount_ciphertext: [u8; 32],
-        pub_key: [u8; 32],
-        nonce: u128,
-    ) -> Result<()> {
-        instructions::mpc::update_pool::handler(
-            ctx,
-            computation_offset,
-            is_yes_ciphertext,
-            amount_ciphertext,
-            pub_key,
-            nonce,
-        )
-    }
-
     #[arcium_callback(encrypted_ix = "update_pool")]
     pub fn update_pool_callback(
         ctx: Context<UpdatePoolCallback>,
         output: SignedComputationOutputs<UpdatePoolOutput>,
     ) -> Result<()> {
         use anchor_spl::token::{self, Transfer};
+        use crate::errors::AvenirError;
 
         // update_pool returns (Enc<Mxe, PoolTotals>, u8)
         // Generated output structure:
@@ -229,9 +225,23 @@ pub mod avenir {
                 let market_id = ctx.accounts.market.id;
                 let bump = ctx.accounts.market.bump;
                 let pending_amount = ctx.accounts.market.pending_amount;
+                let pending_bettor = ctx.accounts.market.pending_bettor;
 
                 // Refund pending bettor's USDC from vault
                 if pending_amount > 0 {
+                    // Basic safety: ensure refund destination matches pending bettor + mint.
+                    // This should normally hold because place_bet supplies the bettor's USDC account.
+                    require_keys_eq!(
+                        ctx.accounts.bettor_token_account.mint,
+                        ctx.accounts.market_vault.mint,
+                        AvenirError::InvalidRefundAccount
+                    );
+                    require_keys_eq!(
+                        ctx.accounts.bettor_token_account.owner,
+                        pending_bettor,
+                        AvenirError::InvalidRefundAccount
+                    );
+
                     let signer_seeds: &[&[&[u8]]] = &[&[
                         b"market",
                         &market_id.to_le_bytes(),
@@ -265,6 +275,32 @@ pub mod avenir {
 
         // === Success path ===
 
+        // Validate pending bet invariants before applying MPC output.
+        // Prevents standalone MPC calls (e.g. legacy update_pool wrapper) and
+        // ignores late callbacks after a stale-lock recovery cleared pending fields.
+        let market = &mut ctx.accounts.market;
+        if market.pending_amount == 0 || market.pending_bettor == Pubkey::default() {
+            msg!("update_pool_callback: no pending bet; ignoring MPC result");
+            market.mpc_lock = false;
+            market.lock_timestamp = 0;
+            return Ok(());
+        }
+        require_keys_eq!(
+            ctx.accounts.user_position.user,
+            market.pending_bettor,
+            AvenirError::InvalidPendingBet
+        );
+        require_keys_eq!(
+            ctx.accounts.bettor_token_account.owner,
+            market.pending_bettor,
+            AvenirError::InvalidRefundAccount
+        );
+        require_keys_eq!(
+            ctx.accounts.bettor_token_account.mint,
+            ctx.accounts.market_vault.mint,
+            AvenirError::InvalidRefundAccount
+        );
+
         // Write updated pool ciphertexts back to MarketPool
         let market_pool = &mut ctx.accounts.market_pool;
         market_pool.yes_pool_encrypted = result.field_0.ciphertexts[0];
@@ -272,19 +308,24 @@ pub mod avenir {
         market_pool.nonce = result.field_0.nonce;
 
         // Write revealed sentiment to Market (plaintext u8)
-        let market = &mut ctx.accounts.market;
         market.sentiment = result.field_1;
 
         // Update UserPosition with pending bet amount
         let position = &mut ctx.accounts.user_position;
         if market.pending_is_yes {
-            position.yes_amount = position.yes_amount.checked_add(market.pending_amount).unwrap();
+            position.yes_amount = position
+                .yes_amount
+                .checked_add(market.pending_amount)
+                .ok_or(AvenirError::MathOverflow)?;
         } else {
-            position.no_amount = position.no_amount.checked_add(market.pending_amount).unwrap();
+            position.no_amount = position
+                .no_amount
+                .checked_add(market.pending_amount)
+                .ok_or(AvenirError::MathOverflow)?;
         }
 
         // Increment total_bets
-        market.total_bets = market.total_bets.checked_add(1).unwrap();
+        market.total_bets = market.total_bets.checked_add(1).ok_or(AvenirError::MathOverflow)?;
 
         // Clear lock and pending fields
         market.mpc_lock = false;
@@ -331,6 +372,15 @@ pub mod avenir {
             }
         };
 
+        // Guard against re-initialization: only write if still in the zeroed placeholder state.
+        let already_initialized = ctx.accounts.dispute_tally.yes_votes_encrypted != [0u8; 32]
+            || ctx.accounts.dispute_tally.no_votes_encrypted != [0u8; 32]
+            || ctx.accounts.dispute_tally.nonce != 0;
+        if already_initialized {
+            msg!("init_dispute_tally_callback: DisputeTally already initialized; ignoring");
+            return Ok(());
+        }
+
         // Write initial encrypted zeros to DisputeTally
         let dispute_tally = &mut ctx.accounts.dispute_tally;
         dispute_tally.yes_votes_encrypted = o.ciphertexts[0];
@@ -364,6 +414,8 @@ pub mod avenir {
         ctx: Context<AddDisputeVoteCallback>,
         output: SignedComputationOutputs<AddDisputeVoteOutput>,
     ) -> Result<()> {
+        use crate::errors::AvenirError;
+
         // add_dispute_vote returns Enc<Mxe, VoteTotals> -- updated encrypted tally
         // Generated output structure:
         //   AddDisputeVoteOutput { field_0: MXEEncryptedStruct<2> }
@@ -392,8 +444,23 @@ pub mod avenir {
         dispute_tally.no_votes_encrypted = o.ciphertexts[1];
         dispute_tally.nonce = o.nonce;
 
-        // Clear MPC lock on dispute
+        // Attribute this vote to a juror index and update dispute counters
         let dispute = &mut ctx.accounts.dispute;
+
+        let juror_key = ctx.accounts.juror.key();
+        let juror_index = dispute
+            .jurors
+            .iter()
+            .position(|j| *j == juror_key)
+            .ok_or(AvenirError::NotSelectedJuror)?;
+
+        // Idempotency guard: if already marked as voted, do not increment.
+        if (dispute.votes_submitted >> juror_index) & 1 == 0 {
+            dispute.votes_submitted |= 1 << juror_index;
+            dispute.vote_count = dispute.vote_count.checked_add(1).ok_or(AvenirError::MathOverflow)?;
+        }
+
+        // Clear MPC lock on dispute
         dispute.mpc_lock = false;
         dispute.lock_timestamp = 0;
 
@@ -410,7 +477,10 @@ pub mod avenir {
         instructions::mpc::finalize_dispute_comp_def::handler(ctx)
     }
 
-    pub fn finalize_dispute(ctx: Context<FinalizeDispute>, computation_offset: u64) -> Result<()> {
+    pub fn finalize_dispute(
+        ctx: Context<FinalizeDispute>,
+        computation_offset: u64,
+    ) -> Result<()> {
         instructions::mpc::finalize_dispute::handler(ctx, computation_offset)
     }
 
@@ -483,7 +553,10 @@ pub mod avenir {
         instructions::mpc::init_compute_payouts_comp_def::handler(ctx)
     }
 
-    pub fn compute_payouts(ctx: Context<ComputePayouts>, computation_offset: u64) -> Result<()> {
+    pub fn compute_payouts(
+        ctx: Context<ComputePayouts>,
+        computation_offset: u64,
+    ) -> Result<()> {
         instructions::mpc::compute_payouts::handler(ctx, computation_offset)
     }
 

@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
+use anchor_spl::associated_token::get_associated_token_address;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
@@ -55,22 +56,50 @@ pub fn handler(
             let signer_seeds: &[&[&[u8]]] =
                 &[&[b"market", &market_id.to_le_bytes(), &[bump]]];
 
-            // Deserialize pending_bettor_token_account as TokenAccount for refund
-            let pending_token_info = ctx.accounts.pending_bettor_token_account.to_account_info();
+            // Validate the refund destination is the pending bettor's USDC ATA.
+            // Prevents a new caller from redirecting a stale-lock refund.
+            if market.pending_amount > 0 {
+                require!(
+                    market.pending_bettor != Pubkey::default(),
+                    AvenirError::InvalidPendingBet
+                );
+
+                let expected_ata = get_associated_token_address(
+                    &market.pending_bettor,
+                    &ctx.accounts.usdc_mint.key(),
+                );
+                require_keys_eq!(
+                    ctx.accounts.pending_bettor_token_account.key(),
+                    expected_ata,
+                    AvenirError::InvalidRefundAccount
+                );
+                require_keys_eq!(
+                    ctx.accounts.pending_bettor_token_account.owner,
+                    market.pending_bettor,
+                    AvenirError::InvalidRefundAccount
+                );
+                require_keys_eq!(
+                    ctx.accounts.pending_bettor_token_account.mint,
+                    ctx.accounts.usdc_mint.key(),
+                    AvenirError::InvalidMint
+                );
+            }
 
             let refund_accounts = Transfer {
                 from: ctx.accounts.market_vault.to_account_info(),
-                to: pending_token_info,
+                to: ctx.accounts.pending_bettor_token_account.to_account_info(),
                 authority: market.to_account_info(),
             };
-            token::transfer(
-                CpiContext::new_with_signer(
-                    ctx.accounts.token_program.to_account_info(),
-                    refund_accounts,
-                    signer_seeds,
-                ),
-                market.pending_amount,
-            )?;
+            if market.pending_amount > 0 {
+                token::transfer(
+                    CpiContext::new_with_signer(
+                        ctx.accounts.token_program.to_account_info(),
+                        refund_accounts,
+                        signer_seeds,
+                    ),
+                    market.pending_amount,
+                )?;
+            }
 
             // Clear lock state
             market.mpc_lock = false;
@@ -92,6 +121,12 @@ pub fn handler(
     if user_position.no_amount > 0 && is_yes {
         return Err(AvenirError::WrongSide.into());
     }
+
+    // 6b. Ensure MarketPool has been initialized by init_pool MPC.
+    // create_market zero-fills ciphertexts as a placeholder; init_pool must replace them.
+    let pool = &ctx.accounts.market_pool;
+    let pool_uninitialized = pool.yes_pool_encrypted == [0u8; 32] && pool.no_pool_encrypted == [0u8; 32];
+    require!(!pool_uninitialized, AvenirError::PoolNotInitialized);
 
     // 7. Transfer USDC: user -> vault
     let cpi_accounts = Transfer {
@@ -201,7 +236,7 @@ pub struct PlaceBet<'info> {
         seeds = [b"market", market.id.to_le_bytes().as_ref()],
         bump = market.bump,
     )]
-    pub market: Account<'info, Market>,
+    pub market: Box<Account<'info, Market>>,
 
     /// The MarketPool PDA containing encrypted pool state.
     #[account(
@@ -209,7 +244,7 @@ pub struct PlaceBet<'info> {
         bump = market_pool.bump,
         constraint = market_pool.market_id == market.id,
     )]
-    pub market_pool: Account<'info, MarketPool>,
+    pub market_pool: Box<Account<'info, MarketPool>>,
 
     /// Per-user, per-market position tracking.
     /// Created via init_if_needed because Arcium callbacks cannot create accounts.
@@ -220,7 +255,7 @@ pub struct PlaceBet<'info> {
         seeds = [b"position", market.id.to_le_bytes().as_ref(), bettor.key().as_ref()],
         bump,
     )]
-    pub user_position: Account<'info, UserPosition>,
+    pub user_position: Box<Account<'info, UserPosition>>,
 
     /// Bettor's USDC token account (source for bet transfer).
     #[account(
@@ -228,7 +263,7 @@ pub struct PlaceBet<'info> {
         token::mint = usdc_mint,
         token::authority = bettor,
     )]
-    pub user_token_account: Account<'info, TokenAccount>,
+    pub user_token_account: Box<Account<'info, TokenAccount>>,
 
     /// Market vault token account (destination for bet transfer).
     #[account(
@@ -238,15 +273,15 @@ pub struct PlaceBet<'info> {
         token::mint = usdc_mint,
         token::authority = market,
     )]
-    pub market_vault: Account<'info, TokenAccount>,
+    pub market_vault: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: Only used for timeout refund -- validated against market.pending_bettor
     /// when timeout recovery triggers. When no timeout, this account is unused.
     #[account(mut)]
-    pub pending_bettor_token_account: UncheckedAccount<'info>,
+    pub pending_bettor_token_account: Box<Account<'info, TokenAccount>>,
 
     /// USDC mint for token account constraints.
-    pub usdc_mint: Account<'info, Mint>,
+    pub usdc_mint: Box<Account<'info, Mint>>,
 
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
@@ -255,13 +290,13 @@ pub struct PlaceBet<'info> {
     #[account(
         address = derive_mxe_pda!()
     )]
-    pub mxe_account: Account<'info, MXEAccount>,
+    pub mxe_account: Box<Account<'info, MXEAccount>>,
 
     #[account(
         mut,
         address = derive_sign_pda!()
     )]
-    pub sign_pda_account: Account<'info, ArciumSignerAccount>,
+    pub sign_pda_account: Box<Account<'info, ArciumSignerAccount>>,
 
     #[account(
         mut,
@@ -284,25 +319,25 @@ pub struct PlaceBet<'info> {
     #[account(
         address = derive_comp_def_pda!(comp_def_offset("update_pool"))
     )]
-    pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
+    pub comp_def_account: Box<Account<'info, ComputationDefinitionAccount>>,
 
     #[account(
         mut,
         address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
     )]
-    pub cluster_account: Account<'info, Cluster>,
+    pub cluster_account: Box<Account<'info, Cluster>>,
 
     #[account(
         mut,
         address = ARCIUM_FEE_POOL_ACCOUNT_ADDRESS,
     )]
-    pub pool_account: Account<'info, FeePool>,
+    pub pool_account: Box<Account<'info, FeePool>>,
 
     #[account(
         mut,
         address = ARCIUM_CLOCK_ACCOUNT_ADDRESS
     )]
-    pub clock_account: Account<'info, ClockAccount>,
+    pub clock_account: Box<Account<'info, ClockAccount>>,
 
     pub arcium_program: Program<'info, Arcium>,
 }

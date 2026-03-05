@@ -1,14 +1,14 @@
-import { PublicKey } from '@solana/web3.js'
-import { PROGRAM_ID } from '#/lib/constants'
+import { PublicKey } from "@solana/web3.js";
+import { PROGRAM_ID } from "#/lib/constants";
 
 /**
  * Encodes a market ID as an 8-byte little-endian buffer for PDA seed derivation.
  * Matches the on-chain `market_id.to_le_bytes()` encoding.
  */
 function marketIdBuffer(id: number): Buffer {
-  const buf = Buffer.alloc(8)
-  buf.writeBigUInt64LE(BigInt(id))
-  return buf
+  const buf = Buffer.alloc(8);
+  buf.writeBigUInt64LE(BigInt(id));
+  return buf;
 }
 
 /**
@@ -17,12 +17,12 @@ function marketIdBuffer(id: number): Buffer {
  */
 export function getMarketPda(
   id: number,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('market'), marketIdBuffer(id)],
-    programId,
-  )
+    [Buffer.from("market"), marketIdBuffer(id)],
+    programId
+  );
 }
 
 /**
@@ -31,12 +31,12 @@ export function getMarketPda(
  */
 export function getMarketPoolPda(
   id: number,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('market_pool'), marketIdBuffer(id)],
-    programId,
-  )
+    [Buffer.from("market_pool"), marketIdBuffer(id)],
+    programId
+  );
 }
 
 /**
@@ -45,12 +45,12 @@ export function getMarketPoolPda(
  */
 export function getVaultPda(
   id: number,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('vault'), marketIdBuffer(id)],
-    programId,
-  )
+    [Buffer.from("vault"), marketIdBuffer(id)],
+    programId
+  );
 }
 
 /**
@@ -60,12 +60,12 @@ export function getVaultPda(
 export function getPositionPda(
   marketId: number,
   user: PublicKey,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('position'), marketIdBuffer(marketId), user.toBuffer()],
-    programId,
-  )
+    [Buffer.from("position"), marketIdBuffer(marketId), user.toBuffer()],
+    programId
+  );
 }
 
 /**
@@ -73,9 +73,9 @@ export function getPositionPda(
  * Seeds: [b"config"]
  */
 export function getConfigPda(
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
-  return PublicKey.findProgramAddressSync([Buffer.from('config')], programId)
+  return PublicKey.findProgramAddressSync([Buffer.from("config")], programId);
 }
 
 /**
@@ -84,12 +84,12 @@ export function getConfigPda(
  */
 export function getDisputePda(
   marketId: number,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('dispute'), marketIdBuffer(marketId)],
-    programId,
-  )
+    [Buffer.from("dispute"), marketIdBuffer(marketId)],
+    programId
+  );
 }
 
 /**
@@ -98,12 +98,12 @@ export function getDisputePda(
  */
 export function getDisputeTallyPda(
   marketId: number,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('dispute_tally'), marketIdBuffer(marketId)],
-    programId,
-  )
+    [Buffer.from("dispute_tally"), marketIdBuffer(marketId)],
+    programId
+  );
 }
 
 /**
@@ -112,12 +112,12 @@ export function getDisputeTallyPda(
  */
 export function getResolverPda(
   wallet: PublicKey,
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('resolver'), wallet.toBuffer()],
-    programId,
-  )
+    [Buffer.from("resolver"), wallet.toBuffer()],
+    programId
+  );
 }
 
 /**
@@ -125,10 +125,10 @@ export function getResolverPda(
  * Seeds: [b"resolver_registry"]
  */
 export function getResolverRegistryPda(
-  programId: PublicKey = PROGRAM_ID,
+  programId: PublicKey = PROGRAM_ID
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('resolver_registry')],
-    programId,
-  )
+    [Buffer.from("resolver_registry")],
+    programId
+  );
 }

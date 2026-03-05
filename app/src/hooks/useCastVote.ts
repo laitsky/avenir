@@ -1,12 +1,31 @@
-import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey, SystemProgram } from '@solana/web3.js'
-import BN from 'bn.js'
-import { toast } from 'sonner'
-import { useAnchorProgram } from '#/lib/anchor'
-import { PROGRAM_ID } from '#/lib/constants'
-import { getMarketPda, getDisputePda, getDisputeTallyPda, getResolverPda } from '#/lib/pda'
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import BN from "bn.js";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { useAnchorProgram } from "#/lib/anchor";
+import {
+  getArciumClusterOffset,
+  getArciumProgramId,
+  getClockAddress,
+  getClusterAccountAddress,
+  getComputationAccountAddress,
+  getComputationDefinitionAddress,
+  getExecutingPoolAddress,
+  getFeePoolAddress,
+  getMXEAccountAddress,
+  getMempoolAccountAddress,
+} from "#/lib/arcium";
+import { PROGRAM_ID } from "#/lib/constants";
+import {
+  getMarketPda,
+  getDisputePda,
+  getDisputeTallyPda,
+  getResolverPda,
+} from "#/lib/pda";
+import { encryptVoteForMpc } from "#/server/arcium-encryption";
 
 /**
  * Hook for submitting encrypted juror votes on active disputes.
@@ -17,113 +36,76 @@ import { getMarketPda, getDisputePda, getDisputeTallyPda, getResolverPda } from 
  * Returns { castVote, loading, error } for the JurorVotePanel UI.
  */
 export function useCastVote(marketId: number) {
-  const program = useAnchorProgram()
-  const { publicKey } = useWallet()
-  const queryClient = useQueryClient()
+  const program = useAnchorProgram();
+  const { publicKey } = useWallet();
+  const queryClient = useQueryClient();
+  const encryptVote = useServerFn(encryptVoteForMpc);
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function castVote(isYes: boolean): Promise<void> {
     if (!program || !publicKey) {
-      throw new Error('Wallet not connected')
+      throw new Error("Wallet not connected");
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      // 1. Encrypt the vote boolean using Arcium client
-      const {
-        RescueCipher,
-        x25519,
-        getMXEPublicKey,
-        deserializeLE,
-        getComputationAccAddress,
-        getClusterAccAddress,
-        getMXEAccAddress,
-        getMempoolAccAddress,
-        getExecutingPoolAccAddress,
-        getCompDefAccAddress,
-        getCompDefAccOffset,
-        getArciumEnv,
-        getFeePoolAccAddress,
-        getClockAccAddress,
-        getArciumProgramId,
-      } = await import('@arcium-hq/client')
-
-      // Generate encryption keypair
-      const privateKey = x25519.utils.randomPrivateKey()
-      const pubKey = x25519.getPublicKey(privateKey)
-
-      // Get MXE public key and derive shared secret
-      const mxePublicKey = await getMXEPublicKey(
-        program.provider as any,
-        PROGRAM_ID,
-      )
-      if (!mxePublicKey) {
-        throw new Error(
-          'Failed to get MXE public key. DKG ceremony may not be complete.',
-        )
-      }
-
-      const sharedSecret = x25519.getSharedSecret(privateKey, mxePublicKey)
-      const cipher = new RescueCipher(sharedSecret)
-
-      // Browser-safe nonce
-      const nonce = new Uint8Array(16)
-      crypto.getRandomValues(nonce)
-
-      // Encrypt vote boolean (1 = Yes, 0 = No)
-      const voteCiphertext = cipher.encrypt([BigInt(isYes ? 1 : 0)], nonce)
-      const nonceBN = deserializeLE(nonce)
+      // 1. Encrypt the vote boolean (server-side)
+      const encrypted = await encryptVote({
+        data: {
+          programId: PROGRAM_ID.toBase58(),
+          isYes,
+        },
+      });
 
       // 2. Derive all PDAs
-      const [marketPda] = getMarketPda(marketId)
-      const [disputePda] = getDisputePda(marketId)
-      const [disputeTallyPda] = getDisputeTallyPda(marketId)
-      const [resolverPda] = getResolverPda(publicKey)
+      const [marketPda] = getMarketPda(marketId);
+      const [disputePda] = getDisputePda(marketId);
+      const [disputeTallyPda] = getDisputeTallyPda(marketId);
+      const [resolverPda] = getResolverPda(publicKey);
 
       // Random computation offset
       const computationOffset = new BN(
-        crypto.getRandomValues(new Uint8Array(8)),
-      )
+        crypto.getRandomValues(new Uint8Array(8))
+      );
 
-      // 3. Arcium account derivation
-      const arciumEnv = getArciumEnv()
-      const clusterOffset = arciumEnv.arciumClusterOffset
-      const compDefIndex = Buffer.from(
-        getCompDefAccOffset('add_dispute_vote'),
-      ).readUInt32LE(0)
+      // 3. Arcium account derivation (no browser @arcium-hq/client dependency)
+      const clusterOffset = getArciumClusterOffset();
 
       const arciumAccounts = {
-        mxeAccount: getMXEAccAddress(PROGRAM_ID),
+        mxeAccount: getMXEAccountAddress(PROGRAM_ID),
         signPdaAccount: PublicKey.findProgramAddressSync(
-          [Buffer.from('ArciumSignerAccount')],
-          PROGRAM_ID,
+          [Buffer.from("ArciumSignerAccount")],
+          PROGRAM_ID
         )[0],
-        mempoolAccount: getMempoolAccAddress(clusterOffset),
-        executingPool: getExecutingPoolAccAddress(clusterOffset),
-        computationAccount: getComputationAccAddress(
-          clusterOffset,
+        mempoolAccount: getMempoolAccountAddress(clusterOffset),
+        executingPool: getExecutingPoolAddress(clusterOffset),
+        computationAccount: getComputationAccountAddress(
           computationOffset,
+          clusterOffset
         ),
-        compDefAccount: getCompDefAccAddress(PROGRAM_ID, compDefIndex),
-        clusterAccount: getClusterAccAddress(clusterOffset),
-        poolAccount: getFeePoolAccAddress(),
-        clockAccount: getClockAccAddress(),
+        compDefAccount: getComputationDefinitionAddress(
+          PROGRAM_ID,
+          "add_dispute_vote"
+        ),
+        clusterAccount: getClusterAccountAddress(clusterOffset),
+        poolAccount: getFeePoolAddress(),
+        clockAccount: getClockAddress(),
         arciumProgram: getArciumProgramId(),
-      }
+      };
 
       // 4. Submit cast_vote transaction
       const sig = await program.methods
         .castVote(
           computationOffset,
-          Array.from(voteCiphertext[0]) as any,
-          Array.from(pubKey) as any,
-          new BN(nonceBN.toString()),
+          encrypted.voteCiphertext as any,
+          encrypted.publicKey as any,
+          new BN(encrypted.nonceBN)
         )
-        .accounts({
+        .accountsPartial({
           juror: publicKey,
           dispute: disputePda,
           disputeTally: disputeTallyPda,
@@ -132,31 +114,31 @@ export function useCastVote(marketId: number) {
           systemProgram: SystemProgram.programId,
           ...arciumAccounts,
         })
-        .rpc({ commitment: 'confirmed' })
+        .rpc({ commitment: "confirmed" });
 
       // 5. Invalidate queries for real-time update
-      queryClient.invalidateQueries({ queryKey: ['dispute', marketId] })
-      queryClient.invalidateQueries({ queryKey: ['market', marketId] })
+      queryClient.invalidateQueries({ queryKey: ["dispute", marketId] });
+      queryClient.invalidateQueries({ queryKey: ["market", marketId] });
 
-      toast.success(`Vote submitted: ${isYes ? 'Yes' : 'No'}`, {
+      toast.success(`Vote submitted: ${isYes ? "Yes" : "No"}`, {
         action: {
-          label: 'View',
+          label: "View",
           onClick: () =>
             window.open(
               `https://solscan.io/tx/${sig}?cluster=devnet`,
-              '_blank',
+              "_blank"
             ),
         },
-      })
+      });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      setError(msg)
-      toast.error(`Failed to submit vote: ${msg}`)
-      throw err
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg);
+      toast.error(`Failed to submit vote: ${msg}`);
+      throw err;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  return { castVote, loading, error }
+  return { castVote, loading, error };
 }

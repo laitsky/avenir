@@ -39,4 +39,7 @@ pub struct AddDisputeVoteCallback<'info> {
     /// The Dispute PDA to clear mpc_lock on completion.
     #[account(mut)]
     pub dispute: Account<'info, Dispute>,
+
+    /// CHECK: Juror pubkey for attributing this MPC vote to a juror index.
+    pub juror: UncheckedAccount<'info>,
 }

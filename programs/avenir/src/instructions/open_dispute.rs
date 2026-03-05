@@ -28,7 +28,10 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) ->
     require!(market.state == 0, AvenirError::MarketAlreadyDisputed);
 
     // 3. Validate grace period has expired (48h after resolution_time)
-    let grace_deadline = market.resolution_time.checked_add(GRACE_PERIOD).unwrap();
+    let grace_deadline = market
+        .resolution_time
+        .checked_add(GRACE_PERIOD)
+        .ok_or(AvenirError::MathOverflow)?;
     require!(
         clock.unix_timestamp > grace_deadline,
         AvenirError::GracePeriodNotExpired
@@ -94,7 +97,10 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) ->
             Resolver::try_deserialize(&mut resolver_data.as_ref())?;
 
         juror_stakes.push(resolver.staked_amount);
-        resolver.active_disputes = resolver.active_disputes.checked_add(1).unwrap();
+        resolver.active_disputes = resolver
+            .active_disputes
+            .checked_add(1)
+            .ok_or(AvenirError::MathOverflow)?;
 
         // Re-serialize the updated resolver back
         let mut writer = resolver_data.as_mut();
@@ -111,7 +117,10 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) ->
     dispute.vote_count = 0;
     dispute.quorum = INITIAL_QUORUM;
     dispute.voting_start = clock.unix_timestamp;
-    dispute.voting_end = clock.unix_timestamp.checked_add(VOTING_WINDOW).unwrap();
+    dispute.voting_end = clock
+        .unix_timestamp
+        .checked_add(VOTING_WINDOW)
+        .ok_or(AvenirError::MathOverflow)?;
     dispute.tiebreaker_added = false;
     dispute.escalator = ctx.accounts.escalator.key();
     dispute.mpc_lock = false;

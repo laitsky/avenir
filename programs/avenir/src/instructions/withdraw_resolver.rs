@@ -2,10 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 
 use crate::errors::AvenirError;
-use crate::state::{Config, Resolver, ResolverRegistry};
-
-/// Minimum resolver stake: 500 USDC (6 decimals)
-pub const MIN_RESOLVER_STAKE: u64 = 500_000_000;
+use crate::state::{Config, Resolver, ResolverRegistry, MIN_RESOLVER_STAKE};
 
 /// Withdrawal cooldown: 7 days in seconds
 pub const WITHDRAWAL_COOLDOWN: i64 = 604_800;
@@ -17,6 +14,8 @@ pub fn handler(ctx: Context<WithdrawResolver>, amount: u64, execute: bool) -> Re
         // === Request phase ===
         let resolver = &mut ctx.accounts.resolver;
 
+        require!(amount > 0, AvenirError::MathOverflow);
+
         // Cannot withdraw while active in disputes
         require!(
             resolver.active_disputes == 0,
@@ -24,7 +23,11 @@ pub fn handler(ctx: Context<WithdrawResolver>, amount: u64, execute: bool) -> Re
         );
 
         // Validate: remaining stake >= minimum OR full withdrawal
-        let remaining = resolver.staked_amount.checked_sub(amount).unwrap_or(0);
+        require!(amount <= resolver.staked_amount, AvenirError::MathOverflow);
+        let remaining = resolver
+            .staked_amount
+            .checked_sub(amount)
+            .ok_or(AvenirError::MathOverflow)?;
         require!(
             remaining >= MIN_RESOLVER_STAKE || amount == resolver.staked_amount,
             AvenirError::InsufficientStake
@@ -88,7 +91,10 @@ pub fn handler(ctx: Context<WithdrawResolver>, amount: u64, execute: bool) -> Re
 
         // Update resolver state
         let resolver = &mut ctx.accounts.resolver;
-        resolver.staked_amount = resolver.staked_amount.checked_sub(withdrawal_amount).unwrap();
+        resolver.staked_amount = resolver
+            .staked_amount
+            .checked_sub(withdrawal_amount)
+            .ok_or(AvenirError::MathOverflow)?;
         resolver.withdrawal_requested_at = 0;
         resolver.withdrawal_amount = 0;
 

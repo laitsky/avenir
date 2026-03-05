@@ -1,62 +1,62 @@
-import { PublicKey } from '@solana/web3.js'
-import type { BN } from '@coral-xyz/anchor'
+import { PublicKey } from "@solana/web3.js";
+import type { BN } from "@coral-xyz/anchor";
 
 export interface OnChainDispute {
-  publicKey: PublicKey
-  marketId: number
-  status: number // 0=Voting, 1=Finalizing, 2=Settled
-  jurors: PublicKey[]
-  jurorStakes: number[]
-  votesSubmitted: number // Bitfield
-  voteCount: number
-  quorum: number
-  votingStart: number
-  votingEnd: number
-  tiebreakerAdded: boolean
-  escalator: PublicKey
-  mpcLock: boolean
+  publicKey: PublicKey;
+  marketId: number;
+  status: number; // 0=Voting, 1=Finalizing, 2=Settled
+  jurors: PublicKey[];
+  jurorStakes: number[];
+  votesSubmitted: number; // Bitfield
+  voteCount: number;
+  quorum: number;
+  votingStart: number;
+  votingEnd: number;
+  tiebreakerAdded: boolean;
+  escalator: PublicKey;
+  mpcLock: boolean;
 }
 
 export const DISPUTE_STATUS_MAP: Record<number, string> = {
-  0: 'Voting',
-  1: 'Finalizing',
-  2: 'Settled',
-}
+  0: "Voting",
+  1: "Finalizing",
+  2: "Settled",
+};
 
 export interface OnChainMarket {
-  publicKey: PublicKey
-  id: number
-  question: string
-  resolutionSource: string
-  category: number // 0=Politics, 1=Crypto, 2=Sports, 3=Culture, 4=Economics
-  resolutionTime: number // Unix timestamp
-  state: number // 0=Open, 1=Locked, 2=Resolved, 3=Disputed, 4=Finalized
-  winningOutcome: number // 0=None, 1=Yes, 2=No
-  sentiment: number // 0=Unknown, 1=LeaningYes, 2=Even, 3=LeaningNo
-  totalBets: number
-  creator: PublicKey
-  createdAt: number
-  mpcLock: boolean
-  revealedYesPool: number
-  revealedNoPool: number
+  publicKey: PublicKey;
+  id: number;
+  question: string;
+  resolutionSource: string;
+  category: number; // 0=Politics, 1=Crypto, 2=Sports, 3=Culture, 4=Economics
+  resolutionTime: number; // Unix timestamp
+  state: number; // 0=Open, 1=Locked, 2=Resolved, 3=Disputed, 4=Finalized
+  winningOutcome: number; // 0=None, 1=Yes, 2=No
+  sentiment: number; // 0=Unknown, 1=LeaningYes, 2=Even, 3=LeaningNo
+  totalBets: number;
+  creator: PublicKey;
+  createdAt: number;
+  mpcLock: boolean;
+  revealedYesPool: number;
+  revealedNoPool: number;
 }
 
 export interface OnChainPosition {
-  publicKey: PublicKey
-  marketId: number
-  user: PublicKey
-  yesAmount: number
-  noAmount: number
-  claimed: boolean
+  publicKey: PublicKey;
+  marketId: number;
+  user: PublicKey;
+  yesAmount: number;
+  noAmount: number;
+  claimed: boolean;
 }
 
 export const CATEGORY_MAP: Record<number, string> = {
-  0: 'Politics',
-  1: 'Crypto',
-  2: 'Sports',
-  3: 'Culture',
-  4: 'Economics',
-}
+  0: "Politics",
+  1: "Crypto",
+  2: "Sports",
+  3: "Culture",
+  4: "Economics",
+};
 
 export const CATEGORY_REVERSE_MAP: Record<string, number> = {
   Politics: 0,
@@ -64,22 +64,22 @@ export const CATEGORY_REVERSE_MAP: Record<string, number> = {
   Sports: 2,
   Culture: 3,
   Economics: 4,
-}
+};
 
 export const SENTIMENT_MAP: Record<number, string> = {
-  0: 'Unknown',
-  1: 'Leaning Yes',
-  2: 'Even',
-  3: 'Leaning No',
-}
+  0: "Unknown",
+  1: "Leaning Yes",
+  2: "Even",
+  3: "Leaning No",
+};
 
 export const STATE_MAP: Record<number, string> = {
-  0: 'Open',
-  1: 'Locked',
-  2: 'Resolved',
-  3: 'Disputed',
-  4: 'Finalized',
-}
+  0: "Open",
+  1: "Locked",
+  2: "Resolved",
+  3: "Disputed",
+  4: "Finalized",
+};
 
 /**
  * Maps a raw Anchor-decoded Market account to the typed OnChainMarket interface.
@@ -88,21 +88,21 @@ export const STATE_MAP: Record<number, string> = {
 export function mapMarketAccount(
   publicKey: PublicKey,
   account: {
-    id: BN
-    question: string
-    resolutionSource: string
-    category: number
-    resolutionTime: BN
-    state: number
-    winningOutcome: number
-    sentiment: number
-    totalBets: BN
-    creator: PublicKey
-    createdAt: BN
-    mpcLock: boolean
-    revealedYesPool: BN
-    revealedNoPool: BN
-  },
+    id: BN;
+    question: string;
+    resolutionSource: string;
+    category: number;
+    resolutionTime: BN;
+    state: number;
+    winningOutcome: number;
+    sentiment: number;
+    totalBets: BN;
+    creator: PublicKey;
+    createdAt: BN;
+    mpcLock: boolean;
+    revealedYesPool: BN;
+    revealedNoPool: BN;
+  }
 ): OnChainMarket {
   return {
     publicKey,
@@ -120,7 +120,7 @@ export function mapMarketAccount(
     mpcLock: account.mpcLock,
     revealedYesPool: account.revealedYesPool.toNumber(),
     revealedNoPool: account.revealedNoPool.toNumber(),
-  }
+  };
 }
 
 /**
@@ -129,12 +129,12 @@ export function mapMarketAccount(
 export function mapPositionAccount(
   publicKey: PublicKey,
   account: {
-    marketId: BN
-    user: PublicKey
-    yesAmount: BN
-    noAmount: BN
-    claimed: boolean
-  },
+    marketId: BN;
+    user: PublicKey;
+    yesAmount: BN;
+    noAmount: BN;
+    claimed: boolean;
+  }
 ): OnChainPosition {
   return {
     publicKey,
@@ -143,7 +143,7 @@ export function mapPositionAccount(
     yesAmount: account.yesAmount.toNumber(),
     noAmount: account.noAmount.toNumber(),
     claimed: account.claimed,
-  }
+  };
 }
 
 /**
@@ -152,19 +152,19 @@ export function mapPositionAccount(
 export function mapDisputeAccount(
   publicKey: PublicKey,
   account: {
-    marketId: BN
-    status: number
-    jurors: PublicKey[]
-    jurorStakes: BN[]
-    votesSubmitted: number
-    voteCount: number
-    quorum: number
-    votingStart: BN
-    votingEnd: BN
-    tiebreakerAdded: boolean
-    escalator: PublicKey
-    mpcLock: boolean
-  },
+    marketId: BN;
+    status: number;
+    jurors: PublicKey[];
+    jurorStakes: BN[];
+    votesSubmitted: number;
+    voteCount: number;
+    quorum: number;
+    votingStart: BN;
+    votingEnd: BN;
+    tiebreakerAdded: boolean;
+    escalator: PublicKey;
+    mpcLock: boolean;
+  }
 ): OnChainDispute {
   return {
     publicKey,
@@ -180,5 +180,5 @@ export function mapDisputeAccount(
     tiebreakerAdded: account.tiebreakerAdded,
     escalator: account.escalator,
     mpcLock: account.mpcLock,
-  }
+  };
 }

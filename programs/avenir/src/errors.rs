@@ -54,6 +54,16 @@ pub enum AvenirError {
     MarketNotExpired,
     #[msg("Invalid winning outcome (must be 1=Yes or 2=No)")]
     InvalidOutcome,
+    #[msg("Arithmetic overflow or invalid math operation")]
+    MathOverflow,
+    #[msg("Invalid pending bet state")]
+    InvalidPendingBet,
+    #[msg("Invalid refund destination token account")]
+    InvalidRefundAccount,
+    #[msg("Market pool is not initialized")]
+    PoolNotInitialized,
+    #[msg("Dispute tally is not initialized")]
+    TallyNotInitialized,
 
     // Resolver / Dispute errors
     #[msg("Resolver stake must be at least 500 USDC")]

@@ -28,7 +28,10 @@ import {
   ArciumContext,
 } from "./helpers";
 
-describe("client-encryption: @arcium-hq/client SDK validation", () => {
+// NOTE: The standalone `updatePool` instruction was removed from the program surface
+// to prevent unsafe pool mutations without corresponding USDC transfers.
+// This suite is kept for reference but skipped until migrated to `placeBet`.
+describe.skip("client-encryption: @arcium-hq/client SDK validation", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -195,7 +198,10 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
     );
 
     // 4. Derive shared secret
-    const sharedSecret = x25519.getSharedSecret(privateKey, fetchedMxePublicKey);
+    const sharedSecret = x25519.getSharedSecret(
+      privateKey,
+      fetchedMxePublicKey
+    );
 
     // 5. Verify: shared secret is 32 bytes
     assert.equal(sharedSecret.length, 32, "shared secret should be 32 bytes");
@@ -206,7 +212,10 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
 
     // 7. Verify: different private keys produce different shared secrets
     const privateKey2 = x25519.utils.randomPrivateKey();
-    const sharedSecret2 = x25519.getSharedSecret(privateKey2, fetchedMxePublicKey);
+    const sharedSecret2 = x25519.getSharedSecret(
+      privateKey2,
+      fetchedMxePublicKey
+    );
     const isDifferent = Array.from(sharedSecret).some(
       (b, i) => b !== sharedSecret2[i]
     );
@@ -357,7 +366,9 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
       })
       .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-    console.log("    update_pool (client-encrypted: Yes 5 USDC) queued, awaiting MPC...");
+    console.log(
+      "    update_pool (client-encrypted: Yes 5 USDC) queued, awaiting MPC..."
+    );
 
     // 7. Await MPC finalization
     const callbackTx = await awaitAndVerifyCallback(
@@ -391,7 +402,9 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
     console.log("      sentiment:", market.sentiment, "(Leaning Yes)");
     console.log("      total_bets:", market.totalBets.toNumber());
     console.log("      mpc_lock:", market.mpcLock);
-    console.log("    INF-07 VALIDATED: @arcium-hq/client encryption consumed by MPC circuit");
+    console.log(
+      "    INF-07 VALIDATED: @arcium-hq/client encryption consumed by MPC circuit"
+    );
   });
 
   // ==========================================================================
@@ -460,7 +473,11 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
       "sentiment should be 1 (Leaning Yes) after User A: Yes=8, No=0"
     );
     assert.equal(marketA.totalBets.toNumber(), 2, "total_bets should be 2");
-    assert.equal(marketA.mpcLock, false, "mpc_lock should be released after User A");
+    assert.equal(
+      marketA.mpcLock,
+      false,
+      "mpc_lock should be released after User A"
+    );
 
     console.log("    User A PASSED: sentiment=1 (Leaning Yes), total_bets=2");
 
@@ -529,7 +546,11 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
       "sentiment should be 2 (Even) after User B: Yes=8, No=8"
     );
     assert.equal(marketB.totalBets.toNumber(), 3, "total_bets should be 3");
-    assert.equal(marketB.mpcLock, false, "mpc_lock should be released after User B");
+    assert.equal(
+      marketB.mpcLock,
+      false,
+      "mpc_lock should be released after User B"
+    );
 
     console.log("    User B PASSED: sentiment=2 (Even), total_bets=3");
 
@@ -589,12 +610,20 @@ describe("client-encryption: @arcium-hq/client SDK validation", () => {
       "sentiment should be 3 (Leaning No) after User C: Yes=8, No=13"
     );
     assert.equal(marketC.totalBets.toNumber(), 4, "total_bets should be 4");
-    assert.equal(marketC.mpcLock, false, "mpc_lock should be released after User C");
+    assert.equal(
+      marketC.mpcLock,
+      false,
+      "mpc_lock should be released after User C"
+    );
 
     console.log("    User C PASSED: sentiment=3 (Leaning No), total_bets=4");
     console.log("    Multi-keypair test PASSED:");
     console.log("      3 unique keypairs with independent shared secrets");
-    console.log("      Sentiment transitions: Leaning Yes -> Even -> Leaning No");
-    console.log("      All 3 sentiment states exercised via different user keypairs");
+    console.log(
+      "      Sentiment transitions: Leaning Yes -> Even -> Leaning No"
+    );
+    console.log(
+      "      All 3 sentiment states exercised via different user keypairs"
+    );
   });
 });

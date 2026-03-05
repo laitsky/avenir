@@ -39,7 +39,7 @@ pub fn handler(ctx: Context<ClaimPayout>) -> Result<()> {
     let total_pool = market
         .revealed_yes_pool
         .checked_add(market.revealed_no_pool)
-        .unwrap();
+        .ok_or(AvenirError::MathOverflow)?;
 
     let winning_pool = if market.winning_outcome == 1 {
         market.revealed_yes_pool
@@ -49,17 +49,19 @@ pub fn handler(ctx: Context<ClaimPayout>) -> Result<()> {
 
     let gross_payout = (user_winning_amount as u128)
         .checked_mul(total_pool as u128)
-        .unwrap()
+        .ok_or(AvenirError::MathOverflow)?
         .checked_div(winning_pool as u128)
-        .unwrap() as u64;
+        .ok_or(AvenirError::MathOverflow)? as u64;
 
     let fee = (gross_payout as u128)
         .checked_mul(market.config_fee_bps as u128)
-        .unwrap()
+        .ok_or(AvenirError::MathOverflow)?
         .checked_div(10_000)
-        .unwrap() as u64;
+        .ok_or(AvenirError::MathOverflow)? as u64;
 
-    let net_payout = gross_payout.checked_sub(fee).unwrap();
+    let net_payout = gross_payout
+        .checked_sub(fee)
+        .ok_or(AvenirError::MathOverflow)?;
 
     // 6. Extract Copy values before CPI to satisfy borrow checker
     let market_id = market.id;

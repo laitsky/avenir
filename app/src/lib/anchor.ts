@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
-import { Program, AnchorProvider } from '@coral-xyz/anchor'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import type { Avenir } from '#/lib/idl/avenir'
-import idl from '#/lib/idl/avenir.json'
+import { useMemo } from "react";
+import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
+import type { Avenir } from "#/lib/idl/avenir";
+import idl from "#/lib/idl/avenir.json";
 
 /**
  * Returns a typed Program<Avenir> instance when wallet is connected.
@@ -10,20 +11,18 @@ import idl from '#/lib/idl/avenir.json'
  * Memoized on connection and publicKey to avoid recreation on re-renders.
  */
 export function useAnchorProgram(): Program<Avenir> | null {
-  const { connection } = useConnection()
-  const wallet = useWallet()
+  const { connection } = useConnection();
+  const wallet = useWallet();
 
   return useMemo(() => {
-    if (!wallet.publicKey) return null
+    if (!wallet.publicKey) return null;
 
-    const provider = new AnchorProvider(
-      connection,
-      wallet as unknown as Parameters<typeof AnchorProvider['prototype']['constructor']>[1],
-      { commitment: 'confirmed' },
-    )
+    const provider = new AnchorProvider(connection, wallet as any, {
+      commitment: "confirmed",
+    });
 
-    return new Program<Avenir>(idl as unknown as Avenir, provider)
-  }, [connection, wallet.publicKey])
+    return new Program<Avenir>(idl as unknown as Avenir, provider);
+  }, [connection, wallet.publicKey]);
 }
 
 /**
@@ -32,22 +31,24 @@ export function useAnchorProgram(): Program<Avenir> | null {
  * This ensures market data can be loaded without a connected wallet.
  */
 export function useReadOnlyProgram(): Program<Avenir> {
-  const { connection } = useConnection()
+  const { connection } = useConnection();
 
   return useMemo(() => {
     const dummyWallet = {
-      publicKey: null,
-      signTransaction: () => Promise.reject(new Error('Read-only provider')),
-      signAllTransactions: () =>
-        Promise.reject(new Error('Read-only provider')),
-    }
+      publicKey: new PublicKey("11111111111111111111111111111111"),
+      payer: undefined,
+      signTransaction: async () => {
+        throw new Error("Read-only provider");
+      },
+      signAllTransactions: async () => {
+        throw new Error("Read-only provider");
+      },
+    } as any;
 
-    const provider = new AnchorProvider(
-      connection,
-      dummyWallet as unknown as Parameters<typeof AnchorProvider['prototype']['constructor']>[1],
-      { commitment: 'confirmed' },
-    )
+    const provider = new AnchorProvider(connection, dummyWallet, {
+      commitment: "confirmed",
+    });
 
-    return new Program<Avenir>(idl as unknown as Avenir, provider)
-  }, [connection])
+    return new Program<Avenir>(idl as unknown as Avenir, provider);
+  }, [connection]);
 }

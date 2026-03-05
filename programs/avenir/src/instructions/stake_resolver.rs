@@ -25,7 +25,10 @@ pub fn handler(ctx: Context<StakeResolver>, amount: u64) -> Result<()> {
 
     // Increment staked amount
     let resolver = &mut ctx.accounts.resolver;
-    resolver.staked_amount = resolver.staked_amount.checked_add(amount).unwrap();
+    resolver.staked_amount = resolver
+        .staked_amount
+        .checked_add(amount)
+        .ok_or(AvenirError::MathOverflow)?;
 
     msg!(
         "Resolver stake topped up - wallet={}, added={}, total={}",

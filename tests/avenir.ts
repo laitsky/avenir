@@ -1,6 +1,11 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { PublicKey, SystemProgram, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import {
+  PublicKey,
+  SystemProgram,
+  Keypair,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import { createMint, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Avenir } from "../target/types/avenir";
 import { assert } from "chai";
@@ -11,6 +16,7 @@ describe("avenir", () => {
 
   const program = anchor.workspace.avenir as Program<Avenir>;
   const admin = provider.wallet;
+  const payer = (admin as any).payer as Keypair;
   const connection = provider.connection;
 
   // Test keypairs
@@ -20,7 +26,6 @@ describe("avenir", () => {
 
   // Will be set in before() hook
   let usdcMint: PublicKey;
-  const mintAuthority = Keypair.generate();
 
   // Derive the Config PDA
   const [configPda] = PublicKey.findProgramAddressSync(
@@ -54,7 +59,19 @@ describe("avenir", () => {
     );
   }
 
-  function getPositionPda(marketId: number, user: PublicKey): [PublicKey, number] {
+  function getMarketPoolPda(marketId: number): [PublicKey, number] {
+    const buf = Buffer.alloc(8);
+    buf.writeBigUInt64LE(BigInt(marketId));
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("market_pool"), buf],
+      program.programId
+    );
+  }
+
+  function getPositionPda(
+    marketId: number,
+    user: PublicKey
+  ): [PublicKey, number] {
     const buf = Buffer.alloc(8);
     buf.writeBigUInt64LE(BigInt(marketId));
     return PublicKey.findProgramAddressSync(
@@ -71,17 +88,11 @@ describe("avenir", () => {
     );
     await connection.confirmTransaction(airdropCreator);
 
-    const airdropMintAuth = await connection.requestAirdrop(
-      mintAuthority.publicKey,
-      2 * LAMPORTS_PER_SOL
-    );
-    await connection.confirmTransaction(airdropMintAuth);
-
     // Create a real USDC mint on localnet (6 decimals like real USDC)
     usdcMint = await createMint(
       connection,
-      mintAuthority, // payer
-      mintAuthority.publicKey, // mint authority
+      payer, // payer
+      payer.publicKey, // mint authority (shared across all test files)
       null, // freeze authority
       6 // decimals
     );
@@ -114,11 +125,25 @@ describe("avenir", () => {
 
       const config = await program.account.config.fetch(configPda);
 
-      assert.ok(config.admin.equals(admin.publicKey), "Admin should match wallet");
-      assert.ok(config.feeRecipient.equals(feeRecipient), "Fee recipient should match");
+      assert.ok(
+        config.admin.equals(admin.publicKey),
+        "Admin should match wallet"
+      );
+      assert.ok(
+        config.feeRecipient.equals(feeRecipient),
+        "Fee recipient should match"
+      );
       assert.ok(config.usdcMint.equals(usdcMint), "USDC mint should match");
-      assert.equal(config.protocolFeeBps, protocolFeeBps, "Protocol fee bps should be 200");
-      assert.equal(config.marketCounter.toNumber(), 0, "Market counter should start at 0");
+      assert.equal(
+        config.protocolFeeBps,
+        protocolFeeBps,
+        "Protocol fee bps should be 200"
+      );
+      assert.equal(
+        config.marketCounter.toNumber(),
+        0,
+        "Market counter should start at 0"
+      );
       assert.equal(config.paused, false, "Should not be paused initially");
       assert.ok(config.bump > 0, "Bump should be set");
     });
@@ -163,8 +188,13 @@ describe("avenir", () => {
         })
         .rpc();
 
-      const whitelist = await program.account.creatorWhitelist.fetch(whitelistPda);
-      assert.ok(whitelist.creator.equals(creator.publicKey), "Creator should match");
+      const whitelist = await program.account.creatorWhitelist.fetch(
+        whitelistPda
+      );
+      assert.ok(
+        whitelist.creator.equals(creator.publicKey),
+        "Creator should match"
+      );
       assert.equal(whitelist.active, true, "Should be active");
       assert.ok(whitelist.bump > 0, "Bump should be set");
       console.log("Creator whitelisted successfully");
@@ -191,9 +221,9 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("Unauthorized") ||
-          err.toString().includes("Error") ||
-          err.toString().includes("2001") ||
-          err.toString().includes("has_one"),
+            err.toString().includes("Error") ||
+            err.toString().includes("2001") ||
+            err.toString().includes("has_one"),
           "Should reject non-admin"
         );
         console.log("Non-admin add_creator correctly rejected");
@@ -234,8 +264,13 @@ describe("avenir", () => {
         })
         .rpc();
 
-      const whitelist = await program.account.creatorWhitelist.fetch(whitelistPda);
-      assert.ok(whitelist.creator.equals(creator.publicKey), "Creator should match after re-add");
+      const whitelist = await program.account.creatorWhitelist.fetch(
+        whitelistPda
+      );
+      assert.ok(
+        whitelist.creator.equals(creator.publicKey),
+        "Creator should match after re-add"
+      );
       assert.equal(whitelist.active, true, "Should be active after re-add");
       console.log("Creator re-added successfully after removal");
     });
@@ -249,8 +284,11 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(1);
       const [vaultPda] = getVaultPda(1);
+      const [marketPoolPda] = getMarketPoolPda(1);
 
-      const resolutionTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400); // 24h from now
+      const resolutionTime = new anchor.BN(
+        Math.floor(Date.now() / 1000) + 86400
+      ); // 24h from now
 
       await program.methods
         .createMarket({
@@ -265,6 +303,7 @@ describe("avenir", () => {
           whitelist: whitelistPda,
           market: marketPda,
           marketVault: vaultPda,
+          marketPool: marketPoolPda,
           usdcMint,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
@@ -275,24 +314,53 @@ describe("avenir", () => {
       // Verify market fields
       const market = await program.account.market.fetch(marketPda);
       assert.equal(market.id.toNumber(), 1, "Market ID should be 1");
-      assert.equal(market.question, "Will ETH reach $10,000 by end of 2026?", "Question should match");
-      assert.equal(market.resolutionSource, "https://coinmarketcap.com/currencies/ethereum/", "Resolution source should match");
+      assert.equal(
+        market.question,
+        "Will ETH reach $10,000 by end of 2026?",
+        "Question should match"
+      );
+      assert.equal(
+        market.resolutionSource,
+        "https://coinmarketcap.com/currencies/ethereum/",
+        "Resolution source should match"
+      );
       assert.equal(market.category, 1, "Category should be 1 (Crypto)");
-      assert.ok(market.resolutionTime.eq(resolutionTime), "Resolution time should match");
+      assert.ok(
+        market.resolutionTime.eq(resolutionTime),
+        "Resolution time should match"
+      );
       assert.equal(market.state, 0, "State should be 0 (Open)");
-      assert.equal(market.winningOutcome, 0, "Winning outcome should be 0 (None)");
+      assert.equal(
+        market.winningOutcome,
+        0,
+        "Winning outcome should be 0 (None)"
+      );
       assert.equal(market.totalBets.toNumber(), 0, "Total bets should be 0");
-      assert.ok(market.creator.equals(creator.publicKey), "Creator should match");
+      assert.ok(
+        market.creator.equals(creator.publicKey),
+        "Creator should match"
+      );
       assert.ok(market.createdAt.toNumber() > 0, "Created at should be set");
-      assert.ok(market.configFeeRecipient.equals(feeRecipient), "Fee recipient should match config");
-      assert.equal(market.configFeeBps, protocolFeeBps, "Fee bps should match config");
+      assert.ok(
+        market.configFeeRecipient.equals(feeRecipient),
+        "Fee recipient should match config"
+      );
+      assert.equal(
+        market.configFeeBps,
+        protocolFeeBps,
+        "Fee bps should match config"
+      );
       assert.equal(market.mpcLock, false, "MPC lock should be false");
       assert.ok(market.bump > 0, "Market bump should be set");
       assert.ok(market.vaultBump > 0, "Vault bump should be set");
 
       // Verify market counter incremented
       const config = await program.account.config.fetch(configPda);
-      assert.equal(config.marketCounter.toNumber(), 1, "Market counter should be 1");
+      assert.equal(
+        config.marketCounter.toNumber(),
+        1,
+        "Market counter should be 1"
+      );
 
       // Verify vault token account exists with correct mint
       const vaultAccount = await connection.getAccountInfo(vaultPda);
@@ -312,6 +380,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(nonWhitelisted.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       try {
         await program.methods
@@ -319,7 +388,9 @@ describe("avenir", () => {
             question: "Will BTC reach $200k?",
             resolutionSource: "https://coinmarketcap.com",
             category: 1,
-            resolutionTime: new anchor.BN(Math.floor(Date.now() / 1000) + 86400),
+            resolutionTime: new anchor.BN(
+              Math.floor(Date.now() / 1000) + 86400
+            ),
           })
           .accounts({
             creator: nonWhitelisted.publicKey,
@@ -327,6 +398,7 @@ describe("avenir", () => {
             whitelist: whitelistPda,
             market: marketPda,
             marketVault: vaultPda,
+            marketPool: marketPoolPda,
             usdcMint,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
@@ -338,8 +410,8 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("AccountNotInitialized") ||
-          err.toString().includes("CreatorNotWhitelisted") ||
-          err.toString().includes("Error"),
+            err.toString().includes("CreatorNotWhitelisted") ||
+            err.toString().includes("Error"),
           "Should reject non-whitelisted creator"
         );
         console.log("Non-whitelisted create_market correctly rejected");
@@ -350,6 +422,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       try {
         await program.methods
@@ -357,7 +430,9 @@ describe("avenir", () => {
             question: "Test question?",
             resolutionSource: "https://example.com",
             category: 5, // Invalid -- only 0-4 allowed
-            resolutionTime: new anchor.BN(Math.floor(Date.now() / 1000) + 86400),
+            resolutionTime: new anchor.BN(
+              Math.floor(Date.now() / 1000) + 86400
+            ),
           })
           .accounts({
             creator: creator.publicKey,
@@ -365,6 +440,7 @@ describe("avenir", () => {
             whitelist: whitelistPda,
             market: marketPda,
             marketVault: vaultPda,
+            marketPool: marketPoolPda,
             usdcMint,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
@@ -376,8 +452,8 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("InvalidCategory") ||
-          err.toString().includes("6003") ||
-          err.toString().includes("Error"),
+            err.toString().includes("6003") ||
+            err.toString().includes("Error"),
           "Should reject invalid category"
         );
         console.log("Invalid category correctly rejected");
@@ -388,6 +464,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       try {
         await program.methods
@@ -403,6 +480,7 @@ describe("avenir", () => {
             whitelist: whitelistPda,
             market: marketPda,
             marketVault: vaultPda,
+            marketPool: marketPoolPda,
             usdcMint,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
@@ -414,8 +492,8 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("DeadlineTooSoon") ||
-          err.toString().includes("6007") ||
-          err.toString().includes("Error"),
+            err.toString().includes("6007") ||
+            err.toString().includes("Error"),
           "Should reject deadline less than 1 hour away"
         );
         console.log("Deadline too soon correctly rejected");
@@ -426,6 +504,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       try {
         await program.methods
@@ -433,7 +512,9 @@ describe("avenir", () => {
             question: "", // Empty question
             resolutionSource: "https://example.com",
             category: 0,
-            resolutionTime: new anchor.BN(Math.floor(Date.now() / 1000) + 86400),
+            resolutionTime: new anchor.BN(
+              Math.floor(Date.now() / 1000) + 86400
+            ),
           })
           .accounts({
             creator: creator.publicKey,
@@ -441,6 +522,7 @@ describe("avenir", () => {
             whitelist: whitelistPda,
             market: marketPda,
             marketVault: vaultPda,
+            marketPool: marketPoolPda,
             usdcMint,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
@@ -452,8 +534,8 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("EmptyQuestion") ||
-          err.toString().includes("6009") ||
-          err.toString().includes("Error"),
+            err.toString().includes("6009") ||
+            err.toString().includes("Error"),
           "Should reject empty question"
         );
         console.log("Empty question correctly rejected");
@@ -464,6 +546,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       try {
         await program.methods
@@ -471,7 +554,9 @@ describe("avenir", () => {
             question: "Valid question?",
             resolutionSource: "", // Empty resolution source
             category: 0,
-            resolutionTime: new anchor.BN(Math.floor(Date.now() / 1000) + 86400),
+            resolutionTime: new anchor.BN(
+              Math.floor(Date.now() / 1000) + 86400
+            ),
           })
           .accounts({
             creator: creator.publicKey,
@@ -479,6 +564,7 @@ describe("avenir", () => {
             whitelist: whitelistPda,
             market: marketPda,
             marketVault: vaultPda,
+            marketPool: marketPoolPda,
             usdcMint,
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
@@ -490,8 +576,8 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("EmptyResolutionSource") ||
-          err.toString().includes("6008") ||
-          err.toString().includes("Error"),
+            err.toString().includes("6008") ||
+            err.toString().includes("Error"),
           "Should reject empty resolution source"
         );
         console.log("Empty resolution source correctly rejected");
@@ -502,6 +588,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(2);
       const [vaultPda] = getVaultPda(2);
+      const [marketPoolPda] = getMarketPoolPda(2);
 
       await program.methods
         .createMarket({
@@ -516,6 +603,7 @@ describe("avenir", () => {
           whitelist: whitelistPda,
           market: marketPda,
           marketVault: vaultPda,
+          marketPool: marketPoolPda,
           usdcMint,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
@@ -526,11 +614,18 @@ describe("avenir", () => {
       // Verify second market
       const market = await program.account.market.fetch(marketPda);
       assert.equal(market.id.toNumber(), 2, "Second market ID should be 2");
-      assert.equal(market.question, "Will Bitcoin reach $200,000 by end of 2026?");
+      assert.equal(
+        market.question,
+        "Will Bitcoin reach $200,000 by end of 2026?"
+      );
 
       // Verify counter incremented
       const config = await program.account.config.fetch(configPda);
-      assert.equal(config.marketCounter.toNumber(), 2, "Market counter should be 2");
+      assert.equal(
+        config.marketCounter.toNumber(),
+        2,
+        "Market counter should be 2"
+      );
 
       console.log("Second market created, counter = 2");
     });
@@ -548,6 +643,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(3);
       const [vaultPda] = getVaultPda(3);
+      const [marketPoolPda] = getMarketPoolPda(3);
 
       await program.methods
         .createMarket({
@@ -562,6 +658,7 @@ describe("avenir", () => {
           whitelist: whitelistPda,
           market: marketPda,
           marketVault: vaultPda,
+          marketPool: marketPoolPda,
           usdcMint,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
@@ -579,7 +676,11 @@ describe("avenir", () => {
 
       // Verify market exists before cancel
       const marketBefore = await program.account.market.fetch(marketPda);
-      assert.equal(marketBefore.totalBets.toNumber(), 0, "Market should have 0 bets");
+      assert.equal(
+        marketBefore.totalBets.toNumber(),
+        0,
+        "Market should have 0 bets"
+      );
 
       await program.methods
         .cancelMarket()
@@ -600,9 +701,14 @@ describe("avenir", () => {
 
       // Verify Vault token account no longer exists
       const vaultAccount = await connection.getAccountInfo(vaultPda);
-      assert.isNull(vaultAccount, "Vault token account should be closed after cancel");
+      assert.isNull(
+        vaultAccount,
+        "Vault token account should be closed after cancel"
+      );
 
-      console.log("Market cancelled: both Market PDA and vault closed, rent returned to creator");
+      console.log(
+        "Market cancelled: both Market PDA and vault closed, rent returned to creator"
+      );
     });
 
     it("rejects cancel from non-creator", async () => {
@@ -610,6 +716,7 @@ describe("avenir", () => {
       const [whitelistPda] = getWhitelistPda(creator.publicKey);
       const [marketPda] = getMarketPda(4);
       const [vaultPda] = getVaultPda(4);
+      const [marketPoolPda] = getMarketPoolPda(4);
 
       await program.methods
         .createMarket({
@@ -624,6 +731,7 @@ describe("avenir", () => {
           whitelist: whitelistPda,
           market: marketPda,
           marketVault: vaultPda,
+          marketPool: marketPoolPda,
           usdcMint,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
@@ -649,10 +757,10 @@ describe("avenir", () => {
       } catch (err) {
         assert.ok(
           err.toString().includes("Unauthorized") ||
-          err.toString().includes("has_one") ||
-          err.toString().includes("ConstraintHasOne") ||
-          err.toString().includes("2001") ||
-          err.toString().includes("Error"),
+            err.toString().includes("has_one") ||
+            err.toString().includes("ConstraintHasOne") ||
+            err.toString().includes("2001") ||
+            err.toString().includes("Error"),
           "Should reject non-creator cancel"
         );
         console.log("Non-creator cancel correctly rejected");
@@ -660,10 +768,43 @@ describe("avenir", () => {
 
       // Verify market still exists
       const marketAccount = await connection.getAccountInfo(marketPda);
-      assert.isNotNull(marketAccount, "Market should still exist after failed cancel");
+      assert.isNotNull(
+        marketAccount,
+        "Market should still exist after failed cancel"
+      );
     });
 
     // Note: Cannot test "rejects cancel with bets" in Phase 2 because place_bet
     // doesn't exist yet. This test gap will be filled in Phase 5.
+  });
+
+  // =========================================================================
+  // Error Variant Verification
+  // =========================================================================
+  describe("error variant verification", () => {
+    const newErrors = [
+      { name: "MathOverflow", msg: "Arithmetic overflow" },
+      { name: "InvalidPendingBet", msg: "Invalid pending bet state" },
+      {
+        name: "InvalidRefundAccount",
+        msg: "Invalid refund destination token account",
+      },
+      { name: "PoolNotInitialized", msg: "Market pool is not initialized" },
+      {
+        name: "TallyNotInitialized",
+        msg: "Dispute tally is not initialized",
+      },
+    ];
+
+    for (const { name, msg } of newErrors) {
+      it(`${name} error variant exists`, () => {
+        const camel = name.charAt(0).toLowerCase() + name.slice(1);
+        const error = program.idl.errors!.find(
+          (e: any) => e.name === camel || e.name === name
+        );
+        assert.isDefined(error, `${name} should exist in IDL`);
+        assert.include(error!.msg, msg);
+      });
+    }
   });
 });

@@ -26,7 +26,11 @@ import {
   ArciumContext,
 } from "./helpers";
 
-describe("update-pool: encrypted state relay integration test", () => {
+// NOTE: The standalone `updatePool` instruction was removed from the program surface
+// to prevent unsafe pool mutations without corresponding USDC transfers.
+// These MPC-only tests are kept for reference but skipped until they are migrated
+// to the production `placeBet` flow.
+describe.skip("update-pool: encrypted state relay integration test", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -206,8 +210,14 @@ describe("update-pool: encrypted state relay integration test", () => {
 
     const isYesNonZero = yesPoolArr.some((b) => b !== 0);
     const isNoNonZero = noPoolArr.some((b) => b !== 0);
-    assert.isTrue(isYesNonZero, "yes_pool_encrypted should be non-zero after init_pool (encrypted zero)");
-    assert.isTrue(isNoNonZero, "no_pool_encrypted should be non-zero after init_pool (encrypted zero)");
+    assert.isTrue(
+      isYesNonZero,
+      "yes_pool_encrypted should be non-zero after init_pool (encrypted zero)"
+    );
+    assert.isTrue(
+      isNoNonZero,
+      "no_pool_encrypted should be non-zero after init_pool (encrypted zero)"
+    );
 
     // Verify: nonce was written (non-zero)
     const nonceVal = poolAfter.nonce;
@@ -282,8 +292,13 @@ describe("update-pool: encrypted state relay integration test", () => {
     const noPoolArr = Array.from(pool.noPoolEncrypted);
 
     // Verify: yes_pool_encrypted changed from init_pool value
-    const yesChanged = yesPoolArr.some((b, i) => b !== initPoolYesCiphertext[i]);
-    assert.isTrue(yesChanged, "yes_pool_encrypted should change after update_pool");
+    const yesChanged = yesPoolArr.some(
+      (b, i) => b !== initPoolYesCiphertext[i]
+    );
+    assert.isTrue(
+      yesChanged,
+      "yes_pool_encrypted should change after update_pool"
+    );
 
     // Verify: nonce updated (different from init_pool nonce)
     assert.isFalse(
@@ -301,11 +316,7 @@ describe("update-pool: encrypted state relay integration test", () => {
     assert.equal(market.mpcLock, false, "mpc_lock should be released");
 
     // Verify: total_bets is 1
-    assert.equal(
-      market.totalBets.toNumber(),
-      1,
-      "total_bets should be 1"
-    );
+    assert.equal(market.totalBets.toNumber(), 1, "total_bets should be 1");
 
     console.log("    update_pool (bet 1) PASSED:");
     console.log("      sentiment:", market.sentiment, "(Leaning Yes)");
@@ -370,7 +381,11 @@ describe("update-pool: encrypted state relay integration test", () => {
     const pool2 = await program.account.marketPool.fetch(marketPoolPda);
 
     // sentiment should be 3 (Leaning No -- 2 USDC No vs 1 USDC Yes)
-    assert.equal(market2.sentiment, 3, "sentiment should be 3 (Leaning No) after bet 2");
+    assert.equal(
+      market2.sentiment,
+      3,
+      "sentiment should be 3 (Leaning No) after bet 2"
+    );
     assert.equal(market2.totalBets.toNumber(), 2, "total_bets should be 2");
     assert.isFalse(
       pool2.nonce.eq(prevNonce),
@@ -430,7 +445,11 @@ describe("update-pool: encrypted state relay integration test", () => {
     const pool3 = await program.account.marketPool.fetch(marketPoolPda);
 
     // sentiment should be 2 (Even -- 2 USDC on each side)
-    assert.equal(market3.sentiment, 2, "sentiment should be 2 (Even) after bet 3");
+    assert.equal(
+      market3.sentiment,
+      2,
+      "sentiment should be 2 (Even) after bet 3"
+    );
     assert.equal(market3.totalBets.toNumber(), 3, "total_bets should be 3");
     assert.isFalse(
       pool3.nonce.eq(nonceBet2),
@@ -438,7 +457,9 @@ describe("update-pool: encrypted state relay integration test", () => {
     );
 
     console.log("    bet 3 PASSED: sentiment=2 (Even), total_bets=3");
-    console.log("    Sentiment transitions validated: Leaning Yes -> Leaning No -> Even");
+    console.log(
+      "    Sentiment transitions validated: Leaning Yes -> Leaning No -> Even"
+    );
   });
 
   // ==========================================================================
@@ -487,7 +508,10 @@ describe("update-pool: encrypted state relay integration test", () => {
 
     // Verify mpc_lock is set
     const marketLocked = await program.account.market.fetch(marketPda);
-    assert.isTrue(marketLocked.mpcLock, "mpc_lock should be true while MPC is in progress");
+    assert.isTrue(
+      marketLocked.mpcLock,
+      "mpc_lock should be true while MPC is in progress"
+    );
 
     // Immediately try to queue another update_pool -- should fail
     const bet2 = encryptBetInput(arciumCtx.mxePublicKey, false, 500_000);
@@ -529,14 +553,18 @@ describe("update-pool: encrypted state relay integration test", () => {
     } catch (err: any) {
       const errStr = err.toString();
       assert.isTrue(
-        errStr.includes("MpcLocked") || errStr.includes("6011") || errStr.includes("Market MPC computation is in progress"),
+        errStr.includes("MpcLocked") ||
+          errStr.includes("6011") ||
+          errStr.includes("Market MPC computation is in progress"),
         `Expected MpcLocked error, got: ${errStr.substring(0, 200)}`
       );
       console.log("    Second update_pool correctly rejected with MpcLocked");
     }
 
     // Clean up: wait for the first computation to finish so mpc_lock is released
-    console.log("    Awaiting first computation callback to release mpc_lock...");
+    console.log(
+      "    Awaiting first computation callback to release mpc_lock..."
+    );
     await awaitAndVerifyCallback(
       provider,
       bet1.computationOffset,
@@ -545,8 +573,13 @@ describe("update-pool: encrypted state relay integration test", () => {
 
     // Verify mpc_lock is released
     const marketUnlocked = await program.account.market.fetch(marketPda);
-    assert.isFalse(marketUnlocked.mpcLock, "mpc_lock should be released after callback");
+    assert.isFalse(
+      marketUnlocked.mpcLock,
+      "mpc_lock should be released after callback"
+    );
 
-    console.log("    mpc_lock test PASSED: concurrent access correctly prevented");
+    console.log(
+      "    mpc_lock test PASSED: concurrent access correctly prevented"
+    );
   });
 });

@@ -15,12 +15,10 @@ use super::mpc::add_dispute_vote_callback::AddDisputeVoteCallback;
 /// 2. Validates voting window is still open
 /// 3. Validates caller is a selected juror
 /// 4. Validates juror hasn't already voted (bitfield check)
-/// 5. Checks MPC lock with 60s timeout recovery
+/// 5. Checks MPC lock with 60s stale-lock timeout recovery
 /// 6. Sets MPC lock on dispute
-/// 7. Marks juror as having voted (bitfield set)
-/// 8. Increments vote_count
-/// 9. Reads stake weight from Resolver account
-/// 10. Queues add_dispute_vote MPC computation
+/// 7. Reads stake weight from Resolver account
+/// 8. Queues add_dispute_vote MPC computation
 pub fn handler(
     ctx: Context<CastVote>,
     computation_offset: u64,
@@ -34,8 +32,14 @@ pub fn handler(
     let stake_weight = ctx.accounts.resolver.staked_amount;
     let juror_key = ctx.accounts.juror.key();
 
+    // Ensure DisputeTally has been initialized by init_dispute_tally MPC.
+    let tally = &ctx.accounts.dispute_tally;
+    let tally_uninitialized =
+        tally.yes_votes_encrypted == [0u8; 32] && tally.no_votes_encrypted == [0u8; 32];
+    require!(!tally_uninitialized, AvenirError::TallyNotInitialized);
+
     // Extract Copy values needed after mutable borrow via scoped block
-    let (market_id, vote_count) = {
+    let market_id = {
         let dispute = &mut ctx.accounts.dispute;
 
         // 1. Validate dispute status == 0 (Voting)
@@ -60,15 +64,15 @@ pub fn handler(
             AvenirError::AlreadyVoted
         );
 
-        // 5. Check MPC lock with 60s timeout recovery
+        // 5. Check MPC lock with timeout recovery
         if dispute.mpc_lock {
             if clock.unix_timestamp - dispute.lock_timestamp > 60 {
-                // Lock is stale (>60s) -- clear it and continue.
-                // No refund needed since voting doesn't hold user funds.
+                // Lock is stale (>60s) -- clear it to allow next vote.
+                // Unlike place_bet, no USDC refund needed since cast_vote
+                // doesn't transfer tokens; the stuck vote simply didn't register.
                 dispute.mpc_lock = false;
                 dispute.lock_timestamp = 0;
             } else {
-                // Lock is active -- reject
                 return Err(AvenirError::MpcLocked.into());
             }
         }
@@ -77,16 +81,10 @@ pub fn handler(
         dispute.mpc_lock = true;
         dispute.lock_timestamp = clock.unix_timestamp;
 
-        // 7. Mark juror as having voted (bitfield set)
-        dispute.votes_submitted |= 1 << juror_index;
-
-        // 8. Increment vote_count
-        dispute.vote_count = dispute.vote_count.checked_add(1).unwrap();
-
-        (dispute.market_id, dispute.vote_count)
+        dispute.market_id
     }; // mutable borrow of dispute ends here
 
-    // 10. Build ArgBuilder and queue add_dispute_vote MPC computation
+    // 8. Build ArgBuilder and queue add_dispute_vote MPC computation
     let args = ArgBuilder::new()
         .x25519_pubkey(pub_key)
         .plaintext_u128(nonce)
@@ -99,7 +97,7 @@ pub fn handler(
         )
         .build();
 
-    // Build callback with DisputeTally (writable) + Dispute (writable)
+    // Build callback with DisputeTally (writable) + Dispute (writable) + Juror (readonly)
     let callback_accounts = vec![
         CallbackAccount {
             pubkey: ctx.accounts.dispute_tally.key(),
@@ -108,6 +106,10 @@ pub fn handler(
         CallbackAccount {
             pubkey: ctx.accounts.dispute.key(),
             is_writable: true,
+        },
+        CallbackAccount {
+            pubkey: ctx.accounts.juror.key(),
+            is_writable: false,
         },
     ];
 
@@ -127,10 +129,9 @@ pub fn handler(
     )?;
 
     msg!(
-        "cast_vote: juror {} voted on dispute for market {}, vote_count={}",
+        "cast_vote: juror {} queued vote on dispute for market {}",
         juror_key,
         market_id,
-        vote_count
     );
 
     Ok(())
@@ -178,13 +179,13 @@ pub struct CastVote<'info> {
     #[account(
         address = derive_mxe_pda!()
     )]
-    pub mxe_account: Account<'info, MXEAccount>,
+    pub mxe_account: Box<Account<'info, MXEAccount>>,
 
     #[account(
         mut,
         address = derive_sign_pda!()
     )]
-    pub sign_pda_account: Account<'info, ArciumSignerAccount>,
+    pub sign_pda_account: Box<Account<'info, ArciumSignerAccount>>,
 
     #[account(
         mut,
@@ -207,25 +208,25 @@ pub struct CastVote<'info> {
     #[account(
         address = derive_comp_def_pda!(comp_def_offset("add_dispute_vote"))
     )]
-    pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
+    pub comp_def_account: Box<Account<'info, ComputationDefinitionAccount>>,
 
     #[account(
         mut,
         address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
     )]
-    pub cluster_account: Account<'info, Cluster>,
+    pub cluster_account: Box<Account<'info, Cluster>>,
 
     #[account(
         mut,
         address = ARCIUM_FEE_POOL_ACCOUNT_ADDRESS,
     )]
-    pub pool_account: Account<'info, FeePool>,
+    pub pool_account: Box<Account<'info, FeePool>>,
 
     #[account(
         mut,
         address = ARCIUM_CLOCK_ACCOUNT_ADDRESS
     )]
-    pub clock_account: Account<'info, ClockAccount>,
+    pub clock_account: Box<Account<'info, ClockAccount>>,
 
     pub system_program: Program<'info, System>,
     pub arcium_program: Program<'info, Arcium>,

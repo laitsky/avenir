@@ -14,12 +14,12 @@ pub struct UpdatePoolCallback<'info> {
     #[account(
         address = derive_comp_def_pda!(comp_def_offset("update_pool"))
     )]
-    pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
+    pub comp_def_account: Box<Account<'info, ComputationDefinitionAccount>>,
 
     #[account(
         address = derive_mxe_pda!()
     )]
-    pub mxe_account: Account<'info, MXEAccount>,
+    pub mxe_account: Box<Account<'info, MXEAccount>>,
 
     /// CHECK: computation_account, verified by arcium
     pub computation_account: UncheckedAccount<'info>,
@@ -27,7 +27,7 @@ pub struct UpdatePoolCallback<'info> {
     #[account(
         address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
     )]
-    pub cluster_account: Account<'info, Cluster>,
+    pub cluster_account: Box<Account<'info, Cluster>>,
 
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     /// CHECK: instructions_sysvar, checked by the account constraint
@@ -35,24 +35,24 @@ pub struct UpdatePoolCallback<'info> {
 
     /// The MarketPool PDA to write updated encrypted pool state into.
     #[account(mut)]
-    pub market_pool: Account<'info, MarketPool>,
+    pub market_pool: Box<Account<'info, MarketPool>>,
 
     /// The Market account to update sentiment, mpc_lock, pending fields, and total_bets.
     #[account(mut)]
-    pub market: Account<'info, Market>,
+    pub market: Box<Account<'info, Market>>,
 
     /// The UserPosition PDA to accumulate bet amounts on success.
     /// Pre-created in place_bet with init_if_needed.
     #[account(mut)]
-    pub user_position: Account<'info, UserPosition>,
+    pub user_position: Box<Account<'info, UserPosition>>,
 
     /// The market vault holding USDC -- source for failure refund.
     #[account(mut)]
-    pub market_vault: Account<'info, TokenAccount>,
+    pub market_vault: Box<Account<'info, TokenAccount>>,
 
     /// The bettor's token account -- destination for failure refund.
     #[account(mut)]
-    pub bettor_token_account: Account<'info, TokenAccount>,
+    pub bettor_token_account: Box<Account<'info, TokenAccount>>,
 
     /// SPL Token program for transfer CPI on failure refund.
     pub token_program: Program<'info, Token>,

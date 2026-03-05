@@ -37,7 +37,7 @@ pub struct CreateMarket<'info> {
         init,
         payer = creator,
         space = 8 + Market::INIT_SPACE,
-        seeds = [b"market", config.market_counter.checked_add(1).unwrap().to_le_bytes().as_ref()],
+        seeds = [b"market", config.market_counter.wrapping_add(1).to_le_bytes().as_ref()],
         bump,
     )]
     pub market: Account<'info, Market>,
@@ -45,7 +45,7 @@ pub struct CreateMarket<'info> {
     #[account(
         init,
         payer = creator,
-        seeds = [b"vault", config.market_counter.checked_add(1).unwrap().to_le_bytes().as_ref()],
+        seeds = [b"vault", config.market_counter.wrapping_add(1).to_le_bytes().as_ref()],
         bump,
         token::mint = usdc_mint,
         token::authority = market,
@@ -58,7 +58,7 @@ pub struct CreateMarket<'info> {
         init,
         payer = creator,
         space = 8 + MarketPool::INIT_SPACE,
-        seeds = [b"market_pool", config.market_counter.checked_add(1).unwrap().to_le_bytes().as_ref()],
+        seeds = [b"market_pool", config.market_counter.wrapping_add(1).to_le_bytes().as_ref()],
         bump,
     )]
     pub market_pool: Account<'info, MarketPool>,
@@ -91,7 +91,10 @@ pub fn handler(ctx: Context<CreateMarket>, params: CreateMarketParams) -> Result
 
     // Increment market counter
     let config = &mut ctx.accounts.config;
-    config.market_counter += 1;
+    config.market_counter = config
+        .market_counter
+        .checked_add(1)
+        .ok_or(AvenirError::MathOverflow)?;
 
     // Initialize market
     let market = &mut ctx.accounts.market;

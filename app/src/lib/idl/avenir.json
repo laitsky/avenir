@@ -128,6 +128,9 @@
             "The Dispute PDA to clear mpc_lock on completion."
           ],
           "writable": true
+        },
+        {
+          "name": "juror"
         }
       ],
       "args": [
@@ -1043,7 +1046,7 @@
               },
               {
                 "kind": "account",
-                "path": "config.market_counter.checked_add(1)",
+                "path": "config.market_counter.wrapping_add(1)",
                 "account": "Config"
               }
             ]
@@ -1066,7 +1069,7 @@
               },
               {
                 "kind": "account",
-                "path": "config.market_counter.checked_add(1)",
+                "path": "config.market_counter.wrapping_add(1)",
                 "account": "Config"
               }
             ]
@@ -1099,7 +1102,7 @@
               },
               {
                 "kind": "account",
-                "path": "config.market_counter.checked_add(1)",
+                "path": "config.market_counter.wrapping_add(1)",
                 "account": "Config"
               }
             ]
@@ -3194,191 +3197,6 @@
       ]
     },
     {
-      "name": "update_pool",
-      "discriminator": [
-        239,
-        214,
-        170,
-        78,
-        36,
-        35,
-        30,
-        34
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "market",
-          "docs": [
-            "The Market account -- used for mpc_lock check/set."
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "market.id",
-                "account": "Market"
-              }
-            ]
-          }
-        },
-        {
-          "name": "market_pool",
-          "docs": [
-            "The MarketPool PDA containing encrypted pool state.",
-            "Must have been initialized by init_pool callback before update_pool is called."
-          ],
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  116,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "market_pool.market_id",
-                "account": "MarketPool"
-              }
-            ]
-          }
-        },
-        {
-          "name": "user_position",
-          "docs": [
-            "UserPosition PDA (needed for callback account matching)."
-          ],
-          "writable": true
-        },
-        {
-          "name": "market_vault",
-          "docs": [
-            "Market vault token account (needed for callback account matching)."
-          ],
-          "writable": true
-        },
-        {
-          "name": "bettor_token_account",
-          "docs": [
-            "Bettor's token account (needed for callback account matching)."
-          ],
-          "writable": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "mxe_account"
-        },
-        {
-          "name": "sign_pda_account",
-          "writable": true
-        },
-        {
-          "name": "mempool_account",
-          "writable": true
-        },
-        {
-          "name": "executing_pool",
-          "writable": true
-        },
-        {
-          "name": "computation_account",
-          "writable": true
-        },
-        {
-          "name": "comp_def_account"
-        },
-        {
-          "name": "cluster_account",
-          "writable": true
-        },
-        {
-          "name": "pool_account",
-          "writable": true,
-          "address": "G2sRWJvi3xoyh5k2gY49eG9L8YhAEWQPtNb1zb1GXTtC"
-        },
-        {
-          "name": "clock_account",
-          "writable": true,
-          "address": "7EbMUTLo5DjdzbN7s8BXeZwXzEwNQb1hScfRvWg8a6ot"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "arcium_program",
-          "address": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ"
-        }
-      ],
-      "args": [
-        {
-          "name": "computation_offset",
-          "type": "u64"
-        },
-        {
-          "name": "is_yes_ciphertext",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "amount_ciphertext",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "pub_key",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "nonce",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "update_pool_callback",
       "discriminator": [
         183,
@@ -3942,101 +3760,126 @@
     },
     {
       "code": 6024,
+      "name": "MathOverflow",
+      "msg": "Arithmetic overflow or invalid math operation"
+    },
+    {
+      "code": 6025,
+      "name": "InvalidPendingBet",
+      "msg": "Invalid pending bet state"
+    },
+    {
+      "code": 6026,
+      "name": "InvalidRefundAccount",
+      "msg": "Invalid refund destination token account"
+    },
+    {
+      "code": 6027,
+      "name": "PoolNotInitialized",
+      "msg": "Market pool is not initialized"
+    },
+    {
+      "code": 6028,
+      "name": "TallyNotInitialized",
+      "msg": "Dispute tally is not initialized"
+    },
+    {
+      "code": 6029,
       "name": "StakeTooLow",
       "msg": "Resolver stake must be at least 500 USDC"
     },
     {
-      "code": 6025,
+      "code": 6030,
       "name": "ResolverNotApproved",
       "msg": "Resolver is not approved"
     },
     {
-      "code": 6026,
+      "code": 6031,
       "name": "ResolverAlreadyApproved",
       "msg": "Resolver is already approved"
     },
     {
-      "code": 6027,
+      "code": 6032,
       "name": "RegistryFull",
       "msg": "Resolver registry is full"
     },
     {
-      "code": 6028,
+      "code": 6033,
       "name": "ActiveDisputeExists",
       "msg": "Cannot withdraw while active in a dispute"
     },
     {
-      "code": 6029,
+      "code": 6034,
       "name": "CooldownNotElapsed",
       "msg": "7-day withdrawal cooldown has not elapsed"
     },
     {
-      "code": 6030,
+      "code": 6035,
       "name": "WithdrawalNotRequested",
       "msg": "No pending withdrawal request"
     },
     {
-      "code": 6031,
+      "code": 6036,
       "name": "InsufficientStake",
       "msg": "Withdrawal would leave stake below minimum"
     },
     {
-      "code": 6032,
+      "code": 6037,
       "name": "GracePeriodExpired",
       "msg": "48-hour grace period has expired; market must resolve via dispute"
     },
     {
-      "code": 6033,
+      "code": 6038,
       "name": "NotMarketParticipant",
       "msg": "Caller has no position on this market"
     },
     {
-      "code": 6034,
+      "code": 6039,
       "name": "MarketAlreadyDisputed",
       "msg": "Market is already in dispute"
     },
     {
-      "code": 6035,
+      "code": 6040,
       "name": "GracePeriodNotExpired",
       "msg": "48-hour grace period has not expired yet"
     },
     {
-      "code": 6036,
+      "code": 6041,
       "name": "NotEnoughResolvers",
       "msg": "Not enough approved resolvers for jury selection"
     },
     {
-      "code": 6037,
+      "code": 6042,
       "name": "NotSelectedJuror",
       "msg": "Caller is not a selected juror for this dispute"
     },
     {
-      "code": 6038,
+      "code": 6043,
       "name": "AlreadyVoted",
       "msg": "Juror has already submitted a vote"
     },
     {
-      "code": 6039,
+      "code": 6044,
       "name": "VotingWindowClosed",
       "msg": "Dispute voting window has closed"
     },
     {
-      "code": 6040,
+      "code": 6045,
       "name": "DisputeNotVoting",
       "msg": "Dispute is not in voting state"
     },
     {
-      "code": 6041,
+      "code": 6046,
       "name": "QuorumNotReached",
       "msg": "Not enough votes to finalize dispute"
     },
     {
-      "code": 6042,
+      "code": 6047,
       "name": "TiebreakerAlreadyAdded",
       "msg": "Tiebreaker juror has already been added"
     },
     {
-      "code": 6043,
+      "code": 6048,
       "name": "DisputeNotSettled",
       "msg": "Dispute is not settled"
     }

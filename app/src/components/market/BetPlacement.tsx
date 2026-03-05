@@ -17,6 +17,18 @@ import { useFinalizeDispute } from '#/hooks/useFinalizeDispute'
 import { useAddTiebreaker } from '#/hooks/useAddTiebreaker'
 import { useMarketPool, isPoolInitialized } from '#/hooks/useMarketPool'
 import { useAnchorProgram } from '#/lib/anchor'
+import {
+  getArciumClusterOffset,
+  getArciumProgramId,
+  getClockAddress,
+  getClusterAccountAddress,
+  getComputationAccountAddress,
+  getComputationDefinitionAddress,
+  getExecutingPoolAddress,
+  getFeePoolAddress,
+  getMXEAccountAddress,
+  getMempoolAccountAddress,
+} from '#/lib/arcium'
 import { PROGRAM_ID } from '#/lib/constants'
 import { getMarketPoolPda } from '#/lib/pda'
 import { useWalletSelector } from '#/components/wallet/WalletSelectorProvider'
@@ -168,7 +180,7 @@ export function BetPlacement({ market, position, dispute = null }: BetPlacementP
         />
       )
     case 'dispute-finalized':
-      return <DisputeFinalizedMode market={market} dispute={dispute!} />
+      return <DisputeFinalizedMode market={market} />
     case 'expired':
       return <ExpiredMode />
   }
@@ -203,49 +215,30 @@ function PoolInitializingMode({ market }: { market: OnChainMarket }) {
         crypto.getRandomValues(new Uint8Array(8)),
       )
 
-      // Arcium account derivation (dynamic import for browser safety)
-      const {
-        getComputationAccAddress,
-        getClusterAccAddress,
-        getMXEAccAddress,
-        getMempoolAccAddress,
-        getExecutingPoolAccAddress,
-        getCompDefAccAddress,
-        getCompDefAccOffset,
-        getArciumEnv,
-        getFeePoolAccAddress,
-        getClockAccAddress,
-        getArciumProgramId,
-      } = await import('@arcium-hq/client')
-
-      const arciumEnv = getArciumEnv()
-      const clusterOffset = arciumEnv.arciumClusterOffset
-      const compDefIndex = Buffer.from(
-        getCompDefAccOffset('init_pool'),
-      ).readUInt32LE(0)
+      const clusterOffset = getArciumClusterOffset()
 
       const arciumAccounts = {
-        mxeAccount: getMXEAccAddress(PROGRAM_ID),
+        mxeAccount: getMXEAccountAddress(PROGRAM_ID),
         signPdaAccount: PublicKey.findProgramAddressSync(
           [Buffer.from('ArciumSignerAccount')],
           PROGRAM_ID,
         )[0],
-        mempoolAccount: getMempoolAccAddress(clusterOffset),
-        executingPool: getExecutingPoolAccAddress(clusterOffset),
-        computationAccount: getComputationAccAddress(
-          clusterOffset,
+        mempoolAccount: getMempoolAccountAddress(clusterOffset),
+        executingPool: getExecutingPoolAddress(clusterOffset),
+        computationAccount: getComputationAccountAddress(
           computationOffset,
+          clusterOffset,
         ),
-        compDefAccount: getCompDefAccAddress(PROGRAM_ID, compDefIndex),
-        clusterAccount: getClusterAccAddress(clusterOffset),
-        poolAccount: getFeePoolAccAddress(),
-        clockAccount: getClockAccAddress(),
+        compDefAccount: getComputationDefinitionAddress(PROGRAM_ID, 'init_pool'),
+        clusterAccount: getClusterAccountAddress(clusterOffset),
+        poolAccount: getFeePoolAddress(),
+        clockAccount: getClockAddress(),
         arciumProgram: getArciumProgramId(),
       }
 
       const sig = await program.methods
         .initPool(computationOffset)
-        .accounts({
+        .accountsPartial({
           payer: publicKey,
           marketPool: marketPoolPda,
           systemProgram: SystemProgram.programId,
@@ -1195,10 +1188,8 @@ function DisputePendingMode({
 
 function DisputeFinalizedMode({
   market,
-  dispute,
 }: {
   market: OnChainMarket
-  dispute: OnChainDispute
 }) {
   const finalizeDispute = useFinalizeDispute(market.id)
 

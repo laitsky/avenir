@@ -30,18 +30,28 @@ function sleep(ms: number): Promise<void> {
 }
 
 /** Retry a transaction up to maxRetries on blockhash/network errors */
-async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delayMs = 2000): Promise<T> {
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  delayMs = 2000
+): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (err: any) {
       const msg = err?.toString?.() ?? "";
-      const isRetryable = msg.includes("Blockhash not found") ||
+      const isRetryable =
+        msg.includes("Blockhash not found") ||
         msg.includes("fetch failed") ||
         msg.includes("block height exceeded") ||
         msg.includes("TransactionExpiredBlockheight");
       if (isRetryable && attempt < maxRetries) {
-        console.log(`    Retry ${attempt}/${maxRetries} after devnet error: ${msg.slice(0, 80)}`);
+        console.log(
+          `    Retry ${attempt}/${maxRetries} after devnet error: ${msg.slice(
+            0,
+            80
+          )}`
+        );
         await sleep(delayMs);
         continue;
       }
@@ -113,7 +123,10 @@ function formatMs(ms: number): string {
 // Benchmark
 // ============================================================================
 
-describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
+// NOTE: The standalone `updatePool` instruction was removed from the program surface
+// to prevent unsafe pool mutations without corresponding USDC transfers.
+// This benchmark is kept for reference but skipped until migrated to `placeBet`.
+describe.skip("benchmark: MPC latency for update_pool on devnet/localnet", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -169,29 +182,27 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
 
     // 2. Create USDC mint (6 decimals) -- use admin (payer) as mint payer for devnet reliability
     await sleep(2000);
-    usdcMint = await withRetry(() => createMint(
-      connection,
-      payer,
-      payer.publicKey,
-      null,
-      6
-    ));
+    usdcMint = await withRetry(() =>
+      createMint(connection, payer, payer.publicKey, null, 6)
+    );
     console.log(`  USDC mint created: ${usdcMint.toBase58()}`);
 
     // 3. Initialize Config PDA
     await sleep(1000);
-    await withRetry(() => program.methods
-      .initialize({
-        feeRecipient,
-        usdcMint,
-        protocolFeeBps,
-      })
-      .accounts({
-        admin: admin.publicKey,
-        config: configPda,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    await withRetry(() =>
+      program.methods
+        .initialize({
+          feeRecipient,
+          usdcMint,
+          protocolFeeBps,
+        })
+        .accounts({
+          admin: admin.publicKey,
+          config: configPda,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" })
+    );
     console.log("  Config PDA initialized");
 
     // 4. Whitelist the test creator
@@ -201,16 +212,18 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
     );
 
     await sleep(1000);
-    await withRetry(() => program.methods
-      .addCreator()
-      .accounts({
-        admin: admin.publicKey,
-        config: configPda,
-        whitelist: whitelistPda,
-        creator: creator.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    await withRetry(() =>
+      program.methods
+        .addCreator()
+        .accounts({
+          admin: admin.publicKey,
+          config: configPda,
+          whitelist: whitelistPda,
+          creator: creator.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" })
+    );
     console.log("  Creator whitelisted");
 
     // 5. Setup Arcium context
@@ -225,15 +238,11 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
 
     // 7. Create market and initialize pool
     await sleep(1000);
-    const marketResult = await withRetry(() => createTestMarket(
-      program,
-      admin,
-      creator,
-      usdcMint,
-      configPda,
-      1,
-      { question: "Benchmark market for MPC latency measurement" }
-    ));
+    const marketResult = await withRetry(() =>
+      createTestMarket(program, admin, creator, usdcMint, configPda, 1, {
+        question: "Benchmark market for MPC latency measurement",
+      })
+    );
     marketPda = marketResult.marketPda;
     marketPoolPda = marketResult.marketPoolPda;
     console.log("  Market created");
@@ -248,24 +257,26 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
     );
 
     await sleep(1000);
-    await withRetry(() => program.methods
-      .initPool(initOffset)
-      .accountsPartial({
-        payer: payer.publicKey,
-        marketPool: marketPoolPda,
-        mxeAccount: initAccounts.mxeAccount,
-        signPdaAccount: initAccounts.signPdaAccount,
-        mempoolAccount: initAccounts.mempoolAccount,
-        executingPool: initAccounts.executingPool,
-        computationAccount: initAccounts.computationAccount,
-        compDefAccount: initAccounts.compDefAccount,
-        clusterAccount: initAccounts.clusterAccount,
-        poolAccount: initAccounts.poolAccount,
-        clockAccount: initAccounts.clockAccount,
-        systemProgram: SystemProgram.programId,
-        arciumProgram: initAccounts.arciumProgram,
-      })
-      .rpc({ skipPreflight: true, commitment: "confirmed" }));
+    await withRetry(() =>
+      program.methods
+        .initPool(initOffset)
+        .accountsPartial({
+          payer: payer.publicKey,
+          marketPool: marketPoolPda,
+          mxeAccount: initAccounts.mxeAccount,
+          signPdaAccount: initAccounts.signPdaAccount,
+          mempoolAccount: initAccounts.mempoolAccount,
+          executingPool: initAccounts.executingPool,
+          computationAccount: initAccounts.computationAccount,
+          compDefAccount: initAccounts.compDefAccount,
+          clusterAccount: initAccounts.clusterAccount,
+          poolAccount: initAccounts.poolAccount,
+          clockAccount: initAccounts.clockAccount,
+          systemProgram: SystemProgram.programId,
+          arciumProgram: initAccounts.arciumProgram,
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" })
+    );
     console.log("  init_pool submitted, awaiting MPC callback...");
 
     await awaitAndVerifyCallback(provider, initOffset, program.programId);
@@ -436,9 +447,7 @@ describe("benchmark: MPC latency for update_pool on devnet/localnet", () => {
         "  Recommendation: Accept for v1, document SCAL-01 (batched epoch model) for v2"
       );
     } else {
-      console.log(
-        "  Assessment: FAIL -- latency significantly exceeds target"
-      );
+      console.log("  Assessment: FAIL -- latency significantly exceeds target");
       console.log(
         "  Recommendation: Prioritize SCAL-01 (batched epoch model) for v2"
       );

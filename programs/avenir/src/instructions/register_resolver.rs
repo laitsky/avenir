@@ -2,10 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 
 use crate::errors::AvenirError;
-use crate::state::{Config, Resolver};
-
-/// Minimum resolver stake: 500 USDC (6 decimals)
-pub const MIN_RESOLVER_STAKE: u64 = 500_000_000;
+use crate::state::{Config, Resolver, MIN_RESOLVER_STAKE};
 
 pub fn handler(ctx: Context<RegisterResolver>, amount: u64) -> Result<()> {
     // Validate minimum stake

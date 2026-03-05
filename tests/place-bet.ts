@@ -29,7 +29,10 @@ import {
   ArciumContext,
 } from "./mpc/helpers";
 
-describe("place_bet", () => {
+const RUN_ARCIUM_INTEGRATION_TESTS =
+  process.env.ARCIUM_INTEGRATION_TESTS === "1";
+
+(RUN_ARCIUM_INTEGRATION_TESTS ? describe : describe.skip)("place_bet", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -62,10 +65,7 @@ describe("place_bet", () => {
   let marketId: number;
 
   // PDA helpers
-  function getPositionPda(
-    mktId: number,
-    user: PublicKey
-  ): [PublicKey, number] {
+  function getPositionPda(mktId: number, user: PublicKey): [PublicKey, number] {
     const buf = Buffer.alloc(8);
     buf.writeBigUInt64LE(BigInt(mktId));
     return PublicKey.findProgramAddressSync(
@@ -262,7 +262,9 @@ describe("place_bet", () => {
     const isYes = true;
 
     // Get balances before
-    const bettorBalanceBefore = (await getAccount(connection, bettorTokenAccount)).amount;
+    const bettorBalanceBefore = (
+      await getAccount(connection, bettorTokenAccount)
+    ).amount;
     const vaultBalanceBefore = (await getAccount(connection, vaultPda)).amount;
 
     // Encrypt bet input
@@ -314,7 +316,9 @@ describe("place_bet", () => {
       .rpc({ skipPreflight: true, commitment: "confirmed" });
 
     // Verify: bettor's token balance decreased by 5 USDC
-    const bettorBalanceAfter = (await getAccount(connection, bettorTokenAccount)).amount;
+    const bettorBalanceAfter = (
+      await getAccount(connection, bettorTokenAccount)
+    ).amount;
     assert.equal(
       Number(bettorBalanceBefore - bettorBalanceAfter),
       betAmount,
@@ -357,8 +361,14 @@ describe("place_bet", () => {
 
     console.log("    Valid Yes bet placed:");
     console.log("      Amount:", betAmount, "lamports (5 USDC)");
-    console.log("      Bettor balance change:", Number(bettorBalanceBefore - bettorBalanceAfter));
-    console.log("      Vault balance change:", Number(vaultBalanceAfter - vaultBalanceBefore));
+    console.log(
+      "      Bettor balance change:",
+      Number(bettorBalanceBefore - bettorBalanceAfter)
+    );
+    console.log(
+      "      Vault balance change:",
+      Number(vaultBalanceAfter - vaultBalanceBefore)
+    );
     console.log("      mpc_lock:", market.mpcLock);
     console.log("      lock_timestamp:", market.lockTimestamp.toNumber());
 
@@ -375,7 +385,10 @@ describe("place_bet", () => {
 
     // Verify lock released
     const marketAfterCallback = await program.account.market.fetch(marketPda);
-    assert.isFalse(marketAfterCallback.mpcLock, "mpc_lock should be released after callback");
+    assert.isFalse(
+      marketAfterCallback.mpcLock,
+      "mpc_lock should be released after callback"
+    );
     console.log("    MPC callback complete, lock released");
   });
 
@@ -396,7 +409,9 @@ describe("place_bet", () => {
     const [positionPda] = getPositionPda(marketId, bettor.publicKey);
 
     // Record balance before
-    const bettorBalanceBefore = (await getAccount(connection, bettorTokenAccount)).amount;
+    const bettorBalanceBefore = (
+      await getAccount(connection, bettorTokenAccount)
+    ).amount;
 
     try {
       await program.methods
@@ -439,7 +454,6 @@ describe("place_bet", () => {
       const errStr = e.toString();
       assert.isTrue(
         errStr.includes("BetTooSmall") ||
-          errStr.includes("6012") ||
           errStr.includes("Bet amount must be at least 1 USDC"),
         `Expected BetTooSmall error, got: ${errStr.substring(0, 200)}`
       );
@@ -447,7 +461,9 @@ describe("place_bet", () => {
     }
 
     // Verify no USDC transferred
-    const bettorBalanceAfter = (await getAccount(connection, bettorTokenAccount)).amount;
+    const bettorBalanceAfter = (
+      await getAccount(connection, bettorTokenAccount)
+    ).amount;
     assert.equal(
       Number(bettorBalanceBefore),
       Number(bettorBalanceAfter),
@@ -523,7 +539,9 @@ describe("place_bet", () => {
     const [positionPda2] = getPositionPda(marketId, bettor2.publicKey);
 
     // Record bettor2 balance before
-    const bettor2BalanceBefore = (await getAccount(connection, bettor2TokenAccount)).amount;
+    const bettor2BalanceBefore = (
+      await getAccount(connection, bettor2TokenAccount)
+    ).amount;
 
     try {
       await program.methods
@@ -566,7 +584,6 @@ describe("place_bet", () => {
       const errStr = e.toString();
       assert.isTrue(
         errStr.includes("MpcLocked") ||
-          errStr.includes("6012") ||
           errStr.includes("Market MPC computation is in progress"),
         `Expected MpcLocked error, got: ${errStr.substring(0, 200)}`
       );
@@ -574,7 +591,9 @@ describe("place_bet", () => {
     }
 
     // Verify bettor2 balance unchanged
-    const bettor2BalanceAfter = (await getAccount(connection, bettor2TokenAccount)).amount;
+    const bettor2BalanceAfter = (
+      await getAccount(connection, bettor2TokenAccount)
+    ).amount;
     assert.equal(
       Number(bettor2BalanceBefore),
       Number(bettor2BalanceAfter),
@@ -593,7 +612,10 @@ describe("place_bet", () => {
     );
 
     const marketUnlocked = await program.account.market.fetch(marketPda);
-    assert.isFalse(marketUnlocked.mpcLock, "mpc_lock should be released after callback");
+    assert.isFalse(
+      marketUnlocked.mpcLock,
+      "mpc_lock should be released after callback"
+    );
     console.log("    Lock released after callback");
   });
 
@@ -672,7 +694,9 @@ describe("place_bet", () => {
     console.log("      name:", marketExpiredError!.name);
     console.log("      code:", marketExpiredError!.code);
     console.log("      msg:", marketExpiredError!.msg);
-    console.log("    Note: Runtime test skipped (requires Clock sysvar manipulation)");
+    console.log(
+      "    Note: Runtime test skipped (requires Clock sysvar manipulation)"
+    );
   });
 
   // ==========================================================================
@@ -739,7 +763,9 @@ describe("place_bet", () => {
           errStr.includes("Cannot bet on opposite side"),
         `Expected WrongSide error, got: ${errStr.substring(0, 200)}`
       );
-      console.log("    WrongSide correctly rejected (bettor has Yes position, attempted No bet)");
+      console.log(
+        "    WrongSide correctly rejected (bettor has Yes position, attempted No bet)"
+      );
     }
   });
 });

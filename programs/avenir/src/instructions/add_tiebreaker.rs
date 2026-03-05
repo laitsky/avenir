@@ -81,18 +81,23 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, AddTiebreaker<'info>>) 
     dispute.voting_end = clock.unix_timestamp + 86400;
 
     // 7. Increment quorum by 1
-    dispute.quorum = dispute.quorum.checked_add(1).unwrap();
+    dispute.quorum = dispute.quorum.checked_add(1).ok_or(AvenirError::MathOverflow)?;
 
     // 8. Set tiebreaker_added
     dispute.tiebreaker_added = true;
 
     // 9. Increment active_disputes on the new resolver
-    // Re-serialize the resolver with incremented active_disputes
-    let mut updated_resolver = resolver;
-    updated_resolver.active_disputes = updated_resolver.active_disputes.checked_add(1).unwrap();
-    let mut writer = Vec::new();
-    updated_resolver.try_serialize(&mut writer).map_err(|_| AvenirError::NotSelectedJuror)?;
-    resolver_data[8..8 + writer.len()].copy_from_slice(&writer[8..]);
+    let mut resolver = resolver;
+    resolver.active_disputes = resolver
+        .active_disputes
+        .checked_add(1)
+        .ok_or(AvenirError::MathOverflow)?;
+
+    // Re-serialize the updated resolver back in-place (same pattern as open_dispute)
+    let mut writer = resolver_data.as_mut();
+    resolver
+        .try_serialize(&mut writer)
+        .map_err(|_| AvenirError::NotSelectedJuror)?;
 
     msg!(
         "add_tiebreaker: added juror {} to dispute for market {}, quorum now {}, voting_end={}",

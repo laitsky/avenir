@@ -18,7 +18,10 @@ pub fn handler(ctx: Context<ResolveMarket>, winning_outcome: u8) -> Result<()> {
 
     // Validate within 48-hour grace period (172800 seconds)
     // After this window, the market must be resolved via dispute escalation
-    let grace_deadline = market.resolution_time.checked_add(172_800).unwrap();
+    let grace_deadline = market
+        .resolution_time
+        .checked_add(172_800)
+        .ok_or(AvenirError::MathOverflow)?;
     require!(
         clock.unix_timestamp <= grace_deadline,
         AvenirError::GracePeriodExpired

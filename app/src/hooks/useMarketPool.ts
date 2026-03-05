@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useConnection } from '@solana/wallet-adapter-react'
-import { useReadOnlyProgram } from '#/lib/anchor'
-import { getMarketPoolPda } from '#/lib/pda'
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { useReadOnlyProgram } from "#/lib/anchor";
+import { getMarketPoolPda } from "#/lib/pda";
 
 /**
  * Checks if a MarketPool has been initialized by the MPC callback.
@@ -12,13 +12,13 @@ import { getMarketPoolPda } from '#/lib/pda'
  * representations of zero -- which are non-zero byte arrays.
  */
 export function isPoolInitialized(pool: {
-  yesPoolEncrypted: number[]
-  noPoolEncrypted: number[]
+  yesPoolEncrypted: number[];
+  noPoolEncrypted: number[];
 }): boolean {
   return (
     !pool.yesPoolEncrypted.every((b: number) => b === 0) ||
     !pool.noPoolEncrypted.every((b: number) => b === 0)
-  )
+  );
 }
 
 /**
@@ -31,36 +31,36 @@ export function isPoolInitialized(pool: {
  * init_pool callback writing encrypted zeros).
  */
 export function useMarketPool(marketId: number) {
-  const program = useReadOnlyProgram()
-  const { connection } = useConnection()
-  const queryClient = useQueryClient()
+  const program = useReadOnlyProgram();
+  const { connection } = useConnection();
+  const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['marketPool', marketId],
+    queryKey: ["marketPool", marketId],
     queryFn: async () => {
-      const [poolPda] = getMarketPoolPda(marketId)
-      return await program.account.marketPool.fetch(poolPda)
+      const [poolPda] = getMarketPoolPda(marketId);
+      return await program.account.marketPool.fetch(poolPda);
     },
     enabled: marketId >= 0,
-  })
+  });
 
   // WebSocket subscription for real-time updates (detects init_pool callback)
   useEffect(() => {
-    const [poolPda] = getMarketPoolPda(marketId)
+    const [poolPda] = getMarketPoolPda(marketId);
     const subId = connection.onAccountChange(poolPda, () => {
-      queryClient.invalidateQueries({ queryKey: ['marketPool', marketId] })
-    })
+      queryClient.invalidateQueries({ queryKey: ["marketPool", marketId] });
+    });
     return () => {
-      connection.removeAccountChangeListener(subId)
-    }
-  }, [connection, marketId, queryClient])
+      connection.removeAccountChangeListener(subId);
+    };
+  }, [connection, marketId, queryClient]);
 
   const poolInitialized = query.data
     ? isPoolInitialized(query.data as any)
-    : false
+    : false;
 
   return {
     ...query,
     poolInitialized,
-  }
+  };
 }
