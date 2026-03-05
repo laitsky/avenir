@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 09-02-PLAN.md (header search bar)
-last_updated: "2026-03-05T01:46:10.840Z"
+stopped_at: Completed 09-01-PLAN.md (portfolio page + useUserPositions hook)
+last_updated: "2026-03-05T01:46:44.928Z"
 progress:
   total_phases: 11
   completed_phases: 10
   total_plans: 42
-  completed_plans: 40
+  completed_plans: 41
 ---
 
 # Project State
@@ -93,6 +93,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 12 P02 | 1min | 1 tasks | 1 files |
 | Phase 12 P01 | 4min | 2 tasks | 3 files |
 | Phase 09-portfolio-search P02 | 2 | 2 tasks | 2 files |
+| Phase 09 P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -222,6 +223,8 @@ Recent decisions affecting current work:
 - [12-01]: Recovery init_pool button appears after 30s timeout matching CONTEXT.md recommendation
 - [Phase 09-02]: Client-side filtering against already-fetched useMarkets data -- no infrastructure overhead for v1 market count
 - [Phase 09-02]: hidden md:block wrapper on SearchBar -- mobile overlay deferred to Plan 03
+- [Phase 09]: memcmp offset 16 for user pubkey in UserPosition: discriminator (8) + market_id (8) = 16 bytes before user field
+- [Phase 09]: ClaimablePositionCard as separate sub-component so each card gets its own useClaimPayout hook instance
 
 ### Pending Todos
 
@@ -236,7 +239,7 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-05T01:46:10.838Z
-**Stopped at:** Completed 09-02-PLAN.md (header search bar)
+**Last session:** 2026-03-05T01:46:44.926Z
+**Stopped at:** Completed 09-01-PLAN.md (portfolio page + useUserPositions hook)
 **Resume file:** None
 **Note:** Phase 12 complete (2/2). useCreateMarket chains create_market + init_pool. BetPlacement has 13-mode state machine with pool-initializing gate. All 39 plans across 12 phases complete.

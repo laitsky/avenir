@@ -258,7 +258,7 @@ Plans:
   2. New markets accept their first bet without MPC failure due to uninitialized pool
   3. Each encrypt call in encryption.ts uses a unique nonce (no nonce reuse between isYes and amount)
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 12-01: useCreateMarket hook (create_market + init_pool chaining) + pool-initializing gate in BetPlacement (Wave 1)
@@ -283,7 +283,7 @@ Phases 2, 3, 4 execute in parallel after Phase 1. Phase 5 requires 2+3. Phase 7 
 | 6. Resolution & Payouts | 5/5 | Complete | 2026-03-04 |
 | 7. Core UI Integration | 3/3 | Complete | 2026-03-04 |
 | 8. Dispute System | 0/6 | Planned | - |
-| 9. Portfolio & Search | 1/3 | In Progress|  |
+| 9. Portfolio & Search | 2/3 | In Progress|  |
 | 10. RTG Submission | 0/3 | Not started | - |
 | 11. Wire Dispute Frontend Hooks | 2/2 | Complete    | 2026-03-04 |
 | 12. Pool Init & Encryption Hardening | 2/2 | Complete    | 2026-03-04 |

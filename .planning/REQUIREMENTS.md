@@ -41,7 +41,7 @@ Requirements for initial release / RTG submission. Each maps to roadmap phases.
 - [x] **UX-01**: Homepage displays a tiled market feed with category tabs and sorting (trending, newest, ending soon)
 - [x] **UX-02**: Market detail page shows question, description, deadline countdown, fog-wrapped sentiment, and bet placement interface
 - [x] **UX-03**: User can connect Solana wallet (Phantom, Solflare, Backpack)
-- [ ] **UX-04**: Portfolio view shows active positions, potential payouts, and resolved bet history
+- [x] **UX-04**: Portfolio view shows active positions, potential payouts, and resolved bet history
 - [x] **UX-05**: Full-text search across market questions, descriptions, and categories
 - [x] **UX-06**: Fog gradients overlay encrypted data (pool amounts, sentiment, jury votes, market cards)
 - [x] **UX-07**: Fog clears with animation when data is revealed (resolution, dispute outcome)
@@ -137,7 +137,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-01 | Phase 7: Core UI Integration | Complete |
 | UX-02 | Phase 7: Core UI Integration | Complete |
 | UX-03 | Phase 7: Core UI Integration | Complete |
-| UX-04 | Phase 9: Portfolio & Search | Pending |
+| UX-04 | Phase 9: Portfolio & Search | Complete |
 | UX-05 | Phase 9: Portfolio & Search | Complete |
 | UX-06 | Phase 4: Design System & Fog | Complete |
 | UX-07 | Phase 4: Design System & Fog | Complete |
