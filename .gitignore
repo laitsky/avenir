@@ -11,5 +11,10 @@ yarn.lock
 artifacts
 build
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # Planning docs (internal only)
 .planning/
