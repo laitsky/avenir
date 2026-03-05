@@ -358,7 +358,7 @@ function Portfolio() {
             </p>
             <button
               type="button"
-              onClick={() => setVisible(true)}
+              onClick={() => setVisible?.(true)}
               className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-5 py-2.5 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
             >
               Connect Wallet
