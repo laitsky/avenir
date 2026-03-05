@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import {
   HeadContent,
   Outlet,
@@ -34,34 +33,24 @@ export const Route = createRootRoute({
   component: RootLayout,
 })
 
-function useMounted() {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  return mounted
-}
-
 function RootLayout() {
-  const mounted = useMounted()
-
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        {mounted ? (
-          <ConnectionProvider endpoint={RPC_ENDPOINT}>
-            <WalletProvider wallets={[]} autoConnect>
-              <WalletModalProvider>
-                <Header />
-                <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
-                  <Outlet />
-                </main>
-                <Toaster theme="dark" position="bottom-right" />
-              </WalletModalProvider>
-            </WalletProvider>
-          </ConnectionProvider>
-        ) : null}
+        <ConnectionProvider endpoint={RPC_ENDPOINT}>
+          <WalletProvider wallets={[]} autoConnect>
+            <WalletModalProvider>
+              <Header />
+              <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
+                <Outlet />
+              </main>
+              <Toaster theme="dark" position="bottom-right" />
+            </WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
         <Scripts />
       </body>
     </html>

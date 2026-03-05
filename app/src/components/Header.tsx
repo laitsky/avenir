@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { ClientOnly } from '@tanstack/react-router'
 import { Menu, X, Search } from 'lucide-react'
 import { WalletButton } from '#/components/wallet/WalletButton'
 import { SearchBar } from '#/components/search/SearchBar'
@@ -65,18 +64,7 @@ export function Header() {
               Portfolio
             </Link>
             <SearchBar />
-            <ClientOnly
-              fallback={
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
-                >
-                  Connect Wallet
-                </button>
-              }
-            >
-              <WalletButton />
-            </ClientOnly>
+            <WalletButton />
           </div>
 
           {/* Mobile icon buttons (below md) */}
@@ -122,18 +110,7 @@ export function Header() {
                 Portfolio
               </Link>
               <div className="px-6 py-4">
-                <ClientOnly
-                  fallback={
-                    <button
-                      type="button"
-                      className="cursor-pointer rounded-lg border border-accent/25 bg-accent/5 px-4 py-2 text-[13px] font-medium text-accent transition-all hover:border-accent/40 hover:bg-accent/10"
-                    >
-                      Connect Wallet
-                    </button>
-                  }
-                >
-                  <WalletButton />
-                </ClientOnly>
+                <WalletButton />
               </div>
             </div>
           </div>
