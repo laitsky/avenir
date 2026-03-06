@@ -17,12 +17,17 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
-  build: {
-    rollupOptions: {
-      // @arcium-hq/client depends on Node's `crypto` and cannot be bundled for browsers.
-      // It's only loaded via dynamic import() at runtime in guarded code paths.
-      external: ["@arcium-hq/client"],
+  resolve: {
+    alias: {
+      // @arcium-hq/client@0.5.2 imports Node `crypto` at module top level.
+      // Alias to crypto-browserify so the SDK can be bundled for the browser.
+      crypto: "crypto-browserify",
+      stream: "stream-browserify",
     },
+  },
+  define: {
+    // Some transitive deps (crypto-browserify) reference `process.browser`
+    "process.browser": true,
   },
 });
 

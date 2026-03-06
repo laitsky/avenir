@@ -1,9 +1,33 @@
 import { useMemo } from "react";
 import { Program, AnchorProvider } from "@coral-xyz/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import type { Avenir } from "#/lib/idl/avenir";
 import idl from "#/lib/idl/avenir.json";
+
+/**
+ * Creates a read-only AnchorProvider for non-hook code that needs to fetch
+ * on-chain data (e.g. MXE public key lookup). Uses a dummy wallet that
+ * cannot sign -- suitable for account reads only.
+ */
+export function createReadonlyAnchorProvider(
+  connection: Connection
+): AnchorProvider {
+  const dummyWallet = {
+    publicKey: new PublicKey("11111111111111111111111111111111"),
+    payer: undefined,
+    signTransaction: async () => {
+      throw new Error("Read-only provider");
+    },
+    signAllTransactions: async () => {
+      throw new Error("Read-only provider");
+    },
+  } as any;
+
+  return new AnchorProvider(connection, dummyWallet, {
+    commitment: "confirmed",
+  });
+}
 
 /**
  * Returns a typed Program<Avenir> instance when wallet is connected.
@@ -34,21 +58,9 @@ export function useReadOnlyProgram(): Program<Avenir> {
   const { connection } = useConnection();
 
   return useMemo(() => {
-    const dummyWallet = {
-      publicKey: new PublicKey("11111111111111111111111111111111"),
-      payer: undefined,
-      signTransaction: async () => {
-        throw new Error("Read-only provider");
-      },
-      signAllTransactions: async () => {
-        throw new Error("Read-only provider");
-      },
-    } as any;
-
-    const provider = new AnchorProvider(connection, dummyWallet, {
-      commitment: "confirmed",
-    });
-
-    return new Program<Avenir>(idl as unknown as Avenir, provider);
+    return new Program<Avenir>(
+      idl as unknown as Avenir,
+      createReadonlyAnchorProvider(connection)
+    );
   }, [connection]);
 }
