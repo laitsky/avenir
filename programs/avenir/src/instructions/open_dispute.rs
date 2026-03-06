@@ -48,7 +48,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, OpenDispute<'info>>) ->
     );
 
     // 6. Select 7 jurors deterministically using Fisher-Yates partial shuffle
-    let seed = market.id ^ (clock.slot as u64);
+    let seed = market.id;
     let mut available: Vec<usize> = (0..resolver_count).collect();
     let mut selected_indices: Vec<usize> = Vec::with_capacity(JUROR_COUNT);
 

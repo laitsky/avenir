@@ -32,7 +32,6 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, AddTiebreaker<'info>>) 
     let seed = dispute
         .market_id
         .wrapping_mul(6364136223846793005)
-        ^ clock.slot
         ^ (dispute.vote_count as u64);
 
     let registry_len = registry.resolvers.len() as u64;

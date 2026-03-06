@@ -42,15 +42,15 @@ Plans:
 **Depends on**: Phase 8, Phase 11
 **Gap Closure**: Closes `RES-03`, `RES-06`; fixes the audit's `useOpenDispute` -> `open_dispute` integration mismatch and unblocks the dispute lifecycle
 **Requirements**: RES-03, RES-06
+**Plans:** 2 plans
 **Success Criteria** (what must be TRUE):
-  1. `useOpenDispute` derives or fetches resolver ordering that matches the instruction's slot-based validation
+  1. `useOpenDispute` derives or fetches resolver ordering that matches the instruction's deterministic validation
   2. `remaining_accounts` are passed in the exact order expected by `open_dispute`
   3. Escalation succeeds end-to-end and the downstream finalize flow is no longer blocked by account-contract mismatch
 
 Plans:
-- [ ] 14-01: Reconcile client resolver ordering with the on-chain juror selection contract
-- [ ] 14-02: Update dispute escalation wiring to pass validated `remaining_accounts`
-- [ ] 14-03: Re-verify the `grace -> escalate -> vote -> finalize` path after the ordering fix
+- [ ] 14-01-PLAN.md -- Fix on-chain seeds to be client-predictable, create shared juror-selection.ts with TDD tests
+- [ ] 14-02-PLAN.md -- Wire selectJurors/selectTiebreakerJuror into useOpenDispute and useAddTiebreaker hooks
 
 ### Phase 15: Wire Market Creation Into Live UI Flow
 **Goal**: Restore the missing routed entrypoint for live market creation so the shipped app can exercise the full create -> init_pool -> bet lifecycle.
