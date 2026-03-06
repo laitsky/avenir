@@ -142,7 +142,11 @@ export async function setupArciumContext(
  * Encrypts a bet input for submission to the update_pool MPC computation.
  *
  * Generates an x25519 keypair, derives a shared secret with the MXE,
- * creates a RescueCipher, and encrypts isYes (as BigInt 0/1) and amount.
+ * creates a RescueCipher, and encrypts isYes and amount in a single combined
+ * `cipher.encrypt([isYes, amount], nonce)` call. This matches the live
+ * browser-side contract in `app/src/lib/client-encryption.ts` and avoids the
+ * CTR counter-reuse bug of the previous split-call approach.
+ *
  * Also generates a random computation offset for the computation account PDA.
  */
 export function encryptBetInput(
@@ -158,17 +162,22 @@ export function encryptBetInput(
   const sharedSecret = x25519.getSharedSecret(privateKey, mxePublicKey);
   const cipher = new RescueCipher(sharedSecret);
 
-  // Encrypt BetInput fields
+  // Encrypt both bet fields in one combined call.
+  // One nonce, one encrypt invocation -- each plaintext element gets a
+  // distinct CTR counter block, preventing the counter-reuse bug that
+  // occurred with two separate same-nonce encrypt calls.
   const nonce = randomBytes(16);
-  const isYesCiphertext = cipher.encrypt([BigInt(isYes ? 1 : 0)], nonce);
-  const amountCiphertext = cipher.encrypt([BigInt(amount)], nonce);
+  const [isYesCiphertext, amountCiphertext] = cipher.encrypt(
+    [BigInt(isYes ? 1 : 0), BigInt(amount)],
+    nonce
+  );
 
   // Random computation offset
   const computationOffset = new anchor.BN(randomBytes(8), "hex");
 
   return {
-    isYesCiphertext: isYesCiphertext[0],
-    amountCiphertext: amountCiphertext[0],
+    isYesCiphertext,
+    amountCiphertext,
     publicKey,
     nonce,
     nonceBN: new anchor.BN(deserializeLE(nonce).toString()),
