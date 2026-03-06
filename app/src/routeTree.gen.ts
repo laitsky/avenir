@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CreateRouteImport } from './routes/create'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketIdRouteImport } from './routes/market/$id'
 
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
@@ -31,29 +37,33 @@ const MarketIdRoute = MarketIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
   '/portfolio': typeof PortfolioRoute
   '/market/$id': typeof MarketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
   '/portfolio': typeof PortfolioRoute
   '/market/$id': typeof MarketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
   '/portfolio': typeof PortfolioRoute
   '/market/$id': typeof MarketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/portfolio' | '/market/$id'
+  fullPaths: '/' | '/create' | '/portfolio' | '/market/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/portfolio' | '/market/$id'
-  id: '__root__' | '/' | '/portfolio' | '/market/$id'
+  to: '/' | '/create' | '/portfolio' | '/market/$id'
+  id: '__root__' | '/' | '/create' | '/portfolio' | '/market/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  CreateRoute: typeof CreateRoute
   IndexRoute: typeof IndexRoute
   PortfolioRoute: typeof PortfolioRoute
   MarketIdRoute: typeof MarketIdRoute
@@ -61,6 +71,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portfolio': {
       id: '/portfolio'
       path: '/portfolio'
@@ -86,6 +103,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  CreateRoute: CreateRoute,
   IndexRoute: IndexRoute,
   PortfolioRoute: PortfolioRoute,
   MarketIdRoute: MarketIdRoute,

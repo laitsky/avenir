@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Menu, X, Search } from 'lucide-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletButton } from '#/components/wallet/WalletButton'
 import { SearchBar } from '#/components/search/SearchBar'
+import { useWhitelist } from '#/hooks/useWhitelist'
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+
+  const { publicKey } = useWallet()
+  const { data: isWhitelisted } = useWhitelist(publicKey ?? null)
 
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
@@ -63,6 +68,15 @@ export function Header() {
             >
               Portfolio
             </Link>
+            {isWhitelisted && (
+              <Link
+                to="/create"
+                className="text-[13px] text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
+                activeProps={{ className: 'active text-foreground' }}
+              >
+                Create
+              </Link>
+            )}
             <SearchBar />
             <WalletButton />
           </div>
@@ -109,6 +123,16 @@ export function Header() {
               >
                 Portfolio
               </Link>
+              {isWhitelisted && (
+                <Link
+                  to="/create"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex min-h-[44px] items-center px-6 py-4 text-[15px] text-muted-foreground transition-colors hover:text-foreground no-underline [&.active]:text-foreground"
+                  activeProps={{ className: 'active text-foreground' }}
+                >
+                  Create
+                </Link>
+              )}
               <div className="px-6 py-4">
                 <WalletButton />
               </div>
