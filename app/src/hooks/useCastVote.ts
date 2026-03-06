@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
 import { useAnchorProgram } from "#/lib/anchor";
 import {
   getArciumClusterOffset,
@@ -18,6 +17,7 @@ import {
   getMXEAccountAddress,
   getMempoolAccountAddress,
 } from "#/lib/arcium";
+import { encryptVoteForMpcClient } from "#/lib/client-encryption";
 import { PROGRAM_ID } from "#/lib/constants";
 import {
   getMarketPda,
@@ -25,21 +25,20 @@ import {
   getDisputeTallyPda,
   getResolverPda,
 } from "#/lib/pda";
-import { encryptVoteForMpc } from "#/server/arcium-encryption";
 
 /**
  * Hook for submitting encrypted juror votes on active disputes.
  *
- * Encrypts the vote boolean using @arcium-hq/client (mirroring usePlaceBet pattern),
+ * Encrypts the vote boolean in-browser via the shared client-encryption helper,
  * builds and sends the cast_vote transaction with all required PDA accounts.
  *
  * Returns { castVote, loading, error } for the JurorVotePanel UI.
  */
 export function useCastVote(marketId: number) {
   const program = useAnchorProgram();
+  const { connection } = useConnection();
   const { publicKey } = useWallet();
   const queryClient = useQueryClient();
-  const encryptVote = useServerFn(encryptVoteForMpc);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,13 +52,12 @@ export function useCastVote(marketId: number) {
     setError(null);
 
     try {
-      // 1. Encrypt the vote boolean (server-side)
-      const encrypted = await encryptVote({
-        data: {
-          programId: PROGRAM_ID.toBase58(),
-          isYes,
-        },
-      });
+      // 1. Encrypt the vote boolean (browser-side)
+      const encrypted = await encryptVoteForMpcClient(
+        connection,
+        PROGRAM_ID,
+        isYes
+      );
 
       // 2. Derive all PDAs
       const [marketPda] = getMarketPda(marketId);
@@ -72,7 +70,7 @@ export function useCastVote(marketId: number) {
         crypto.getRandomValues(new Uint8Array(8))
       );
 
-      // 3. Arcium account derivation (no browser @arcium-hq/client dependency)
+      // 3. Arcium account derivation
       const clusterOffset = getArciumClusterOffset();
 
       const arciumAccounts = {
