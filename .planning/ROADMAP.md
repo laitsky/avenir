@@ -42,7 +42,7 @@ Plans:
 **Depends on**: Phase 8, Phase 11
 **Gap Closure**: Closes `RES-03`, `RES-06`; fixes the audit's `useOpenDispute` -> `open_dispute` integration mismatch and unblocks the dispute lifecycle
 **Requirements**: RES-03, RES-06
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 **Success Criteria** (what must be TRUE):
   1. `useOpenDispute` derives or fetches resolver ordering that matches the instruction's deterministic validation
   2. `remaining_accounts` are passed in the exact order expected by `open_dispute`

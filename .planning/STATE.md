@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Post-Audit Gap Closure
 status: executing
-stopped_at: Phase 14 context gathered
-last_updated: "2026-03-06T07:09:58.624Z"
-last_activity: 2026-03-06 -- Completed 13-03 (cleanup, verification, app-side test proof)
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-03-06T07:40:03.344Z"
+last_activity: 2026-03-06 -- Completed 14-01 (predictable seeds, juror-selection.ts)
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 84
+  total_plans: 5
+  completed_plans: 4
+  percent: 98
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 13-restore-client-side-encryption-boundary (complete)
-Plan: 13-01 complete, 13-02 complete, 13-03 complete
-Status: v1.0 gap closure executing; Phase 13 complete -- browser encryption boundary restored and verified
-Last activity: 2026-03-06 -- Completed 13-03 (cleanup, verification, app-side test proof)
+Phase: 14-repair-dispute-escalation-account-ordering (executing)
+Plan: 14-01 complete, 14-02 pending
+Status: v1.0 gap closure executing; Phase 14 plan 01 complete -- predictable juror selection seeds and shared TS module
+Last activity: 2026-03-06 -- Completed 14-01 (predictable seeds, juror-selection.ts)
 
-Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░] 84%
+Progress: [██████████] 98%
 
 ## Performance Metrics
 
@@ -103,6 +103,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 | Phase 13 P02 | 2min | 2 tasks | 2 files |
 | Phase 13 P03 | 6min | 2 tasks | 4 files |
 | Phase 13 P03 | 6min | 2 tasks | 4 files |
+| Phase 14 P01 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -256,6 +257,8 @@ Recent decisions affecting current work:
 - [Phase 13]: Server encryption module replaced with guard (not deleted) -- provides runtime error if accidentally re-imported
 - [Phase 13]: Fast SDK tests use locally generated x25519 keys -- proves cipher contract without DKG/Arcium runtime
 - [Phase 13]: MPC integration tests gated behind ARCIUM_INTEGRATION_TESTS env flag to separate fast from live tests
+- [Phase 14]: market.id alone as open_dispute seed (simplest predictable value)
+- [Phase 14]: BigInt u64 masking after each wrapping operation for Rust parity
 
 ### Pending Todos
 
@@ -270,7 +273,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-**Last session:** 2026-03-06T07:09:58.621Z
-**Stopped at:** Phase 14 context gathered
-**Resume file:** .planning/phases/14-repair-dispute-escalation-account-ordering/14-CONTEXT.md
+**Last session:** 2026-03-06T07:40:03.341Z
+**Stopped at:** Completed 14-01-PLAN.md
+**Resume file:** None
 **Note:** Phase 13 complete. All 3 plans executed: browser encryption boundary restored (01+02), server boundary guarded, tests verified (03). Next: Phase 14+ gap closure.
