@@ -9,6 +9,7 @@ import {
   getResolverRegistryPda,
   getResolverPda,
 } from "#/lib/pda";
+import { selectTiebreakerJuror } from "#/lib/juror-selection";
 
 /**
  * Submits the add_tiebreaker instruction for tie scenarios.
@@ -16,10 +17,9 @@ import {
  * This is a plain Anchor instruction (NOT an MPC queue instruction).
  * Any wallet can trigger it when a dispute has been reset to Voting after a tie.
  *
- * The on-chain code uses clock.slot + LCG for deterministic juror selection,
- * which the client cannot predict. The client passes a candidate Resolver PDA
- * as remaining_accounts. If the slot-based selection doesn't match, the TX
- * will fail and the user can retry (different slot = different selection).
+ * Selection is deterministic using selectTiebreakerJuror which replicates the
+ * on-chain LCG algorithm with market_id and vote_count as seed inputs.
+ * The client computes the exact tiebreaker juror before TX submission.
  */
 export function useAddTiebreaker(marketId: number) {
   const program = useAnchorProgram();
@@ -43,24 +43,24 @@ export function useAddTiebreaker(marketId: number) {
       );
       const resolvers: PublicKey[] = (registry as any).resolvers;
 
-      // Fetch dispute to get current jurors
+      // Fetch dispute to get current jurors and vote count
       const dispute = await readOnlyProgram.account.dispute.fetch(disputePda);
       const currentJurors: PublicKey[] = (dispute as any).jurors;
-      const currentJurorKeys = new Set(currentJurors.map((j) => j.toBase58()));
+      const voteCount: number = (dispute as any).voteCount;
 
-      // Find non-juror candidates from registry
-      const candidates = resolvers.filter(
-        (r) => !currentJurorKeys.has(r.toBase58())
+      // Select tiebreaker using same deterministic algorithm as on-chain
+      const selectedJuror = selectTiebreakerJuror(
+        marketId,
+        voteCount,
+        resolvers,
+        currentJurors
       );
 
-      if (candidates.length === 0) {
+      if (!selectedJuror) {
         throw new Error("No eligible resolver candidates for tiebreaker");
       }
 
-      // Build remaining_accounts with the first candidate resolver PDA.
-      // If only 1 candidate, it's guaranteed to match on-chain selection.
-      // If multiple, the TX may fail due to slot mismatch -- user can retry.
-      const candidateResolverPda = getResolverPda(candidates[0])[0];
+      const candidateResolverPda = getResolverPda(selectedJuror)[0];
 
       const sig = await program.methods
         .addTiebreaker()
