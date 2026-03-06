@@ -55,6 +55,50 @@ export interface EncryptedBetResult {
   nonceBN: string;
 }
 
+export interface EncryptedVoteResult {
+  voteCiphertext: number[];
+  publicKey: number[];
+  nonce: number[];
+  nonceBN: string;
+}
+
+/**
+ * Encrypts a juror vote in the browser for submission to the cast_vote
+ * instruction.
+ *
+ * Uses a single `cipher.encrypt([isYes], nonce)` call -- one field, one nonce.
+ * This is intentionally simpler than the bet path which encrypts two fields
+ * (isYes + amount) in a combined call.
+ */
+export async function encryptVoteForMpcClient(
+  connection: Connection,
+  programId: PublicKey,
+  isYes: boolean
+): Promise<EncryptedVoteResult> {
+  const { deserializeLE } = await import("@arcium-hq/client");
+  const { cipher, publicKey } = await prepareEncryptionContext(
+    connection,
+    programId
+  );
+
+  const nonce = crypto.getRandomValues(new Uint8Array(16));
+
+  // Single-field encrypt: vote is just a boolean (1 or 0)
+  const [voteCiphertext] = cipher.encrypt(
+    [BigInt(isYes ? 1 : 0)],
+    nonce
+  );
+
+  const nonceBN = deserializeLE(nonce);
+
+  return {
+    voteCiphertext: Array.from(voteCiphertext),
+    publicKey: Array.from(publicKey),
+    nonce: Array.from(nonce),
+    nonceBN: nonceBN.toString(),
+  };
+}
+
 /**
  * Encrypts a bet payload in the browser for submission to the place_bet
  * instruction.
