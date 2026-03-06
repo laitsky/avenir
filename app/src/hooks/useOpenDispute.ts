@@ -26,6 +26,7 @@ import {
   getDisputeTallyPda,
   getResolverPda,
 } from "#/lib/pda";
+import { selectJurors } from "#/lib/juror-selection";
 
 export type EscalateStep =
   | "idle"
@@ -43,8 +44,13 @@ const BASE_DELAY_MS = 2000;
 /**
  * Handles the full dispute escalation flow:
  * 1. Pre-check resolver count (>= 7 required)
- * 2. Submit open_dispute TX with resolver remaining_accounts
- * 3. Auto-chain init_dispute_tally TX for MPC encrypted vote state
+ * 2. Compute deterministic juror selection via selectJurors (Fisher-Yates)
+ * 3. Submit open_dispute TX with exactly 7 selected resolver remaining_accounts
+ * 4. Auto-chain init_dispute_tally TX for MPC encrypted vote state
+ *
+ * Juror selection is deterministic and client-predictable -- the shared
+ * selectJurors function replicates the on-chain Fisher-Yates algorithm using
+ * market.id as the seed, ensuring remaining_accounts match on-chain expectations.
  *
  * If open_dispute succeeds but init_dispute_tally fails, retry only retries
  * the init_dispute_tally step (dispute already exists on-chain).
@@ -105,9 +111,10 @@ export function useOpenDispute(marketId: number) {
       const [disputePda] = getDisputePda(marketId);
       const [disputeTallyPda] = getDisputeTallyPda(marketId);
 
-      // Build remaining_accounts: each resolver's Resolver PDA
-      const resolverAccounts = resolvers.map((resolverPubkey) => ({
-        pubkey: getResolverPda(resolverPubkey)[0],
+      // Select exactly 7 jurors using the same deterministic algorithm as on-chain
+      const selectedJurors = selectJurors(marketId, resolvers);
+      const resolverAccounts = selectedJurors.map((jurorPubkey) => ({
+        pubkey: getResolverPda(jurorPubkey)[0],
         isSigner: false,
         isWritable: true,
       }));
