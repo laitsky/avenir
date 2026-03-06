@@ -5,7 +5,6 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import BN from "bn.js";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
 import { useAnchorProgram } from "#/lib/anchor";
 import {
   getArciumClusterOffset,
@@ -19,6 +18,7 @@ import {
   getMXEAccountAddress,
   getMempoolAccountAddress,
 } from "#/lib/arcium";
+import { encryptBetForMpcClient } from "#/lib/client-encryption";
 import { PROGRAM_ID, USDC_MINT } from "#/lib/constants";
 import {
   getMarketPda,
@@ -26,7 +26,6 @@ import {
   getVaultPda,
   getPositionPda,
 } from "#/lib/pda";
-import { encryptBetForMpc } from "#/server/arcium-encryption";
 
 export type BetStep =
   | "idle"
@@ -43,6 +42,9 @@ const BASE_DELAY_MS = 2000;
 /**
  * Handles the full bet placement flow: encrypt -> submit -> confirm.
  *
+ * Encryption happens entirely in the browser via the shared client-encryption
+ * helper -- no plaintext bet payload crosses the browser/server boundary.
+ *
  * Tracks step state for UI progress indicators.
  * Implements exponential backoff retry for MPC lock contention.
  * Shows toast notifications on success/failure per CONTEXT.md.
@@ -52,7 +54,6 @@ export function usePlaceBet(marketId: number) {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
   const queryClient = useQueryClient();
-  const encryptBet = useServerFn(encryptBetForMpc);
 
   const [step, setStep] = useState<BetStep>("idle");
   const [retryCount, setRetryCount] = useState(0);
@@ -69,16 +70,15 @@ export function usePlaceBet(marketId: number) {
         throw new Error("Wallet not connected");
       }
 
-      // Step 1: Encrypt
+      // Step 1: Encrypt in the browser
       setStep("encrypting");
       const amountLamports = amount * 1_000_000; // USDC has 6 decimals
-      const encrypted = await encryptBet({
-        data: {
-          programId: PROGRAM_ID.toBase58(),
-          isYes,
-          amount: amountLamports,
-        },
-      });
+      const encrypted = await encryptBetForMpcClient(
+        connection,
+        PROGRAM_ID,
+        isYes,
+        amountLamports
+      );
 
       // Step 2: Submit
       setStep("submitting");
