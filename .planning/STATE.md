@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Post-Audit Gap Closure
 status: executing
-stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-03-06T07:40:03.344Z"
-last_activity: 2026-03-06 -- Completed 14-01 (predictable seeds, juror-selection.ts)
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-03-06T07:44:18.994Z"
+last_activity: 2026-03-06 -- Completed 14-02 (wired selectJurors/selectTiebreakerJuror into hooks)
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 98
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 14-repair-dispute-escalation-account-ordering (executing)
-Plan: 14-01 complete, 14-02 pending
-Status: v1.0 gap closure executing; Phase 14 plan 01 complete -- predictable juror selection seeds and shared TS module
-Last activity: 2026-03-06 -- Completed 14-01 (predictable seeds, juror-selection.ts)
+Phase: 14-repair-dispute-escalation-account-ordering (complete)
+Plan: 14-02 complete (2/2 plans done)
+Status: v1.0 gap closure executing; Phase 14 complete -- dispute hooks wired with deterministic juror selection
+Last activity: 2026-03-06 -- Completed 14-02 (wired selectJurors/selectTiebreakerJuror into hooks)
 
-Progress: [██████████] 98%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -104,6 +104,7 @@ Progress: [██████████] 98%
 | Phase 13 P03 | 6min | 2 tasks | 4 files |
 | Phase 13 P03 | 6min | 2 tasks | 4 files |
 | Phase 14 P01 | 3min | 2 tasks | 6 files |
+| Phase 14 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -259,6 +260,7 @@ Recent decisions affecting current work:
 - [Phase 13]: MPC integration tests gated behind ARCIUM_INTEGRATION_TESTS env flag to separate fast from live tests
 - [Phase 14]: market.id alone as open_dispute seed (simplest predictable value)
 - [Phase 14]: BigInt u64 masking after each wrapping operation for Rust parity
+- [14-02]: Hook structure preserved exactly -- only import and selection logic replaced, no mutation/retry/error changes needed
 
 ### Pending Todos
 
@@ -273,7 +275,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-**Last session:** 2026-03-06T07:40:03.341Z
-**Stopped at:** Completed 14-01-PLAN.md
+**Last session:** 2026-03-06T07:44:18.992Z
+**Stopped at:** Completed 14-02-PLAN.md
 **Resume file:** None
-**Note:** Phase 13 complete. All 3 plans executed: browser encryption boundary restored (01+02), server boundary guarded, tests verified (03). Next: Phase 14+ gap closure.
+**Note:** Phase 14 complete. Both plans executed: predictable seeds + juror-selection.ts (01), hooks wired with deterministic selection (02). RES-03 and RES-06 closed.

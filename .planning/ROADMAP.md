@@ -15,7 +15,7 @@
 ## Active Gap Closure Phases
 
 - [x] **Phase 13: Restore Client-Side Encryption Boundary** - Move live bet and vote encryption back to the browser and re-establish nonce-safe payload handling (completed 2026-03-06)
-- [ ] **Phase 14: Repair Dispute Escalation Account Ordering** - Align `useOpenDispute` with the on-chain juror ordering contract and unblock dispute finalization
+- [x] **Phase 14: Repair Dispute Escalation Account Ordering** - Align `useOpenDispute` with the on-chain juror ordering contract and unblock dispute finalization (completed 2026-03-06)
 - [ ] **Phase 15: Wire Market Creation Into Live UI Flow** - Expose `useCreateMarket` in the routed app and restore the create -> init_pool -> bet entrypoint
 - [ ] **Phase 16: RTG Publication And Audit Drift Cleanup** - Close `RTG-01`, refresh stale verification evidence, and prepare the milestone for re-audit
 
@@ -42,7 +42,7 @@ Plans:
 **Depends on**: Phase 8, Phase 11
 **Gap Closure**: Closes `RES-03`, `RES-06`; fixes the audit's `useOpenDispute` -> `open_dispute` integration mismatch and unblocks the dispute lifecycle
 **Requirements**: RES-03, RES-06
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 **Success Criteria** (what must be TRUE):
   1. `useOpenDispute` derives or fetches resolver ordering that matches the instruction's deterministic validation
   2. `remaining_accounts` are passed in the exact order expected by `open_dispute`
