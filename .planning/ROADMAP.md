@@ -57,14 +57,14 @@ Plans:
 **Depends on**: Phase 2, Phase 7, Phase 12
 **Gap Closure**: Closes the audit's broken market lifecycle flow where `useCreateMarket` exists but no route invokes it
 **Requirements**: Audit flow repair
-**Plans:** 2 plans
+**Plans:** 1/2 plans complete
 **Success Criteria** (what must be TRUE):
   1. The routed app exposes a live create-market entrypoint that invokes `useCreateMarket`
   2. Successful market creation leads to an initialized pool path ready for first-bet UX
   3. The create -> init_pool -> bet path is verifiable in the live app instead of being stranded in an unused hook
 
 Plans:
-- [ ] 15-01-PLAN.md -- Create useWhitelist hook and wire conditional Create link into Header
+- [x] 15-01-PLAN.md -- Create useWhitelist hook and wire conditional Create link into Header
 - [ ] 15-02-PLAN.md -- Create /create route with form, access gating, and post-creation redirect
 
 ### Phase 16: RTG Publication And Audit Drift Cleanup

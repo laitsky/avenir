@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Post-Audit Gap Closure
 status: executing
-stopped_at: Phase 15 context gathered
-last_updated: "2026-03-06T11:03:09.565Z"
-last_activity: 2026-03-06 -- Completed 14-02 (wired selectJurors/selectTiebreakerJuror into hooks)
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-06T11:33:01Z"
+last_activity: 2026-03-06 -- Completed 15-01 (useWhitelist hook + conditional Create nav link)
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_plans: 7
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -25,17 +25,17 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 14-repair-dispute-escalation-account-ordering (complete)
-Plan: 14-02 complete (2/2 plans done)
-Status: v1.0 gap closure executing; Phase 14 complete -- dispute hooks wired with deterministic juror selection
-Last activity: 2026-03-06 -- Completed 14-02 (wired selectJurors/selectTiebreakerJuror into hooks)
+Phase: 15-wire-market-creation-into-live-ui-flow (in progress)
+Plan: 15-01 complete (1/2 plans done)
+Status: v1.0 gap closure executing; useWhitelist hook + conditional Create nav link wired
+Last activity: 2026-03-06 -- Completed 15-01 (useWhitelist hook + conditional Create nav link)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 6min
 - Total execution time: 2.4 hours
 
@@ -105,6 +105,7 @@ Progress: [██████████] 100%
 | Phase 13 P03 | 6min | 2 tasks | 4 files |
 | Phase 14 P01 | 3min | 2 tasks | 6 files |
 | Phase 14 P02 | 2min | 2 tasks | 2 files |
+| Phase 15 P01 | 2min | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -261,6 +262,7 @@ Recent decisions affecting current work:
 - [Phase 14]: market.id alone as open_dispute seed (simplest predictable value)
 - [Phase 14]: BigInt u64 masking after each wrapping operation for Rust parity
 - [14-02]: Hook structure preserved exactly -- only import and selection logic replaced, no mutation/retry/error changes needed
+- [15-01]: Placeholder /create route added to unblock type-safe TanStack Router Link -- Plan 02 will replace with full form
 
 ### Pending Todos
 
@@ -275,7 +277,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-**Last session:** 2026-03-06T11:03:09.562Z
-**Stopped at:** Phase 15 context gathered
-**Resume file:** .planning/phases/15-wire-market-creation-into-live-ui-flow/15-CONTEXT.md
-**Note:** Phase 14 complete. Both plans executed: predictable seeds + juror-selection.ts (01), hooks wired with deterministic selection (02). RES-03 and RES-06 closed.
+**Last session:** 2026-03-06T11:33:01Z
+**Stopped at:** Completed 15-01-PLAN.md
+**Resume file:** .planning/phases/15-wire-market-creation-into-live-ui-flow/15-01-SUMMARY.md
+**Note:** Phase 15 plan 01 complete. useWhitelist hook created, Header wired with conditional Create link (desktop + mobile). Placeholder /create route added for type safety. Plan 02 next.
