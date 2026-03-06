@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Post-Audit Gap Closure
 status: executing
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-03-06T11:33:01Z"
-last_activity: 2026-03-06 -- Completed 15-01 (useWhitelist hook + conditional Create nav link)
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-03-06T11:37:39Z"
+last_activity: 2026-03-06 -- Completed 15-02 (full /create route with form, access gating, redirect)
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -25,17 +25,17 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 15-wire-market-creation-into-live-ui-flow (in progress)
-Plan: 15-01 complete (1/2 plans done)
-Status: v1.0 gap closure executing; useWhitelist hook + conditional Create nav link wired
-Last activity: 2026-03-06 -- Completed 15-01 (useWhitelist hook + conditional Create nav link)
+Phase: 15-wire-market-creation-into-live-ui-flow (complete)
+Plan: 15-02 complete (2/2 plans done)
+Status: Phase 15 complete; full /create route with form, access gating, and post-creation redirect
+Last activity: 2026-03-06 -- Completed 15-02 (full /create route with form, access gating, redirect)
 
-Progress: [████████░░] 86%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 41
+- Total plans completed: 42
 - Average duration: 6min
 - Total execution time: 2.4 hours
 
@@ -106,6 +106,7 @@ Progress: [████████░░] 86%
 | Phase 14 P01 | 3min | 2 tasks | 6 files |
 | Phase 14 P02 | 2min | 2 tasks | 2 files |
 | Phase 15 P01 | 2min | 1 tasks | 4 files |
+| Phase 15 P02 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -263,6 +264,8 @@ Recent decisions affecting current work:
 - [Phase 14]: BigInt u64 masking after each wrapping operation for Rust parity
 - [14-02]: Hook structure preserved exactly -- only import and selection logic replaced, no mutation/retry/error changes needed
 - [15-01]: Placeholder /create route added to unblock type-safe TanStack Router Link -- Plan 02 will replace with full form
+- [15-02]: MarketForm extracted as shared sub-component for both fog-gated (disabled) and interactive renders
+- [15-02]: Partial failure detected by step=error AND newMarketId!==null (market created, init_pool failed)
 
 ### Pending Todos
 
@@ -277,7 +280,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-**Last session:** 2026-03-06T11:33:01Z
-**Stopped at:** Completed 15-01-PLAN.md
-**Resume file:** .planning/phases/15-wire-market-creation-into-live-ui-flow/15-01-SUMMARY.md
-**Note:** Phase 15 plan 01 complete. useWhitelist hook created, Header wired with conditional Create link (desktop + mobile). Placeholder /create route added for type safety. Plan 02 next.
+**Last session:** 2026-03-06T11:37:39Z
+**Stopped at:** Completed 15-02-PLAN.md
+**Resume file:** .planning/phases/15-wire-market-creation-into-live-ui-flow/15-02-SUMMARY.md
+**Note:** Phase 15 complete (2/2 plans). Full /create route with form, three-state access gating (disconnected/fog/active), useCreateMarket integration, and post-creation redirect to /market/$id.

@@ -16,7 +16,7 @@
 
 - [x] **Phase 13: Restore Client-Side Encryption Boundary** - Move live bet and vote encryption back to the browser and re-establish nonce-safe payload handling (completed 2026-03-06)
 - [x] **Phase 14: Repair Dispute Escalation Account Ordering** - Align `useOpenDispute` with the on-chain juror ordering contract and unblock dispute finalization (completed 2026-03-06)
-- [ ] **Phase 15: Wire Market Creation Into Live UI Flow** - Expose `useCreateMarket` in the routed app and restore the create -> init_pool -> bet entrypoint
+- [x] **Phase 15: Wire Market Creation Into Live UI Flow** - Expose `useCreateMarket` in the routed app and restore the create -> init_pool -> bet entrypoint (completed 2026-03-06)
 - [ ] **Phase 16: RTG Publication And Audit Drift Cleanup** - Close `RTG-01`, refresh stale verification evidence, and prepare the milestone for re-audit
 
 ## Phase Details
@@ -57,7 +57,7 @@ Plans:
 **Depends on**: Phase 2, Phase 7, Phase 12
 **Gap Closure**: Closes the audit's broken market lifecycle flow where `useCreateMarket` exists but no route invokes it
 **Requirements**: Audit flow repair
-**Plans:** 1/2 plans complete
+**Plans:** 2/2 plans complete
 **Success Criteria** (what must be TRUE):
   1. The routed app exposes a live create-market entrypoint that invokes `useCreateMarket`
   2. Successful market creation leads to an initialized pool path ready for first-bet UX
