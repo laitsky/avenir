@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Post-Audit Gap Closure
-status: in_progress
-stopped_at: Completed 16-02 (Phase 11/12 verification re-verified with current evidence)
-last_updated: "2026-03-07T05:41:31Z"
-last_activity: 2026-03-07 -- Completed 16-02 (re-verified Phase 11/12 verification docs with gap-closure cross-references)
+status: complete
+stopped_at: Completed 16-03-PLAN.md (all gap-closure phases complete, milestone passes re-audit)
+last_updated: "2026-03-07T05:48:52.816Z"
+last_activity: 2026-03-07 -- Completed 16-03 (milestone audit, REQUIREMENTS.md, ROADMAP.md updated for re-audit)
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
-  percent: 90
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Encrypted betting pools that prevent herding -- users bet their genuine belief without seeing which side is winning
-**Current focus:** Plan and execute v1.0 post-audit gap-closure phases 13-16 before starting v1.1 scope
+**Current focus:** v1.0 post-audit gap-closure complete; milestone passes re-audit with 36/38 requirements satisfied
 
 ## Current Position
 
-Phase: 16-rtg-publication-and-audit-drift-cleanup (in progress)
-Plan: 16-02 complete (2/3 plans done)
-Status: Verification drift cleaned; Phase 11/12 re-verified with current evidence and gap-closure cross-references
-Last activity: 2026-03-07 -- Completed 16-02 (re-verified Phase 11/12 verification docs)
+Phase: 16-rtg-publication-and-audit-drift-cleanup (complete)
+Plan: 16-03 complete (3/3 plans done -- phase complete)
+Status: All gap-closure phases (13-16) complete; milestone audit passes with 36/38 requirements satisfied
+Last activity: 2026-03-07 -- Completed 16-03 (milestone audit, REQUIREMENTS.md, ROADMAP.md updated for re-audit)
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 42
+- Total plans completed: 43
 - Average duration: 6min
 - Total execution time: 2.4 hours
 
@@ -109,6 +109,7 @@ Progress: [█████████░] 90%
 | Phase 15 P02 | 2min | 1 tasks | 1 files |
 | Phase 16 P01 | 4min | 2 tasks | 1 files |
 | Phase 16 P02 | 5min | 2 tasks | 2 files |
+| Phase 16 P03 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -273,6 +274,8 @@ Recent decisions affecting current work:
 - [16-02]: Re-verification rewrites Observable Truths with current line numbers rather than patching old numbers
 - [16-02]: Cross-references to gap-closure phases embedded in Evidence column alongside line number citations
 - [16-02]: Phase 13/14/15 verification docs confirmed adequate rather than recreated
+- [Phase 16]: Milestone audit scores updated to 36/38 requirements, 12/12 phases, 5/5 integration, 5/5 flows
+- [Phase 16]: INF-02 and UX-08 preserved as partial/deferred -- not falsely marked as satisfied
 
 ### Pending Todos
 
@@ -287,7 +290,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-**Last session:** 2026-03-07T05:41:31Z
-**Stopped at:** Completed 16-02 (Phase 11/12 verification re-verified with current evidence)
-**Resume file:** .planning/phases/16-rtg-publication-and-audit-drift-cleanup/16-02-SUMMARY.md
-**Note:** Phase 16 plan 02 complete (2/3 plans). Phase 11 and 12 verification docs re-verified with current line numbers, Phase 14/13 cross-references, and confirmation that Phases 13/14/15 verification docs exist and pass. Clear regression -> fix -> re-verification audit trail established.
+**Last session:** 2026-03-07T05:48:52.814Z
+**Stopped at:** Completed 16-03-PLAN.md (all gap-closure phases complete, milestone passes re-audit)
+**Resume file:** None
+**Note:** Phase 16 complete (3/3 plans). All gap-closure phases (13-16) complete. Milestone audit updated to status: passed with 36/38 requirements satisfied. REQUIREMENTS.md shows 0 pending gap closures. ROADMAP.md shows all 4 gap-closure phases complete. Deferred items (INF-02, UX-08) explicitly preserved.
