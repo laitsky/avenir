@@ -3,21 +3,22 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-12 shipped on 2026-03-05 ([archive roadmap](milestones/v1.0-ROADMAP.md), [archive requirements](milestones/v1.0-REQUIREMENTS.md), [audit](milestones/v1.0-MILESTONE-AUDIT.md))
-- 🚧 **v1.0 Post-Audit Gap Closure** — Phases 13-16 planned from the 2026-03-06 milestone audit
+- ✅ **v1.0 Post-Audit Gap Closure** — Phases 13-16 completed 2026-03-07 ([audit](milestones/v1.0-MILESTONE-AUDIT.md))
 
 ## Current Status
 
-- The 2026-03-06 audit reopened `v1.0` because live integration drift broke parts of the archived Phase 11/12 closure and `RTG-01` remains open.
-- Active planning is limited to gap-closure phases 13-16. The shipped milestone definition remains archived in `.planning/milestones/v1.0-ROADMAP.md`.
-- Deferred optional cleanup from the audit stays out of scope for this pass: `INF-02` runtime validation, `UX-08` evidence cleanup, and manual browser/README verification items.
-- Next action: execute `Phase 16`.
+- All gap-closure phases (13-16) are complete. The v1.0 milestone passes re-audit with 36/38 requirements satisfied.
+- Phase 13 restored client-side encryption for bets and votes. Phase 14 fixed dispute escalation account ordering. Phase 15 wired market creation into the live UI. Phase 16 made the repo public, re-verified stale verification docs, and updated milestone artifacts.
+- The shipped milestone definition remains archived in `.planning/milestones/v1.0-ROADMAP.md`.
+- Deferred items remain out of scope: `INF-02` runtime validation (blocked by Arcium DKG), `UX-08` evidence cleanup, and manual browser/README verification items.
+- Milestone is ready for re-audit.
 
-## Active Gap Closure Phases
+## Completed Gap Closure Phases
 
 - [x] **Phase 13: Restore Client-Side Encryption Boundary** - Move live bet and vote encryption back to the browser and re-establish nonce-safe payload handling (completed 2026-03-06)
 - [x] **Phase 14: Repair Dispute Escalation Account Ordering** - Align `useOpenDispute` with the on-chain juror ordering contract and unblock dispute finalization (completed 2026-03-06)
 - [x] **Phase 15: Wire Market Creation Into Live UI Flow** - Expose `useCreateMarket` in the routed app and restore the create -> init_pool -> bet entrypoint (completed 2026-03-06)
-- [ ] **Phase 16: RTG Publication And Audit Drift Cleanup** - Close `RTG-01`, refresh stale verification evidence, and prepare the milestone for re-audit
+- [x] **Phase 16: RTG Publication And Audit Drift Cleanup** - Close `RTG-01`, refresh stale verification evidence, and prepare the milestone for re-audit (completed 2026-03-07)
 
 ## Phase Details
 
@@ -26,6 +27,7 @@
 **Depends on**: Phase 7, Phase 8, Phase 12
 **Gap Closure**: Closes `BET-02`, `INF-07`, `RES-05`; fixes the audit's frontend/server encryption boundary regressions in betting and dispute flows
 **Requirements**: BET-02, INF-07, RES-05
+**Plans:** 3/3 plans complete
 **Success Criteria** (what must be TRUE):
   1. Bet payload encryption happens in the browser and no plaintext bet input reaches `app/src/server/arcium-encryption.ts`
   2. Vote payload encryption happens in the browser and no plaintext juror vote reaches the server encryption path
@@ -33,9 +35,9 @@
   4. Betting and vote hooks submit ciphertext-compatible payloads that match the existing on-chain/MPC interfaces
 
 Plans:
-- [ ] 13-01: Move live bet encryption back to the client boundary and restore nonce-safe bet payload handling
-- [ ] 13-02: Move dispute vote encryption back to the client boundary and remove plaintext server handoff
-- [ ] 13-03: Re-verify encrypted payload handling across the live betting and voting hooks
+- [x] 13-01: Move live bet encryption back to the client boundary and restore nonce-safe bet payload handling
+- [x] 13-02: Move dispute vote encryption back to the client boundary and remove plaintext server handoff
+- [x] 13-03: Re-verify encrypted payload handling across the live betting and voting hooks
 
 ### Phase 14: Repair Dispute Escalation Account Ordering
 **Goal**: Make dispute escalation compatible with the on-chain juror-selection contract so the full dispute lifecycle works again.
@@ -49,8 +51,8 @@ Plans:
   3. Escalation succeeds end-to-end and the downstream finalize flow is no longer blocked by account-contract mismatch
 
 Plans:
-- [ ] 14-01-PLAN.md -- Fix on-chain seeds to be client-predictable, create shared juror-selection.ts with TDD tests
-- [ ] 14-02-PLAN.md -- Wire selectJurors/selectTiebreakerJuror into useOpenDispute and useAddTiebreaker hooks
+- [x] 14-01-PLAN.md -- Fix on-chain seeds to be client-predictable, create shared juror-selection.ts with TDD tests
+- [x] 14-02-PLAN.md -- Wire selectJurors/selectTiebreakerJuror into useOpenDispute and useAddTiebreaker hooks
 
 ### Phase 15: Wire Market Creation Into Live UI Flow
 **Goal**: Restore the missing routed entrypoint for live market creation so the shipped app can exercise the full create -> init_pool -> bet lifecycle.
@@ -65,14 +67,14 @@ Plans:
 
 Plans:
 - [x] 15-01-PLAN.md -- Create useWhitelist hook and wire conditional Create link into Header
-- [ ] 15-02-PLAN.md -- Create /create route with form, access gating, and post-creation redirect
+- [x] 15-02-PLAN.md -- Create /create route with form, access gating, and post-creation redirect
 
 ### Phase 16: RTG Publication And Audit Drift Cleanup
 **Goal**: Close the remaining publication blocker and bring milestone verification artifacts back in sync with the live repo after the code fixes land.
 **Depends on**: Phase 13, Phase 14, Phase 15
 **Gap Closure**: Closes `RTG-01` and the audit's verification-drift findings for phases 11 and 12
 **Requirements**: RTG-01
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 **Success Criteria** (what must be TRUE):
   1. The GitHub repository is public and RTG judges can access the project without private-repo blockers
   2. Phase 11 and Phase 12 verification artifacts no longer claim behavior contradicted by the live repo
@@ -81,4 +83,4 @@ Plans:
 Plans:
 - [x] 16-01-PLAN.md -- Pre-publication cleanup and make repository public (RTG-01 closure)
 - [x] 16-02-PLAN.md -- Re-verify Phase 11/12 and confirm Phase 13/14/15 verification adequacy
-- [ ] 16-03-PLAN.md -- Update milestone audit, REQUIREMENTS.md, and ROADMAP.md for re-audit readiness
+- [x] 16-03-PLAN.md -- Update milestone audit, REQUIREMENTS.md, and ROADMAP.md for re-audit readiness
