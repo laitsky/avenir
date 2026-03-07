@@ -145,18 +145,6 @@ Encrypted data creates a UX challenge: how do you show users that information ex
 
 When a market resolves and pool totals are decrypted, the fog clears with an animation revealing the true numbers underneath. The transition from obscured to clear reinforces the privacy story -- users experience the moment encryption ends.
 
-![Market feed with fog overlays](docs/screenshots/market-feed-fog.png)
-*Live market cards with fog gradients obscuring encrypted pool totals and sentiment data*
-
-![Encrypted sentiment behind fog](docs/screenshots/encrypted-sentiment.png)
-*Market detail view showing the coarse sentiment signal wrapped in fog -- users know the direction but not the magnitude*
-
-![Fog clears on resolution](docs/screenshots/fog-reveal-resolved.png)
-*A resolved market with fog cleared -- true pool totals and final odds are now visible*
-
-![Dispute voting fog](docs/screenshots/dispute-fog.png)
-*Dispute view with fog over the encrypted vote tally -- jurors cannot see how others have voted*
-
 ## Getting Started
 
 ### Prerequisites
