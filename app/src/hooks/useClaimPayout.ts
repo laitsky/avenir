@@ -8,14 +8,13 @@ import {
   getMarketPda,
   getVaultPda,
   getPositionPda,
-  getConfigPda,
 } from "#/lib/pda";
 
 /**
  * Submits a claimPayout instruction for winners.
  *
  * Derives all required PDAs: market, position, vault.
- * Fetches the config to determine the fee recipient's token account.
+ * Fetches the market snapshot to determine the fee recipient's token account.
  */
 export function useClaimPayout(marketId: number) {
   const program = useAnchorProgram();
@@ -32,7 +31,6 @@ export function useClaimPayout(marketId: number) {
       const [marketPda] = getMarketPda(marketId);
       const [vaultPda] = getVaultPda(marketId);
       const [positionPda] = getPositionPda(marketId, publicKey);
-      const [configPda] = getConfigPda();
 
       // User's USDC ATA
       const winnerTokenAccount = await getAssociatedTokenAddress(
@@ -40,11 +38,12 @@ export function useClaimPayout(marketId: number) {
         publicKey
       );
 
-      // Fetch config to get fee recipient
-      const config = await readOnlyProgram.account.config.fetch(configPda);
+      // claim_payout validates against market.config_fee_recipient, not the
+      // current Config account, so derive the ATA from the market snapshot.
+      const market = await readOnlyProgram.account.market.fetch(marketPda);
       const feeRecipientTokenAccount = await getAssociatedTokenAddress(
         USDC_MINT,
-        (config as any).feeRecipient
+        (market as any).configFeeRecipient
       );
 
       const sig = await program.methods
